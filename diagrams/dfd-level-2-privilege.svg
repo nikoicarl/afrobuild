@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350">
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle">DFD Level 2: Privilege Management</text>
+  
+  <!-- Process: Privilege (left) -->
+  <rect x="50" y="150" width="150" height="100" fill="#f0f0f0" stroke="#333" stroke-width="2" rx="5" ry="5"/>
+  <text x="125" y="200" font-family="Arial" font-size="18" text-anchor="middle">Privilege</text>
+  
+  <!-- Process: Add Privilege (middle top) -->
+  <rect x="325" y="100" width="200" height="80" fill="#e6f2ff" stroke="#4682b4" stroke-width="2" rx="10" ry="10"/>
+  <text x="425" y="150" font-family="Arial" font-size="18" text-anchor="middle">Add Privilege</text>
+  
+  <!-- Process: Update Privilege (middle bottom) -->
+  <rect x="325" y="220" width="200" height="80" fill="#e6f2ff" stroke="#4682b4" stroke-width="2" rx="10" ry="10"/>
+  <text x="425" y="270" font-family="Arial" font-size="18" text-anchor="middle">Update Privilege</text>
+  
+  <!-- Data Store: Privilege Table (right top) -->
+  <rect x="650" y="100" width="140" height="80" fill="#fff9e6" stroke="#e6b800" stroke-width="2" rx="5" ry="5"/>
+  <text x="720" y="150" font-family="Arial" font-size="18" text-anchor="middle">Privilege Table</text>
+  
+  <!-- Data Store: UserPrivilege (right bottom) -->
+  <rect x="650" y="220" width="140" height="80" fill="#fff9e6" stroke="#e6b800" stroke-width="2" rx="5" ry="5"/>
+  <text x="720" y="270" font-family="Arial" font-size="18" text-anchor="middle">UserPrivilege</text>
+  
+  <!-- Arrows from Privilege to processes -->
+  <line x1="200" y1="180" x2="325" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="200" y1="220" x2="325" y2="260" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Arrows from processes to data stores -->
+  <line x1="525" y1="140" x2="650" y2="140" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="525" y1="220" x2="650" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="525" y1="160" x2="650" y2="240" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="525" y1="260" x2="650" y2="260" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Define the arrowhead marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+</svg>
