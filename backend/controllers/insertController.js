@@ -8,12 +8,10 @@ const md5 = require('md5');
 
 module.exports = (socket, Database)=>{
     socket.on('insertNewProduct', async (browserblob)=>{
-        let logig_manage_product_name = browserblob.logig_manage_product_name;
-        let logig_manage_product_type = browserblob.logig_manage_product_type;
-        let logig_manage_product_generic = browserblob.logig_manage_product_generic;
-        let logig_manage_product_manufacturer = browserblob.logig_manage_product_manufacturer;
-        let logig_manage_product_description = browserblob.logig_manage_product_description;
-        let logig_manage_product_hiddenid = browserblob.logig_manage_product_hiddenid;
+        let name = browserblob.name;
+        let description = browserblob.description;
+        let generic = browserblob.price;
+        let hiddenid = browserblob.hiddenid;
 
         let melody1 = browserblob.melody1;
 
@@ -27,7 +25,7 @@ module.exports = (socket, Database)=>{
             const PrivilegeModel = new Privilege(Database, userid);
 
             //Check for empty
-            let result = await gf.ifEmpty([logig_manage_product_name]);
+            let result = await gf.ifEmpty([name]);
             if (result.includes('empty')) {
                 socket.emit(melody1+'_insertNewProduct', {
                     type: 'caution',
@@ -36,12 +34,12 @@ module.exports = (socket, Database)=>{
             } else {
                 let privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData;
 
-                let privilege = (logig_manage_product_hiddenid == "" || logig_manage_product_hiddenid == undefined) ? privilegeData.pharmacy.add_product : privilegeData.pharmacy.update_product;
+                let privilege = (hiddenid == "" || hiddenid == undefined) ? privilegeData.add_product : privilegeData.update_product;
                 if (privilege == "yes") {
-                    let productid = logig_manage_product_hiddenid == "" || logig_manage_product_hiddenid == undefined ? 0 : logig_manage_product_hiddenid;
+                    let productid = hiddenid == "" || hiddenid == undefined ? 0 : hiddenid;
                     result = await ProductModel.preparedFetch({
-                        sql: 'product_name = ? AND type = ? AND productid != ? AND status =?',
-                        columns: [logig_manage_product_name, logig_manage_product_type, productid, 'active']
+                        sql: 'product_name = ? AND description = ? AND productid != ? AND status =?',
+                        columns: [name, description, productid, 'active']
                     });
                     if (Array.isArray(result)) {
                         if (result.length > 0) {
@@ -50,22 +48,21 @@ module.exports = (socket, Database)=>{
                                 message: 'Sorry, product with the same name exist'
                             });
                         } else {
-                            if (logig_manage_product_hiddenid == "" || logig_manage_product_hiddenid == undefined) {
+                            if (hiddenid == "" || hiddenid == undefined) {
                                 productid = gf.getTimeStamp();
-                                result = await ProductModel.insertTable([productid, logig_manage_product_name, (logig_manage_product_generic == null || logig_manage_product_generic == undefined || logig_manage_product_generic == '' ? 0 : logig_manage_product_generic), (logig_manage_product_manufacturer == null || logig_manage_product_manufacturer == undefined || logig_manage_product_manufacturer == '' ? 0 : logig_manage_product_manufacturer), logig_manage_product_type, logig_manage_product_description, 'active', gf.getDateTime(), sessionid]);
+                                result = await ProductModel.insertTable([productid, name, description, 'active', gf.getDateTime(), sessionid]);
                             } else {
                                 result = await ProductModel.updateTable({
-                                    sql: 'product_name = ?, genericid = ?, manufacturerid = ?, type = ?, description = ? WHERE productid = ? AND status = ?',
-                                    columns: [logig_manage_product_name, (logig_manage_product_generic == null || logig_manage_product_generic == undefined || logig_manage_product_generic == '' ? 0 : logig_manage_product_generic), (logig_manage_product_manufacturer == null || logig_manage_product_manufacturer == undefined || logig_manage_product_manufacturer == '' ? 0 : logig_manage_product_manufacturer),  logig_manage_product_type, logig_manage_product_description, productid, 'active']
+                                    sql: 'name = ?, description = ? WHERE productid = ? AND status = ?',
+                                    columns: [name, description, productid, 'active']
                                 });
                             }
                             if (result.affectedRows !== undefined) {
                                 const SessionModel = new Session(Database);
                                 let activityid = gf.getTimeStamp();
-                                result = await SessionModel.insertTable([activityid, sessionid, (logig_manage_product_hiddenid == "" || logig_manage_product_hiddenid == undefined) ? 'added a new product' : 'updated a product record', 'active', gf.getDateTime()]);
-                                let message = logig_manage_product_hiddenid == "" || logig_manage_product_hiddenid == undefined ? 'Product has been created successfully' : 'Product has been updated successfully';
+                                result = await SessionModel.insertTable([activityid, sessionid, (hiddenid == "" || hiddenid == undefined) ? 'added a new product' : 'updated a product record', 'active', gf.getDateTime()]);
+                                let message = hiddenid == "" || hiddenid == undefined ? 'Product has been created successfully' : 'Product has been updated successfully';
                                 if (result.affectedRows) {
-                                    socket.broadcast.emit('productBroadcast', 'success broadcast');
                                     socket.emit(melody1+'_insertNewProduct', {
                                         type: 'success',
                                         message: message
