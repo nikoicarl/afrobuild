@@ -7,8 +7,7 @@ try {
 
     //Model Router Imports
     const DatabaseModel = require('./backend/model/models/DatabaseModel')
-    const homeRouter = require('./model/routers/homeRouter')
-
+    const homeRouter = require('./backend/routes/homeRouter')
 
 
     //set template engine
