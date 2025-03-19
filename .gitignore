@@ -1,0 +1,15 @@
+node_modules
+
+backups
+
+stuff/uploads/*
+
+package-lock.json
+
+.env
+
+.env/*
+
+.env*
+
+*.env
