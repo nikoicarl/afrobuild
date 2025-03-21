@@ -1,9 +1,8 @@
-const User = require('../models/administration/UserModel');
-const Employee = require('../models/administration/EmployeeModel');
-const Privilege = require('../models/app/PrivilegeFeaturesModel');
+const User = require('../model/models/UserModel');
+const Privilege = require('../model/models/PrivilegeFeaturesModel');
 
 const md5 = require('md5');
-let getSessionIDs = require('../controllers/administration/getSessionIDs');
+let getSessionIDs = require('../controllers/getSessionIDs');
 const path = require('path')
 const dotenv = require('dotenv')
 dotenv.config({path: path.join(__dirname, `./../../system.env`)})

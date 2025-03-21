@@ -1,10 +1,10 @@
-const CreateUpdateModel = require('./CreateUpdateModel');
+const CreateUpdateModel = require('../../app/CreateUpdateModel');
 const Apps = require('./AppsModel');
 const CombinePrivilege = require('./CombinePrivilegeModel');
-const GeneralFunction = require('../administration/GeneralFunctionModel');
+const GeneralFunction = require('./GeneralFunctionModel');
 const gf = new GeneralFunction();
 
-const PrivilegeAfrobuild = require('../accounts/PrivilegeAfrobuildModel');
+const PrivilegeAfrobuild = require('../models/AfrobuildModel');
 
 class PrivilegeFeature {
     /**
