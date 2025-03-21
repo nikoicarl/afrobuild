@@ -8,7 +8,7 @@ try {
     //Model Router Imports
     const DatabaseModel = require('./backend/model/models/DatabaseModel')
     const homeRouter = require('./backend/routes/homeRouter')
-
+    const dashboardRouter = require('./backend/routes/dashboardRouter')
 
     //set template engine
     start.set('view engine', 'ejs')

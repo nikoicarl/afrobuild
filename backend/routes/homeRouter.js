@@ -1,6 +1,6 @@
 const User = require('../model/models/UserModel');
 const Session = require('../model/models/SessionModel');
-const Privilege = require('../models/app/PrivilegeFeaturesModel');
+const Privilege = require('../model/models/PrivilegeFeaturesModel');
 const path = require('path')
 const dotenv = require('dotenv')
 dotenv.config({path: path.join(__dirname, `../../system.env`)})
