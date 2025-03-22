@@ -3,35 +3,49 @@
 
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Afrobuild</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
-
+  <meta name="description" content="Your site description here">
+  
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link rel="icon" href="assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Amatic+SC:wght@400;700&display=swap"
-    rel="stylesheet">
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <!-- Only load Roboto font since it's the main font -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-  <!-- Vendor CSS Files -->
+  <!-- Load critical CSS inline and defer non-critical -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+  
+  <!-- Combine vendor CSS where possible -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-  <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
-
+  
+  <!-- Defer non-critical CSS -->
+  <link rel="preload" href="assets/vendor/bootstrap-icons/bootstrap-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="assets/vendor/aos/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="assets/vendor/glightbox/css/glightbox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="assets/vendor/swiper/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/vendor/aos/aos.css">
+    <link rel="stylesheet" href="assets/vendor/glightbox/css/glightbox.min.css">
+    <link rel="stylesheet" href="assets/vendor/swiper/swiper-bundle.min.css">
+  </noscript>
+  
+  <!-- Apply Roboto as the default font for the entire website -->
+  <style>
+    body, h1, h2, h3, h4, h5, h6, p, a, span, div {
+      font-family: 'Roboto', sans-serif !important;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -40,24 +54,24 @@
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
       <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
-        <img src="assets/img/logo.png" alt="">
+        <img src="assets/img/logo.png" alt="Logo">
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="#hero" class="active">Home<br></a></li>
+          <li><a href="#hero" class="active">Home</a></li>
           <li><a href="#about">About Us</a></li>
           <li><a href="#help">Help Center</a></li>
-          <li><img href="#search" src="assets/img/search_logo.png"></li>
+          <li><a href="#search"><img src="assets/img/search_logo.png" alt="Search"></a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
       <nav class="navmenu">
         <ul>
-          <li><a href="#register">Regsiter Service</a></li>
+          <li><a href="#register">Register Service</a></li>
           <li><a href="#login">Log In</a></li>
-          <li><a class="btn-getstarted" href="index.html#book-a-table">Sign Up</a></li>
+          <li><a class="btn-getstarted" href="#book-a-table">Sign Up</a></li>
         </ul>
       </nav>
 
@@ -75,15 +89,16 @@
           </p>
           <div class="row">
             <div class="col-md-12">
-              <div class="search-container">
-                <input type="text" placeholder="What can we help you with today?">
-                <button>Search</button>
-              </div>
+              <form action="/search" method="GET" class="search-container">
+                <input type="text" name="query" placeholder="What can we help you with today?"
+                  aria-label="Search products and services">
+                <button type="submit" aria-label="Submit search">Search</button>
+              </form>
             </div>
           </div>
         </div>
         <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
-          <img src="assets/img/pic1.png" class="mb-4" alt="">
+          <img src="assets/img/pic1.png" class="mb-4 img-fluid" alt="">
         </div>
       </div>
 
@@ -393,7 +408,8 @@
         <!-- Product Card 1 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/Rectangle 527.png" class="card-img-top" alt="Plumbering Repair" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/Rectangle 527.png" class="card-img-top" alt="Plumbering Repair"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Plumbering Repair</h5>
             </div>
@@ -415,7 +431,8 @@
         <!-- Product Card 2 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/service2.png" class="card-img-top" alt="Roof replacement" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/service2.png" class="card-img-top" alt="Roof replacement"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Roof replacement</h5>
             </div>
@@ -437,7 +454,8 @@
         <!-- Product Card 3 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/service3.png" class="card-img-top" alt="Roof replacement" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/service3.png" class="card-img-top" alt="Roof replacement"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Cement Sales</h5>
             </div>
@@ -461,7 +479,8 @@
         <!-- Product Card 1 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/Rectangle 527.png" class="card-img-top" alt="Plumbering Repair" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/Rectangle 527.png" class="card-img-top" alt="Plumbering Repair"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Plumbering Repair</h5>
             </div>
@@ -483,7 +502,8 @@
         <!-- Product Card 2 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/service2.png" class="card-img-top" alt="Roof replacement" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/service2.png" class="card-img-top" alt="Roof replacement"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Roof replacement</h5>
             </div>
@@ -505,7 +525,8 @@
         <!-- Product Card 3 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/service3.png" class="card-img-top" alt="Roof replacement" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/service3.png" class="card-img-top" alt="Roof replacement"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Cement Sales</h5>
             </div>
@@ -547,7 +568,8 @@
         <!-- Product Card 1 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/plumbering repair.png" class="card-img-top" alt="Plumbering Repair" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/plumbering repair.png" class="card-img-top" alt="Plumbering Repair"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Plumbering Repair</h5>
             </div>
@@ -569,7 +591,8 @@
         <!-- Product Card 2 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/roof repair.png" class="card-img-top" alt="Roof installation & Repair" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/roof repair.png" class="card-img-top" alt="Roof installation & Repair"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Roof installation & Repair</h5>
             </div>
@@ -591,7 +614,8 @@
         <!-- Product Card 3 -->
         <div class="col-md-4 mb-4">
           <div class="card shadow-sm h-100">
-            <img src="assets/img/bathroom remodel.png" class="card-img-top" alt="Bathroom Remodel" style="height: 250px; object-fit: cover;">
+            <img src="assets/img/bathroom remodel.png" class="card-img-top" alt="Bathroom Remodel"
+              style="height: 250px; object-fit: cover;">
             <div class="card-body pb-0">
               <h5 class="card-title">Bathroom Remodel</h5>
             </div>
@@ -630,7 +654,7 @@
           </div>
         </div>
         <div class="col-lg-6 mt-5">
-          <img src="assets/img/banner_img.png" class="img-fluid" alt="Roof installation & Repair" >
+          <img src="assets/img/banner_img.png" class="img-fluid" alt="Roof installation & Repair">
         </div>
       </div>
     </div>
@@ -639,61 +663,67 @@
     <div class="container my-5">
       <div class="row">
         <div class="col-lg-4 mb-4 mt-5">
-          <h2 class="text-dark mb-3 mt-5" >How it works</h2>
+          <h2 class="text-dark mb-3 mt-5">How it works</h2>
           <p class="text-muted" style="color: #6c757d !important;">
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore Duis aute irure dolor in reprehenderit in voluptate
+            velit esse cillum dolore Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
           </p>
         </div>
-        
+
         <div class="col-lg-7">
           <div class="row">
             <!-- Card 1 -->
             <div class="col-md-6 mb-4">
               <div class="card shadow h-100" style="border-radius: 10px;">
                 <div class="card-body p-4">
-                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px; background-color: #00ab4e !important;">
+                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3"
+                    style="width: 50px; height: 50px; background-color: #00ab4e !important;">
                     <h5 class="m-0 text-white">1</h5>
                   </div>
-                  <h4 >Search for a service</h4>
+                  <h4>Search for a service</h4>
                   <p class="text-muted">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
                 </div>
               </div>
             </div>
-            
+
             <!-- Card 2 -->
             <div class="col-md-6 mb-4">
               <div class="card shadow h-100" style="border-radius: 10px;">
                 <div class="card-body p-4">
-                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px; background-color: #00ab4e !important;">
+                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3"
+                    style="width: 50px; height: 50px; background-color: #00ab4e !important;">
                     <h5 class="m-0 text-white">2</h5>
                   </div>
-                  <h4 >Provide your details</h4>
+                  <h4>Provide your details</h4>
                   <p class="text-muted">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
                 </div>
               </div>
             </div>
-            
+
             <!-- Card 3 -->
             <div class="col-md-6 mb-4">
               <div class="card shadow h-100" style="border-radius: 10px;">
                 <div class="card-body p-4">
-                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px; background-color: #00ab4e !important;">
+                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3"
+                    style="width: 50px; height: 50px; background-color: #00ab4e !important;">
                     <h5 class="m-0 text-white">3</h5>
                   </div>
-                  <h4 >Make a deposite</h4>
+                  <h4>Make a deposite</h4>
                   <p class="text-muted">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
                 </div>
               </div>
             </div>
-            
+
             <!-- Card 4 -->
             <div class="col-md-6 mb-4">
               <div class="card shadow h-100" style="border-radius: 10px;">
                 <div class="card-body p-4">
-                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px; background-color: #00ab4e !important;">
+                  <div class=" text-white rounded-circle d-flex align-items-center justify-content-center mb-3"
+                    style="width: 50px; height: 50px; background-color: #00ab4e !important;">
                     <h5 class="m-0 text-white">4</h5>
                   </div>
-                  <h4 >Enjoy services</h4>
+                  <h4>Enjoy services</h4>
                   <p class="text-muted">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore</p>
                 </div>
               </div>
@@ -705,95 +735,119 @@
 
     <!-- FAQ Accordion  -->
     <div class="container my-5 ">
-      <h2 class="m-3  " >FAQs</h2>
-      
+      <h2 class="m-3  ">FAQs</h2>
+
       <div class="accordion" id="faqAccordion">
         <!-- FAQ Item 1 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
               fringilla vitae nibh at, Nam non. In ac enim. sapien elementum Lorem
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
-        
+
         <!-- FAQ Item 2 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingTwo">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
               quis ultrices Praesent risus elementum tincidunt dui
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
-        
+
         <!-- FAQ Item 3 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingThree">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
               quis ultrices Praesent risus elementum tincidunt dui
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
-        
+
         <!-- FAQ Item 4 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingFour">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
               quis ultrices Praesent risus elementum tincidunt dui
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
-        
+
         <!-- FAQ Item 5 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingFive">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
               Lorem ipsum dolor sit amet
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+          <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
-        
+
         <!-- FAQ Item 6 -->
         <div class="accordion-item border-0 border-bottom">
           <h2 class="accordion-header" id="headingSix">
-            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix" >
+            <button class="accordion-button collapsed py-4 bg-white" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
               Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet
               <span class="icon-wrapper"></span>
             </button>
           </h2>
-          <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+          <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix"
+            data-bs-parent="#faqAccordion">
             <div class="accordion-body pb-4">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a molestie massa.</p>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod, nunc sit amet fringilla
+                faucibus, urna eros fermentum risus, id lobortis velit purus vel metus. Etiam sit amet tempus lorem, a
+                molestie massa.</p>
             </div>
           </div>
         </div>
@@ -809,7 +863,7 @@
         <div class="col-md-3 footer-section">
           <h4>LOGO</h4>
           <p>Lorem ipsum dolor sit amet</p>
-          
+
           <div class="mt-5">
             <h5 class="text-white">Explore more</h5>
             <form class="subscription-form d-flex mt-3">
@@ -817,14 +871,14 @@
               <button type="submit" class="btn">SUBSCRIBE</button>
             </form>
             <p class="mt-2" style="font-size: 0.8rem;">
-              By submitting this form, you agree to receive marketing and other 
-              communications from Afrobuild about company updates. You can 
-              unsubscribe from these communications at any time. For more 
+              By submitting this form, you agree to receive marketing and other
+              communications from Afrobuild about company updates. You can
+              unsubscribe from these communications at any time. For more
               information on our privacy practices, please review our <a href="#">Privacy Policy</a>.
             </p>
           </div>
         </div>
-        
+
         <!-- Service Providers -->
         <div class="col-md-3 footer-section">
           <h4>SERVICE PROVIDERS</h4>
@@ -832,7 +886,7 @@
             <li class="mb-2"><a href="#">Register your busienss</a></li>
           </ul>
         </div>
-        
+
         <!-- About Us -->
         <div class="col-md-3 footer-section">
           <h4>ABOUT US</h4>
@@ -842,7 +896,7 @@
             <li class="mb-2"><a href="#">Help Center & FAQs</a></li>
           </ul>
         </div>
-        
+
         <!-- Contact Us -->
         <div class="col-md-3 footer-section">
           <h4>CONTACT US</h4>
@@ -855,9 +909,9 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="footer-divider"></div>
-      
+
       <div class="row">
         <div class="col-md-6">
           <div class="footer-links">
@@ -894,6 +948,17 @@
 
   <!-- Preloader -->
   <div id="preloader"></div>
+
+  <!-- Add basic JavaScript validation -->
+  <script>
+    document.querySelector('.search-container form').addEventListener('submit', function (e) {
+      const query = this.querySelector('input[name="query"]').value.trim();
+      if (query.length < 2) {
+        e.preventDefault();
+        alert('Please enter at least 2 characters to search');
+      }
+    });
+  </script>
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
