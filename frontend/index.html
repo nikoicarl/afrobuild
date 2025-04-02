@@ -984,7 +984,7 @@
 
       if (!searchForm) {
         // Log all forms on the page to help debugging
-        console.log('Available forms:', document.querySelectorAll('form'));
+       // console.log('Available forms:', document.querySelectorAll('form'));
 
         // Try a more general selector
         searchForm = document.querySelector('form[action="/search"]');
@@ -1001,11 +1001,11 @@
               alert('Please enter at least 2 characters to search');
             }
           } else {
-            console.error('Search input element not found');
+            //console.error('Search input element not found');
           }
         });
       } else {
-        console.error('Search form not found - check your HTML structure and class names');
+        //console.error('Search form not found - check your HTML structure and class names');
       }
     });
   </script>
