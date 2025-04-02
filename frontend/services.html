@@ -108,7 +108,7 @@
         <!-- tab -->
         <div class="container">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation" >
+                <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="service-tab" data-bs-toggle="tab" data-bs-target="#home"
                         type="button" role="tab" aria-controls="home" aria-selected="true">Services</button>
                 </li>
@@ -120,6 +120,7 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="service-tab">
 
+
                     <!-- // Tab Contents -->
                     <div>
                         <!-- Purchase Section End -->
@@ -127,14 +128,37 @@
                         <!-- Popular Services  -->
                         <div class="container " style="margin-top: 70px;">
                             <div class="row ">
-                                <div class="col-lg-6">
-                                    <h2 class="mt-0 pt-0"> Popular Services</h2>
+                                <div class="col-lg-12">
+                                    <h4 class="mt-0 pt-0"> Popular Services</h4>
                                 </div>
-                                <div class="col-lg-6">
-                                    <span class="float-end mt-0 pt-1" style="font-size: 16px;"> Browse more</span>
+                            </div>
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                <!-- //Search input with icon heree` -->
+                                <div class="input-group mb-3 mt-4">
+                                    <input type="text" class="form-control" placeholder="Search for services"
+                                        aria-label="Search for services" aria-describedby="button-addon2">
+                                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i
+                                            class="bi bi-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 mt-4">
+                                    <!-- Filter -->
+                                    <select class="form-select form-control" aria-label="Default select example">
+                                        <option selected>Filter</option>
+                                        <option value="1">Option 1</option>
+                                        <option value="2">Option 2</option>
+                                        <option value="3">Option 3</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Popular Services End -->
 
                         <!-- Card Section -->
@@ -373,10 +397,9 @@
                         <!-- Card Section End -->
                     </div>
 
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="product-tab">...</div>
                 </div>
-                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="product-tab">...</div>
             </div>
-        </div>
 
 
     </main>
@@ -487,7 +510,7 @@
         .nav-tabs .nav-item {
             flex: 1;
             text-align: center;
-            border-radius: 0!important;
+            border-radius: 0 !important;
             border: none;
             font-weight: 500;
             font-size: 20px;
@@ -500,7 +523,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color:#396827!important;
+            color: #396827 !important;
 
         }
     </style>
