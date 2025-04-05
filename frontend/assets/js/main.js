@@ -173,4 +173,12 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+
+  // navigation function
+  function navigation(open, general) {
+    $('.' + general).hide();
+    $('.' + open).show();
+  }
+
+
 })();
