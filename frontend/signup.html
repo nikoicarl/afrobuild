@@ -153,6 +153,8 @@
 
         // on click function
         $(document).ready(function () {
+
+            // on click of the continue button
             $('.afrobuild_continue_btn').click(function (e) {
                 e.preventDefault();
                 var firstName = $('#firstName').val();
@@ -178,7 +180,16 @@
                     // check if password and confirm password are equal
                     if (password && confirm_password) {
                         if (password !== confirm_password) {
-                            alert('Password and Confirm Password do not match');
+                            // Sweetaleert
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Password and Confirm Password do not match',
+                                icon: 'error',
+                                confirmButtonText: 'Continue',
+                                customClass: {
+                                    confirmButton: 'btn btn-success'
+                                }
+                            })
                             return;
                         }
                     }
@@ -195,6 +206,19 @@
                         }
                     })
                 }
+            });
+
+            // on click of the back button
+            $('.afrobuild_signup_back_btn').click(function (e) {
+                e.preventDefault();
+                navigation('signup_general', 'password-section');
+                
+                // hide the password section
+                $('.password-section').hide();
+                $('.afrobuild_continue_btn').text('Continue');
+                $('.afrobuild_continue_btn').attr('type', 'button');
+                $('.afrobuild_continue_btn').attr('id', 'submit_btn');
+                $('.afrobuild_continue_btn').attr('onclick', 'return false;');
             });
         });
 
