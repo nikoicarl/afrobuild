@@ -1,4 +1,4 @@
-const CreateUpdateModel = require('../../app/CreateUpdateModel');
+const CreateUpdateModel = require('./CreateUpdateModel');
 const Apps = require('./AppsModel');
 const CombinePrivilege = require('./CombinePrivilegeModel');
 const GeneralFunction = require('./GeneralFunctionModel');

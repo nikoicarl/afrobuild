@@ -1,5 +1,5 @@
 const Session = require('./SessionModel');
-const CreateUpdateModel = require('../../app/CreateUpdateModel');
+const CreateUpdateModel = require('./CreateUpdateModel');
 
 //Intialize Class
 class Vendor {

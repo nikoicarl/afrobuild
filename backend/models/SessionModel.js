@@ -1,4 +1,4 @@
-const CreateUpdateModel = require('../../app/CreateUpdateModel');
+const CreateUpdateModel = require('./CreateUpdateModel');
 
 //Intialize Class
 class Session {
