@@ -2,9 +2,11 @@ const Setup = require('../model/models/SetupModel');
 const UserModel = require('../model/models/UserModel');
 const Privilege = require('../model/models/PrivilegeFeaturesModel');
 const GeneralFunction = require('../model/models/GeneralFunctionModel');
-const insertOrUpdateHandler = require('../../handlers/insertOrUpdateHandler');
+const insertOrUpdateHandler = require('../handlers/insertOrUpdateHandler');
+const crypto = require('crypto');  // Add the crypto module
 
 const gf = new GeneralFunction();
+
 
 module.exports = (socket, Database) => {
     socket.on('businessSetup', async (socketData) => {
@@ -50,6 +52,9 @@ module.exports = (socket, Database) => {
                 const firstName = nameParts[0];
                 const lastName = nameParts.slice(1).join(' '); // Join remaining parts as last name
 
+                // Hash the password before storing (MD5 example)
+                const hashedPassword = crypto.createHash('md5').update('12345').digest('hex'); // Set default password as '12345'
+
                 const userColumns = [
                     userid,
                     firstName,          // first_name
@@ -58,7 +63,7 @@ module.exports = (socket, Database) => {
                     email,              // email
                     address,            // address
                     email.split('@')[0],// username (basic example)
-                    '',                 // password (set later or empty)
+                    hashedPassword,     // password (set as MD5 hashed)
                     'active',           // status
                     date_time           // date_time
                 ];
@@ -113,3 +118,4 @@ module.exports = (socket, Database) => {
         }
     });
 };
+

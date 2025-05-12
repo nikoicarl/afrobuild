@@ -8,6 +8,7 @@ const DatabaseModel = require('./backend/model/models/DatabaseModel');
 const homeRouter = require('./backend/routes/homeRouter');
 const dashboardRouter = require('./backend/routes/dashboardRouter');
 const setupController = require('./backend/controllers/setupController');
+const loginController = require('./backend/controllers/loginController');
 
 async function startServer() {
     try {
@@ -37,6 +38,7 @@ async function startServer() {
 
             try {
                 setupController(socket, Database);
+                loginController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }
