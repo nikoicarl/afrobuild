@@ -4,9 +4,9 @@ const socketIo = require('socket.io');
 const path = require('path');
 
 // Model & Route Imports
-const DatabaseModel = require('./backend/model/models/DatabaseModel');
-const homeRouter = require('./backend/routes/homeRouter');
-const dashboardRouter = require('./backend/routes/dashboardRouter');
+const DatabaseModel = require('./backend/models/DatabaseModel');
+const homeRouter = require('./backend/routers/homeRouter');
+const dashboardRouter = require('./backend/routers/dashboardRouter');
 const setupController = require('./backend/controllers/setupController');
 const loginController = require('./backend/controllers/loginController');
 
@@ -28,7 +28,7 @@ async function startServer() {
         const Database = new DatabaseModel();
         await Database.createConnection();
 
-        // Register routes with database dependency
+        // Register routers with database dependency
         homeRouter(app, Database);
         dashboardRouter(app, Database);
 

@@ -1,6 +1,6 @@
-const User = require('../model/models/UserModel');
-const Session = require('../model/models/SessionModel');
-const GeneralFunction = require('../model/models/GeneralFunctionModel');
+const User = require('../models/UserModel');
+const Session = require('../models/SessionModel');
+const GeneralFunction = require('../models/GeneralFunctionModel');
 const gf = new GeneralFunction();
 const md5 = require('md5');
 

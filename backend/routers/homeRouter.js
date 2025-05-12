@@ -2,10 +2,10 @@ const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, '../../system.env') });
 
-const User = require('../model/models/UserModel');
-const Session = require('../model/models/SessionModel');
-const Setup = require('../model/models/SetupModel');
-const Privilege = require('../model/models/PrivilegeFeaturesModel');
+const User = require('../models/UserModel');
+const Session = require('../models/SessionModel');
+const Setup = require('../models/SetupModel');
+const Privilege = require('../models/PrivilegeFeaturesModel');
 
 module.exports = function (app, Database) {
     app.get('/', async (request, response) => {

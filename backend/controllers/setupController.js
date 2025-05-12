@@ -1,7 +1,7 @@
-const Setup = require('../model/models/SetupModel');
-const UserModel = require('../model/models/UserModel');
-const Privilege = require('../model/models/PrivilegeFeaturesModel');
-const GeneralFunction = require('../model/models/GeneralFunctionModel');
+const Setup = require('../models/SetupModel');
+const UserModel = require('../models/UserModel');
+const Privilege = require('../models/PrivilegeFeaturesModel');
+const GeneralFunction = require('../models/GeneralFunctionModel');
 const insertOrUpdateHandler = require('../handlers/insertOrUpdateHandler');
 const crypto = require('crypto');  // Add the crypto module
 

@@ -1,5 +1,5 @@
-const User = require('../model/models/UserModel');
-const Privilege = require('../model/models/PrivilegeFeaturesModel');
+const User = require('../models/UserModel');
+const Privilege = require('../models/PrivilegeFeaturesModel');
 
 const md5 = require('md5');
 let getSessionIDs = require('../controllers/getSessionIDs');
