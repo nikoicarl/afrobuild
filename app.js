@@ -1,51 +1,59 @@
+const express = require('express');
+const socketIo = require('socket.io');
+const path = require('path');
 
-try {
-    const express = require('express')
-    const start = express()
-    const socketIo = require('socket.io')
+// Model & Route Imports
+const DatabaseModel = require('./backend/model/models/DatabaseModel');
+const homeRouter = require('./backend/routes/homeRouter');
+const dashboardRouter = require('./backend/routes/dashboardRouter');
+const setupController = require('./backend/controllers/setupController');
 
+async function startServer() {
+    try {
+        const app = express();
 
-    //Model Router Imports
-    const DatabaseModel = require('./backend/model/models/DatabaseModel')
-    const homeRouter = require('./backend/routes/homeRouter')
-    const dashboardRouter = require('./backend/routes/dashboardRouter')
+        // Set EJS as template engine
+        app.set('view engine', 'ejs');
 
-    //set template engine
-    start.set('view engine', 'ejs')
+        // Set static folder
+        app.use(express.static(path.join(__dirname, 'stuff')));
 
-    //set static files folder
-    start.use(express.static('./stuff'))
+        // Optional: Use body parsers if needed
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-    //use models here
-    const Database = new DatabaseModel()
-    Database.createConnection()
-    homeRouter(start, Database)
-    dashboardRouter(start, Database)
+        // Initialize database
+        const Database = new DatabaseModel();
+        await Database.createConnection();
+        // Register routers
+        homeRouter(app, Database);
+        dashboardRouter(app, Database);
 
-
-    //Create port server
-    const server = start.listen(6030, function() {
-        console.log('You are listening to port 6030')
-    })
-
-    const mainSocket = socketIo(server)
-
-
-    mainSocket.on('connection', function(socket) {
-        console.log('A user is connected')
-
-        try {
-            //Stores initialization
-            
-
-        } catch (error) {
-            console.log(error)
-        }
-
-        socket.on('disconnect', function () {
-            console.log('A user has disconnected')
+        // Create server and attach socket.io
+        const server = app.listen(6030, () => {
+            console.log('Server is listening on port 6030');
         });
-    });
-} catch (error) {
-    console.log(error)
+
+        const io = socketIo(server);
+
+        io.on('connection', (socket) => {
+            console.log('A user connected');
+
+            try {
+                
+            } catch (err) {
+                console.error('Socket handler error:', err);
+            }
+
+            socket.on('disconnect', () => {
+                console.log('A user disconnected');
+            });
+        });
+
+    } catch (err) {
+        console.error('Server initialization error:', err);
+    }
 }
+
+// Start the server
+startServer();

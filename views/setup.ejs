@@ -2,13 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Business Setup</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <!-- include custom js here -->
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="assets/js/custom.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -51,12 +49,9 @@
         .form-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: auto;
-            padding-top: 50px;
             width: 100%;
             max-width: 500px;
-            position: absolute;
-            bottom: 15px;
+            margin-top: 30px;
         }
 
         .hide {
@@ -71,35 +66,37 @@
             <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
             </p>
         </div>
+
         <div class="login-section">
             <div class="login-box">
-                <form>
+                <form class="business-setup-form">
                     <div class="personal-details-section signup_general">
                         <h3 class="text-center mt-4 mb-4">Business Details</h3>
-                        <p>Provide us with basic information about business.</p>
+                        <p>Provide us with basic information about your business.</p>
+
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Name"
+                                value="Afrobuild" disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email address"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Mobile Number"
+                                required>
+                        </div>
+
                         <div class="row mb-3">
-                            <div class="col-md-12">
-                                <input type="text" class="form-control mt-3 mb-3" id="name" placeholder="Name"
-                                    value="Afrobuild" disabled>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <input type="email" class="form-control mt-3 mb-4" id="email" placeholder="Email address"
-                                required>
-                        </div>
-                        <div class=" mt-4">
-                            <input type="tel" class="form-control mt-3 mb-3" id="mobile" placeholder="Mobile Number"
-                                required>
-                        </div>
-                        <div class="row ">
                             <div class="col-md-6">
-                                <select class="form-select mt-3 mb-3" id="country" required>
-                                    <option value="" disabled selected>Country</option>
-                                    <option value="">Loading...</option>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="" disabled selected>Loading...</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <select class="form-select mt-3 mb-3" id="region" required>
+                                <select class="form-select" id="region" name="region" required>
                                     <option value="">Select Region</option>
                                     <option value="ashanti">Ashanti</option>
                                     <option value="brong-ahafo">Brong Ahafo</option>
@@ -119,52 +116,51 @@
                                     <option value="bono">Bono</option>
                                     <option value="bono-east">Bono East</option>
                                 </select>
-
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-offset-12">
-                                <textarea class="form-control mt-3 mb-3" id="address" placeholder="Address" rows="2"
-                                    required></textarea>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="address" name="address" placeholder="Address" rows="2"
+                                required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="form-buttons text-end">
+                                    <button type="submit" id="submit" class="btn btn-success">Submit</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+
             <div class="container-fluid pt-5 pb-5">
-                <div class=""
-                    style="width: 100%; height: 100%; outline: 0.50px #A6A6A6 solid; outline-offset: -0.25px;"></div>
-            </div>
-            <div class="form-buttons mt-4 mb-4">
-                <a href="login.html"> <button type="button"
-                        class="btn  hide btn-outline-success afrobuild_signup_back_btn">&#8592; </button></a>
-                <button type="submit" class="btn btn-success afrobuild_continue_btn">Submit</button>
+                <div style="width: 100%; height: 100%; outline: 0.50px #A6A6A6 solid; outline-offset: -0.25px;"></div>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 
     <script>
+        // Fetch countries and fill the country select dropdown
         const selectElement = document.getElementById('country');
 
         fetch('https://restcountries.com/v3.1/all')
             .then(response => response.json())
             .then(data => {
-                // Sort countries by name
                 const countries = data.sort((a, b) =>
                     a.name.common.localeCompare(b.name.common)
                 );
 
-                // Clear the default option
-                selectElement.innerHTML = '<option value="">Select Country</option>';
+                selectElement.innerHTML = '<option value="" disabled selected>Select Country</option>';
 
-                // Populate the select options
                 countries.forEach(country => {
                     const option = document.createElement('option');
-                    option.value = country.cca2; // ISO 3166-1 alpha-2 code
+                    option.value = country.cca2;
                     option.textContent = country.name.common;
                     selectElement.appendChild(option);
                 });
@@ -174,6 +170,9 @@
                 selectElement.innerHTML = '<option value="">Failed to load countries</option>';
             });
     </script>
+
+    <script src="/socket.io/socket.io.js"></script>
+
 </body>
 
 </html>

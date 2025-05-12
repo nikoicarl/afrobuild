@@ -1,76 +1,56 @@
-
 $(document).ready(function () {
+    const socket = io();
 
-    // navigation function
-    function navigation(open, general) {
-        $('.' + general).hide();
-        $('.' + open).show();
-    }
-
-    // on click of the continue button
-    $('.afrobuild_continue_btn').click(function (e) {
+    $(document).on('submit', 'form.business-setup-form', function (e) {
         e.preventDefault();
-        var firstName = $('#firstName').val();
-        var lastName = $('#lastName').val();
-        var email = $('#email').val();
-        var mobile = $('#mobile').val();
-        var country = $('#country').val();
-        var region = $('#region').val();
-        var password = $('#password').val();
-        var confirm_password = $('#confirm_password').val();
 
-        if (firstName && lastName && email && mobile && country && region) {
-            navigation('password-section', 'signup_general');
+        const $form = $(this);
 
-            // change button to submit
-            $('.afrobuild_continue_btn').text('Submit');
+        // Extract form field values
+        const name = $('#name', $form).val();
+        const email = $('#email', $form).val();
+        const mobile = $('#mobile', $form).val();
+        const country = $('#country', $form).val();
+        const region = $('#region', $form).val();
+        const address = $('#address', $form).val();
 
-            $('.afrobuild_continue_btn').attr('type', 'submit');
-            $('.afrobuild_continue_btn').attr('id', 'submit_btn');
-            $('.afrobuild_continue_btn').attr('id', 'submit_btn');
-            $('.afrobuild_continue_btn').attr('onclick', 'return false;');
+        // Simple validation
+        if (!email || !mobile || !country || !region || !address) {
+            Swal.fire('Missing Info', 'Please fill in all required fields.', 'warning');
+            return;
+        }
 
-            // check if password and confirm password are equal
-            if (password && confirm_password) {
-                if (password !== confirm_password) {
-                    // Sweetaleert
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Password and Confirm Password do not match',
-                        icon: 'error',
-                        confirmButtonText: 'Continue',
-                        customClass: {
-                            confirmButton: 'btn btn-success'
-                        }
-                    })
-                    return;
-                }
+        const $submitBtn = $('#submit', $form);
+        $submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...')
+            .prop('disabled', true);
+
+        // Remove previous listener (prevent duplicates)
+        socket.off('businessSetupResponse');
+
+        // Emit the form data via socket
+        socket.emit('businessSetup', {
+            name,
+            email,
+            mobile,
+            country,
+            region,
+            address
+        });
+
+        // Handle server response
+        socket.on('businessSetupResponse', function (data) {
+            if (data.type === 'success') {
+                Swal.fire('Success', data.message || 'Business setup completed.', 'success');
+                $form[0].reset(); // reset the form
+            } else if (data.type === 'caution') {
+                Swal.fire('Note', data.message || 'Something to be aware of.', 'warning');
+            } else {
+                Swal.fire('Error', data.message || 'Something went wrong.', 'error');
             }
 
-        } else {
-            // Sweetaleert
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please fill in all required fields.',
-                icon: 'error',
-                confirmButtonText: 'Continue',
-                customClass: {
-                    confirmButton: 'btn btn-success'
-                }
-            })
-        }
-    });
-
-    // on click of the back button
-    $('.afrobuild_signup_back_btn').click(function (e) {
-        e.preventDefault();
-        navigation('signup_general', 'password-section');
-
-        // hide the password section
-        $('.password-section').hide();
-        $('.afrobuild_continue_btn').text('Continue');
-        $('.afrobuild_continue_btn').attr('type', 'button');
-        $('.afrobuild_continue_btn').attr('id', 'submit_btn');
-        $('.afrobuild_continue_btn').attr('onclick', 'return false;');
+            // Reset submit button
+            $submitBtn.html('Submit').prop('disabled', false);
+            socket.off('businessSetupResponse'); // Clean up
+        });
     });
 });
