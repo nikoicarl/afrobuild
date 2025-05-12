@@ -1,66 +1,115 @@
 const Setup = require('../model/models/SetupModel');
+const UserModel = require('../model/models/UserModel');
 const Privilege = require('../model/models/PrivilegeFeaturesModel');
-const insertOrUpdateHandler = require('../../handlers/insertOrUpdateHandler'); // adjust path if needed
+const GeneralFunction = require('../model/models/GeneralFunctionModel');
+const insertOrUpdateHandler = require('../../handlers/insertOrUpdateHandler');
+
+const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
-    socket.on('insertSetup', async (socketData) => {
-        const {
-            name,
-            email,
-            mobile,
-            country,
-            region,
-            address,
-            melody1,
-            melody2,
-            hiddenid,
-            logo,
-            primary_color,
-            sessionid
-        } = socketData;
+    socket.on('businessSetup', async (socketData) => {
+        try {
+            const {
+                name,
+                email,
+                mobile,
+                country,
+                region,
+                address,
+                hiddenid,
+                logo,
+                primary_color,
+                sessionid
+            } = socketData;
 
-        // Call insert or update handler
-        await insertOrUpdateHandler({
-            socket,
-            Database,
-            ModelClass: Setup,
-            PrivilegeClass: Privilege,
-            socketData: {
-                melody1,
-                melody2,
-                hiddenid
-            },
-            requiredFields: [name, email, mobile, country, region, address],
-            uniqueCheck: {}, // Add a unique check if needed
-            columnsToInsert: [
-                gf.getTimeStamp(),    // setupid
-                name,                 // name
-                email,                // email
-                mobile,               // phone
-                address,              // address
-                country,              // country
-                region,               // state_region
-                '',                   // city
-                '',                   // zipcode
-                logo || '',           // logo
-                primary_color || '',  // primary_color
-                'active',             // status (added by handler)
-                gf.getDateTime(),     // date_time (added by handler)
-                sessionid || ''       // sessionid (added by handler)
-            ],
-            columnsToUpdate: [
-                { name: 'name', value: name },
-                { name: 'email', value: email },
-                { name: 'phone', value: mobile },
-                { name: 'address', value: address },
-                { name: 'country', value: country },
-                { name: 'state_region', value: region },
-                { name: 'logo', value: logo || '' },
-                { name: 'primary_color', value: primary_color || '' }
-            ],
-            privilegeName: 'setup',
-            eventName: 'insertSetup',
-            melody1
-        });
+            // Validation check for required fields
+            if (!name || !email || !mobile || !country || !region || !address) {
+                socket.emit('error', { message: 'Required fields missing.' });
+                return;
+            }
+
+            // Email validation using regular expression
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if (!emailRegex.test(email)) {
+                socket.emit('error', { message: 'Invalid email format.' });
+                return;
+            }
+
+            // INSERT NEW USER BEFORE SETUP
+            const User = new UserModel(Database);
+            const existingUser = await User.preparedFetch({
+                sql: 'email = ?',
+                columns: [email]
+            });
+
+            if (!Array.isArray(existingUser) || existingUser.length === 0) {
+                const userid = gf.getTimeStamp();
+                const date_time = gf.getDateTime();
+
+                const nameParts = name.split(' ');
+                const firstName = nameParts[0];
+                const lastName = nameParts.slice(1).join(' '); // Join remaining parts as last name
+
+                const userColumns = [
+                    userid,
+                    firstName,          // first_name
+                    lastName || '',     // last_name
+                    mobile,             // phone
+                    email,              // email
+                    address,            // address
+                    email.split('@')[0],// username (basic example)
+                    '',                 // password (set later or empty)
+                    'active',           // status
+                    date_time           // date_time
+                ];
+
+                await User.insertTable(userColumns);
+            }
+
+            // INSERT OR UPDATE SETUP
+            await insertOrUpdateHandler({
+                socket,
+                Database,
+                ModelClass: Setup,
+                PrivilegeClass: Privilege,
+                socketData: { hiddenid },
+                requiredFields: [name, email, mobile, country, region, address],
+                uniqueCheck: { email },
+                columnsToInsert: [
+                    gf.getTimeStamp(),
+                    name,
+                    email,
+                    mobile,
+                    address,
+                    country,
+                    region,
+                    '',
+                    '',
+                    logo || '',
+                    primary_color || '',
+                    'active',
+                    gf.getDateTime(),
+                    sessionid || ''
+                ],
+                columnsToUpdate: [
+                    { name: 'name', value: name },
+                    { name: 'email', value: email },
+                    { name: 'phone', value: mobile },
+                    { name: 'address', value: address },
+                    { name: 'country', value: country },
+                    { name: 'state_region', value: region },
+                    { name: 'logo', value: logo || '' },
+                    { name: 'primary_color', value: primary_color || '' }
+                ],
+                privilegeName: 'setup',
+                eventName: 'businessSetup'
+            });
+
+            socket.emit('success', { message: 'Business setup updated successfully.' });
+
+        } catch (error) {
+            console.error(error);
+            socket.emit('error', { message: 'An error occurred during the setup process.' });
+        }
     });
 };

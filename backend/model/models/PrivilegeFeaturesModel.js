@@ -159,7 +159,7 @@ class PrivilegeFeature {
                 for (let i = 0; i < apps.length; i++) {
                     const app = apps[i];
                     let sql, columns;
-                    if (app.app == 'account') {
+                    if (app.app == 'afrobuild') {
                         sql = 'INSERT INTO privilege_afrobuild (privilegeid, accountid) VALUES(?, ?)';
                         columns = [privilegeid, accountid];
                     } 

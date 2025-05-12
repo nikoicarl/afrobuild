@@ -21,11 +21,7 @@ $(document).ready(function () {
         }
 
         const $submitBtn = $('#submit', $form);
-        $submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...')
-            .prop('disabled', true);
-
-        // Remove previous listener (prevent duplicates)
-        socket.off('businessSetupResponse');
+        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...');
 
         // Emit the form data via socket
         socket.emit('businessSetup', {
@@ -38,7 +34,7 @@ $(document).ready(function () {
         });
 
         // Handle server response
-        socket.on('businessSetupResponse', function (data) {
+        socket.once('businessSetupResponse', function (data) { // Use .once to listen for the response just once
             if (data.type === 'success') {
                 Swal.fire('Success', data.message || 'Business setup completed.', 'success');
                 $form[0].reset(); // reset the form
@@ -49,8 +45,7 @@ $(document).ready(function () {
             }
 
             // Reset submit button
-            $submitBtn.html('Submit').prop('disabled', false);
-            socket.off('businessSetupResponse'); // Clean up
+            $submitBtn.prop('disabled', false).html('Submit');
         });
     });
 });

@@ -9,101 +9,92 @@ async function insertOrUpdateHandler({
     socket,
     Database,
     ModelClass,
-    PrivilegeClass,
     socketData,
     requiredFields = [],
     uniqueCheck = {},
     columnsToInsert = [],
     columnsToUpdate = [],
-    privilegeName = '',
-    eventName = '',
-    melody1 = '',
+    eventName = ''
 }) {
     try {
-        const session = getSessionIDs(socketData.melody1);
-        const userid = session.userid;
-        const sessionid = session.sessionid;
-
-        // Session validation
-        if (md5(userid) !== socketData.melody2) {
-            return socket.emit(`${melody1}_${eventName}`, {
+        // Validate session
+        const session = getSessionIDs(socketData.sessionid);
+        if (!session) {
+            return socket.emit(eventName, {
                 type: 'caution',
-                message: 'Sorry your session has expired, wait for about 18 seconds and try again...',
+                message: 'Session not found or expired.',
                 timeout: 'no'
             });
         }
 
+        const { userid, sessionid } = session;
+        console.log('Session:', session); // Log session for debugging (remove in production)
+
         const model = new ModelClass(Database);
-        const privilegeModel = new PrivilegeClass(Database, userid);
 
         // Required field check
-        const emptyCheck = await gf.ifEmpty(requiredFields);
+        const emptyCheck = await gf.ifEmpty(requiredFields.map(field => field.trim())); // Trim spaces
         if (emptyCheck.includes('empty')) {
-            return socket.emit(`${melody1}_${eventName}`, {
+            return socket.emit(eventName, {
                 type: 'caution',
                 message: 'Some fields are required!'
             });
         }
 
-        // Privilege check
-        const privilegeData = (await privilegeModel.getPrivileges()).privilegeData;
-        const hiddenid = socketData.hiddenid;
-        const privilegeKey = hiddenid ? `update_${privilegeName}` : `add_${privilegeName}`;
-        if (privilegeData[privilegeKey] !== 'yes') {
-            return socket.emit(`${melody1}_${eventName}`, {
-                type: 'caution',
-                message: `You have no privilege to ${hiddenid ? 'update' : 'add'} ${privilegeName}`
-            });
-        }
-
-        // Duplicate check
-        if (uniqueCheck && Object.keys(uniqueCheck).length > 0) {
+        // Duplicate check (if uniqueCheck is provided)
+        if (Object.keys(uniqueCheck).length > 0) {
             const existing = await model.preparedFetch({
-                sql: `${Object.keys(uniqueCheck).map(k => `${k} = ?`).join(' AND ')} AND ${privilegeName}id != ? AND status = ?`,
-                columns: [...Object.values(uniqueCheck), hiddenid || 0, 'active']
+                sql: `${Object.keys(uniqueCheck).map(k => `${k} = ?`).join(' AND ')} AND status = ?`,
+                columns: [...Object.values(uniqueCheck), 'active']
             });
 
             if (Array.isArray(existing) && existing.length > 0) {
-                return socket.emit(`${melody1}_${eventName}`, {
+                return socket.emit(eventName, {
                     type: 'caution',
-                    message: `Sorry, ${privilegeName} with the same information already exists`
+                    message: `Sorry, setup with the same information already exists`
                 });
             }
         }
 
+        // Insert or update record
         let result;
-        let itemid = hiddenid || gf.getTimeStamp();
-        if (!hiddenid) {
+        const itemid = socketData.hiddenid || gf.getTimeStamp();
+
+        if (!socketData.hiddenid) {
+            // Inserting a new setup
             result = await model.insertTable([itemid, ...columnsToInsert, 'active', gf.getDateTime(), sessionid]);
         } else {
+            // Updating an existing setup
             result = await model.updateTable({
-                sql: `${columnsToUpdate.map(field => `${field.name} = ?`).join(', ')} WHERE ${privilegeName}id = ? AND status = ?`,
+                sql: `${columnsToUpdate.map(field => `${field.name} = ?`).join(', ')} WHERE setupid = ? AND status = ?`,
                 columns: [...columnsToUpdate.map(field => field.value), itemid, 'active']
             });
         }
 
+        // Log session activity after insert/update
         if (result.affectedRows) {
             const sessionModel = new Session(Database);
             const activityid = gf.getTimeStamp();
             await sessionModel.insertTable([
                 activityid,
                 sessionid,
-                hiddenid ? `updated a ${privilegeName}` : `added a new ${privilegeName}`,
+                socketData.hiddenid ? `updated a setup` : `added a new setup`,
                 'active',
                 gf.getDateTime()
             ]);
 
-            return socket.emit(`${melody1}_${eventName}`, {
+            // Emit success response
+            return socket.emit(eventName, {
                 type: 'success',
-                message: `${privilegeName.charAt(0).toUpperCase() + privilegeName.slice(1)} has been ${hiddenid ? 'updated' : 'created'} successfully`
+                message: `Setup has been ${socketData.hiddenid ? 'updated' : 'created'} successfully`
             });
         } else {
             throw new Error('Database update failed');
         }
 
     } catch (err) {
-        console.error(err);
-        return socket.emit(`${melody1}_${eventName}`, {
+        console.error('Error in insertOrUpdateHandler:', err); // Log full error
+        return socket.emit(eventName, {
             type: 'error',
             message: `Oops, something went wrong: ${err.message}`
         });
