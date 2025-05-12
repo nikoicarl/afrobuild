@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+    <title><%= (setupData && setupData.name == "" || setupData.name == undefined) ? 'LoGig' : setupData.name %> || Enterprise Suite</title>
+    <% if (setupData && setupData.logo == "" || setupData.logo == undefined) { %>
+        <link rel="icon" type="image/x-icon" href="assets/img/logig.png" />
+    <% } else { %>
+        <link rel="icon" type="image/x-icon" href="uploads/<%= setupData.logo %>" />
+    <% } %>
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+    <link href="assets/light_css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/light_css/plugins.css" rel="stylesheet" type="text/css" />
+    <link href="assets/light_css/form-2.css" rel="stylesheet" type="text/css" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <link rel="stylesheet" type="text/css" href="assets/light_css/theme-checkbox-radio.css">
+    <link rel="stylesheet" type="text/css" href="assets/light_css/switches.css">
+
+    <!-- ALL OVASYTE GENERIC COLOR SETTINGS OR COLOR CODES HERE -->
+    <% let ovasytePrimaryColor = setupData.primary_color == null ? '#1b55e2' : setupData.primary_color.split("**")[0]; %> 
+    <% let ovasytePrimaryColorShade = setupData.primary_color == null ? '#c2d5ff' : setupData.primary_color.split("**")[1]; %>
+
+    <% let ovasyteColorStyles = ``; %> 
+
+    <% ovasyteColorStyles += `.ovasyte-bg-primary-color-shade { background-color: ${ovasytePrimaryColorShade} !important; }`; %>
+
+    <% ovasyteColorStyles += `.ovasyte-bg-primary { background-color: ${ovasytePrimaryColor} !important; color: #fff !important; }`; %> 
+    <% ovasyteColorStyles += `.ovasyte-bg-primary-gradient { background-image: linear-gradient(-52deg, ${ovasytePrimaryColorShade} 0%, ${ovasytePrimaryColor} 100%) !important; color: #fff !important; }`; %> 
+    
+    <% ovasyteColorStyles += `.ovasyte-bg-primary-opacity { background-color: ${ovasytePrimaryColor}47 !important; }`; %>
+    <style type="text/css" id="ovasyte_color_theme_style_tag">
+        <%= ovasyteColorStyles %>
+    </style>
+</head>
+
+<body class="form">
+    <div class="form-container outer">
+        <div class="form-form">
+            <div class="form-form-wrap">
+                <div class="form-container">
+                    <div class="form-content">
+                        <div class="mr-5 ml-5 pr-5 pl-5 justify-content-center text-center">
+                            <% if (setupData && setupData.logo == "" || setupData.logo == undefined) { %>
+                                <div class="ml-auto mr-auto" style="width:130px">
+                                    <img  src="assets/img/logo.png"  alt=""  style="max-width: 100%; height: auto;"/>
+                                </div>
+                            <% } else { %>
+                                <div class="ml-auto mr-auto" style="width:120px;">
+                                    <img  src="uploads/<%= setupData.logo %>" alt=""  style="max-width: 100%; height: auto;"/>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <h1 class="mt-3">Sign In</h1>
+                        <p class="">Log in to your account to continue.</p>
+
+                        <form class="text-left c7-login-submit" action="" method="POST">
+                            <div class="form">
+                                <div id="username-field" class="field-wrapper input">
+                                    <label for="username">USERNAME</label>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="feather feather-user">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <input id="username" name="username" type="text" class="form-control username"
+                                        placeholder="Username">
+                                </div>
+
+                                <div id="password-field" class="field-wrapper input mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <label for="password">PASSWORD</label>
+                                        <!-- <a href="auth_pass_recovery_boxed.html" class="forgot-pass-link">Forgot Password?</a> -->
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="feather feather-lock">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    <input id="password" name="password" type="password" class="form-control password" placeholder="Password">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" id="toggle-password" class="feather feather-eye">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" class="ovasyte_login_clear_btn"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="d-sm-flex justify-content-between">
+                                    <div class="field-wrapper">
+                                        <button type="submit" class="btn ovasyte-bg-primary c7-login-form-btn" value="">Log In</button>
+                                    </div>
+                                </div>
+                                <div class="d-sm-flex justify-content-between">
+                                    <div class="field-wrapper c7-login-alert-div"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" class="logig_hidden_url_error" value="<%= JSON.stringify(pageNavigate) %>">
+
+
+    <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
+    <script src="assets/thirdparty/jquery.3.2.1.min.js" type="text/javascript"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <!-- END GLOBAL MANDATORY SCRIPTS -->
+    <!-- <script src="assets/js/authentication/form-2.js"></script> -->
+    <script src="assets/js/sweetalert2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/ajax/app/loginAjax.js" type="text/javascript"></script>
+</body>
+</html>

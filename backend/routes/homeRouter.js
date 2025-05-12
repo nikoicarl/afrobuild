@@ -1,5 +1,6 @@
 const User = require('../model/models/UserModel');
 const Session = require('../model/models/SessionModel');
+const Setup = require('../model/models/SetupModel');
 const Privilege = require('../model/models/PrivilegeFeaturesModel');
 const path = require('path')
 const dotenv = require('dotenv')
@@ -15,9 +16,7 @@ module.exports = function (start, Database) {
                 if (error) {
                     new Setup(Database);
                     new Privilege(Database, 0);
-                    new Employee(Database);
                     new User(Database);
-                    new UserEmployee(Database);
                     new Session(Database);
 
                     console.log('Third error run');
@@ -38,7 +37,7 @@ module.exports = function (start, Database) {
                         }
                     } else {
                         new Privilege(Database, 0);
-                        console.log('Forth error run');
+                        console.log('No Setup data found');
                         response.render('setup', {pageNavigate: queryStr});
                     }
                 }
