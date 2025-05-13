@@ -82,7 +82,7 @@ module.exports = (socket, Database) => {
                     // Insert session
                     const sessionid = gf.getTimeStamp();
                     const sessionResult = await SessionModel.insertTable([
-                        sessionid, gf.getDateTime(), null, userid, 'active',
+                        sessionid, userid, 'Business Setup', gf.getDateTime(), null,
                     ]);
 
                     if (sessionResult.affectedRows) {
@@ -135,7 +135,7 @@ module.exports = (socket, Database) => {
                         }
 
                         if (privilegeResult.affectedRows) {
-                            const sessionResult = await SessionModel.insertTable([sessionid, userid, 'business setup', gf.getDateTime()]);
+                            const sessionResult = await SessionModel.insertTable([sessionid, userid, 'business setup', gf.getDateTime(), null]);
 
                             if (sessionResult.affectedRows) {
                                 const token = gf.shuffle("qwertyuiopasdfghjklzxcvbnm");

@@ -52,7 +52,7 @@ module.exports = function (socket, Database) {
             const sessionId = gf.getTimeStamp();
 
             // Insert session into the database
-            const sessionResult = await SessionModel.insertTable([sessionId, userId, 'logged in successfully', gf.getDateTime()]);
+            const sessionResult = await SessionModel.insertTable([sessionId, userId, 'logged in successfully', gf.getDateTime(), null]);
 
 
             if (!sessionResult.affectedRows) {
