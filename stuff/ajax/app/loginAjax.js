@@ -1,81 +1,74 @@
-$(document).ready(function () { 
+$(document).ready(() => {
     const socket = io();
 
-    // Handle login form submission
-    $('.afrobuild-login-submit').submit(function (e) {
+    $(document).on('submit', 'form.business-setup-form', function (e) {
         e.preventDefault();
 
-        const username = $('.username', this).val();
-        const password = $('.password', this).val();
+        const $form = $(this);
+        const $submitBtn = $form.find('#submit');
 
-        // Set submit button to loading state
-        const $submitBtn = $('.afrobuild-login-form-btn');
-        $submitBtn.html('<div class="spinner-border align-self-center loader-sm" role="status"></div>');
-        $submitBtn.attr('disabled', true);
+        const formData = getFormData($form, ['name', 'email', 'mobile', 'country', 'region', 'address']);
 
-        setTimeout(() => {
-            socket.emit('system_login', {
-                username: username,
-                password: password
-            });
-        }, 500);
-
-        // Handle login response
-        socket.on('_system_login', (data) => {
-            if (data.type === "success") {
-                Swal.fire({
-                    title: 'Success',
-                    text: data.message,
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-
-                const melody = {
-                    melody1: data.melody1,
-                    melody2: data.melody2
-                };
-
-                window.localStorage.setItem('melody', JSON.stringify(melody));
-
-                const queryString = window.location.search;
-                const pubMedQuery = (queryString.includes("pub") && queryString.includes("med")) 
-                    ? queryString 
-                    : `?pub=${melody.melody2}&med=${melody.melody1}`;
-                
-                window.location.replace("/dashboard" + pubMedQuery + "&evn=dash");
-            } else {
-                Swal.fire({
-                    title: data.type === "caution" ? 'Caution' : 'Error',
-                    text: data.message,
-                    icon: data.type === "caution" ? 'warning' : 'error',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-            }
-
-            $submitBtn.html('Sign In');
-            $submitBtn.removeAttr('disabled');
-            $('.password').val('');
-        });
-    });
-
-    // Toggle password visibility
-    $(document).on("click", "path.ovasyte_login_clear_btn", function () {
-        const passwordInput = $('#password');
-        const inputType = passwordInput.attr('type');
-
-        passwordInput.attr('type', inputType === 'password' ? 'text' : 'password');
-    });
-
-    // Redirect on error from hidden error field
-    const hiddenError = $('.logig_hidden_url_error').val();
-    try {
-        const err = JSON.parse(hiddenError);
-        if (err.error) {
-            window.location.replace("/" + window.location.search);
+        if (isMissingRequiredFields(formData)) {
+            Swal.fire('Missing Info', 'Please fill in all required fields.', 'warning');
+            return;
         }
-    } catch (e) {
-        console.warn("Invalid JSON in hidden error field");
+
+        showSubmitting($submitBtn);
+
+        socket.emit('businessSetup', formData);
+
+        socket.once('_businessSetup', (data) => handleResponse(data, $form, $submitBtn));
+    });
+
+    function getFormData($form, fields) {
+        return fields.reduce((data, field) => {
+            data[field] = $form.find(`#${field}`).val().trim();
+            return data;
+        }, {});
+    }
+
+    function isMissingRequiredFields(data) {
+        return ['email', 'mobile', 'country', 'region', 'address'].some(key => !data[key]);
+    }
+
+    function showSubmitting($btn) {
+        $btn.prop('disabled', true).html(`
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...
+        `);
+    }
+
+    function resetButton($btn) {
+        $btn.prop('disabled', false).html('Submit');
+    }
+
+    function handleResponse(data, $form, $submitBtn) {
+        const types = {
+            success: { icon: 'success', title: 'Success' },
+            caution: { icon: 'warning', title: 'Note' },
+            error: { icon: 'error', title: 'Error' }
+        };
+
+        const { type = 'error', message = 'Something happened.', melody1, melody2 } = data;
+        const alertType = types[type] || types.error;
+
+        Swal.fire({
+            title: alertType.title,
+            text: message,
+            icon: alertType.icon,
+            timer: 3000,
+            showConfirmButton: false
+        });
+
+        if (type === 'success') {
+            $form[0].reset();
+            setTimeout(() => {
+                // Example: redirect to dashboard or use melody values
+                // window.location.href = `/welcome/${melody2}`;
+                window.location.reload(); 
+            }, 3000);
+        } else {
+            resetButton($submitBtn);
+        }
     }
 });
