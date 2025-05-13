@@ -1,92 +1,94 @@
-const Session = require('./SessionModel');
 const CreateUpdateModel = require('./CreateUpdateModel');
 
-//Intialize Class
 class User {
-
-    //Constructor 
-    constructor (Database) {
-        //Create foreign key tables
-        this.SessionModel = new Session(Database);
-
+    constructor(Database) {
         this.Database = Database;
 
-        //Table columns
-        this.columnsList = ['userid', 'first_name', 'last_name', 'phone', 'email', 'address', 'username', 'password', 'status', 'date_time', 'sessionid'];
+        // Columns in the 'user' table
+        this.columnsList = [
+            'userid', 'first_name', 'last_name', 'phone', 'email',
+            'address', 'username', 'password', 'status', 'date_time', 'sessionid'
+        ];
 
-        //Call to create table if not exist
+        // Ensure the table is created
         this.createTable();
     }
 
-    //Insert method
-    async insertTable (columns) {
-        let result = await this.createTable();
-        try {
-            if (result) {
-                let sql = `
-                    INSERT INTO user (${this.columnsList.toString()}) VALUES (?,?,?,?,?,?,?,?,?,?,?);
-                `;
-                result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
-                return result;
-            } else {
-                return result;
-            }
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Update method
-    async updateTable (object) {
-        try {
-            let sql = 'UPDATE user SET '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Fetch for prepared statement
-    async preparedFetch (object) {
-        try {
-            let sql = 'SELECT * FROM user WHERE '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Create table method
     async createTable() {
         const CreateUpdateTable = new CreateUpdateModel(this.Database, {
             tableName: 'user',
-
-            createTableStatement: (`
+            createTableStatement: `
                 userid BIGINT(100) PRIMARY KEY,
-                first_name varchar(255),
-                last_name varchar(255),
-                phone varchar(50),
-                email varchar(255),
-                address varchar(255),
-                username varchar(50),
-                password text,
-                status varchar(50),
-                date_time datetime,
+                first_name VARCHAR(255),
+                last_name VARCHAR(255),
+                phone VARCHAR(50),
+                email VARCHAR(255),
+                address VARCHAR(255),
+                username VARCHAR(50),
+                password TEXT,
+                status VARCHAR(50),
+                date_time DATETIME,
                 sessionid BIGINT(100)
-            `),
-
-            foreignKeyStatement: (`
-                ALTER TABLE user ADD FOREIGN KEY(sessionid) REFERENCES session(sessionid); 
-            `),
-
+            `,
+            foreignKeyStatement: `
+                ALTER TABLE user ADD FOREIGN KEY(sessionid) REFERENCES session(sessionid)
+            `,
             alterTableStatement: []
         });
-        let result = await CreateUpdateTable.checkTableExistence();
-        return result;
+
+        return await CreateUpdateTable.checkTableExistence();
     }
 
+    async insertTable(columns) {
+        await this.createTable();
+        try {
+            const placeholders = this.columnsList.map(() => '?').join(',');
+            const sql = `INSERT INTO user (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const result = await this.Database.setupConnection({ sql, columns }, 'object');
+            return result;
+        } catch (error) {
+            console.error('Insert User Error:', error);
+            return { error: true, message: error.message };
+        }
+    }
+
+    async updateTable({ sql, columns }) {
+        try {
+            const fullSql = `UPDATE user SET ${sql}`;
+            const result = await this.Database.setupConnection({ sql: fullSql, columns }, 'object');
+            return result;
+        } catch (error) {
+            console.error('Update User Error:', error);
+            return { error: true, message: error.message };
+        }
+    }
+
+    async preparedFetch({ sql, columns }) {
+        try {
+            const fullSql = `SELECT * FROM user WHERE ${sql}`;
+            const result = await this.Database.setupConnection({ sql: fullSql, columns }, 'object');
+            return result;
+        } catch (error) {
+            console.error('Fetch User Error:', error);
+            return { error: true, message: error.message };
+        }
+    }
+
+    // Optional: Get a user by username
+    async getUserByUsername(username) {
+        return await this.preparedFetch({
+            sql: 'username = ?',
+            columns: [username]
+        });
+    }
+
+    // Optional: Soft-delete user by setting status
+    async deactivateUser(userid) {
+        return await this.updateTable({
+            sql: 'status = ? WHERE userid = ?',
+            columns: ['inactive', userid]
+        });
+    }
 }
 
 module.exports = User;
