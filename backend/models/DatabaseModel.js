@@ -5,6 +5,7 @@ const path = require('path')
 const dotenv = require('dotenv')
 dotenv.config({ path: path.join(__dirname, `../../../system.env`)})
 
+
 //Defining a class for the database connection
 class DbConnect {
 
@@ -63,52 +64,33 @@ class DbConnect {
     }
 
     //connection setup
-    async setupConnection(sqlOrObject, type) {
-    try {
-        let sqlFormat;
-        if (type === 'sql') {
-            sqlFormat = sqlOrObject;
-        } else {
-            let sql = sqlOrObject.sql, 
+    async setupConnection (sqlOrObject, type) {
+        try {
+            let sqlFormat;
+            if (type == 'sql') {
+                sqlFormat = sqlOrObject;
+            } else {
+                let sql = sqlOrObject.sql, 
                 columns = sqlOrObject.columns;
-            sqlFormat = mysql.format(sql, columns);
-        }
-
-        let promisifyConnection;
-        let result;
-
-        // For MySQL
-        if (process.env.DB_CONNECTION_TYPE === 'mysql') {
-            promisifyConnection = promisify(this.dbcon.query).bind(this.dbcon);
-            result = await promisifyConnection(sqlFormat);
-            
-            // Check for affectedRows for MySQL
-            if (result && result.affectedRows !== undefined) {
-                return result;  // MySQL query result with affectedRows
+                sqlFormat = mysql.format(sql, columns);
             }
+    
+            let promisifyConnection;
+            if (process.env.DB_CONNECTION_TYPE == 'mysql') {
+                promisifyConnection = promisify(this.dbcon.query).bind(this.dbcon);
+            } else if (process.env.DB_CONNECTION_TYPE == 'sqlite') {
+                promisifyConnection = promisify(this.dbcon.run).bind(this.dbcon);
+            } else if (process.env.DB_CONNECTION_TYPE == 'sqlite-fetch') {
+                promisifyConnection = promisify(this.dbcon.all).bind(this.dbcon);
+            } else {
+                promisifyConnection = promisify(this.dbcon.query).bind(this.dbcon);
+            }
+    
+            return await promisifyConnection(sqlFormat);
+        } catch (error) {
+            // console.log(error);
         }
-        // For SQLite
-        else if (process.env.DB_CONNECTION_TYPE === 'sqlite') {
-            promisifyConnection = promisify(this.dbcon.run).bind(this.dbcon);
-            result = await promisifyConnection(sqlFormat);
-
-            // Return SQLite result if available (affectedRows concept does not apply in SQLite the same way)
-            return result; // SQLite does not have affectedRows, just return result
-        }
-        // For SQLite fetch
-        else if (process.env.DB_CONNECTION_TYPE === 'sqlite-fetch') {
-            promisifyConnection = promisify(this.dbcon.all).bind(this.dbcon);
-            result = await promisifyConnection(sqlFormat);
-            return result;  // SQLite fetch query results
-        }
-
-        return result; // Return result in all cases if above conditions are not met
-    } catch (error) {
-        console.error('Error during setupConnection:', error);
-        return { error: 'Database query failed: ' + error.message };
     }
-}
-
 }
 
 module.exports = DbConnect;

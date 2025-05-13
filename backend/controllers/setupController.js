@@ -105,6 +105,8 @@ module.exports = (socket, Database) => {
                     gf.getDateTime(), sessionid,
                 ]);
 
+                console.log(insertSetupResult);
+
                 if (insertSetupResult.affectedRows) {
                     const insertUserResult = await UserModel.insertTable([
                         userid, 'admin', md5('admin123'), 'active', gf.getDateTime(), null,
