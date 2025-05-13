@@ -1,120 +1,146 @@
 const Setup = require('../models/SetupModel');
-const UserModel = require('../models/UserModel');
+const User = require('../models/UserModel');
+const Session = require('../models/SessionModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
-const crypto = require('crypto');  // Add the crypto module
+const Apps = require('../models/AppsModel');
+const md5 = require('md5');
 
 const gf = new GeneralFunction();
 
-
 module.exports = (socket, Database) => {
-    socket.on('businessSetup', async (socketData) => {
+    socket.on('businessSetup', async (browserblob) => {
+        const { name, email, mobile, address, country, region } = browserblob;
+
+        const AppsModel = new Apps(Database);
+        const SetupModel = new Setup(Database);
+        const UserModel = new User(Database);
+        const SessionModel = new Session(Database);
+
         try {
-            const {
-                name,
-                email,
-                mobile,
-                country,
-                region,
-                address,
-                hiddenid,
-                logo,
-                primary_color,
-                sessionid
-            } = socketData;
-
-            // Validation check for required fields
-            if (!name || !email || !mobile || !country || !region || !address) {
-                socket.emit('error', { message: 'Required fields missing.' });
-                return;
+            // Validate input fields
+            const validationStatus = gf.ifEmpty([name, email, mobile, address, country, region]);
+            if (validationStatus.includes('empty')) {
+                return socket.emit('_businessSetup', {
+                    type: 'caution',
+                    message: 'Some fields are required',
+                });
             }
 
-            // Email validation using regular expression
-            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            if (!emailRegex.test(email)) {
-                socket.emit('error', { message: 'Invalid email format.' });
-                return;
-            }
-
-            // INSERT NEW USER BEFORE SETUP
-            const User = new UserModel(Database);
-            const existingUser = await User.preparedFetch({
-                sql: 'email = ?',
-                columns: [email]
+            // Ensure 'afrobuild' app is registered
+            const appCheck = await AppsModel.preparedFetch({
+                sql: '1',
+                columns: ['afrobuild'],
             });
 
-            if (!Array.isArray(existingUser) || existingUser.length === 0) {
+            if (!appCheck.length) {
+                await AppsModel.insertTable([gf.getTimeStamp(), 'afrobuild', 'yes']);
+            }
+
+            // Check for existing setup
+            const setupResult = await SetupModel.preparedFetch({
+                sql: '1',
+                columns: [],
+            });
+
+            if (Array.isArray(setupResult) && setupResult.length > 0) {
+                // Update existing setup
+                const updateResult = await SetupModel.updateTable({
+                    sql: 'name=?, email=?, phone=?, address=?, country=?, state_region=? WHERE 1',
+                    columns: [name, email, mobile, address, country, region],
+                });
+
+                if (updateResult.affectedRows) {
+                    await UserModel.updateTable({
+                        sql: 'username=?, password=?, status=?, date_time=? WHERE 1',
+                        columns: ['admin', md5('admin123'), 'active', gf.getDateTime()],
+                    });
+
+                    const userFetch = await UserModel.preparedFetch({
+                        sql: '1',
+                        columns: [],
+                    });
+
+                    const userid = userFetch?.[0]?.userid;
+                    if (!userid) throw new Error('User ID not found');
+
+                    const PrivilegeModelWithUser = new Privilege(Database, userid);
+                    const privileges = await PrivilegeModelWithUser.getPrivileges();
+
+                    if (!privileges.privilegeData?.administration?.add_privilege) {
+                        const privilegeid = gf.getTimeStamp();
+                        await PrivilegeModelWithUser.insertTable(privilegeid, userid, 'admin');
+                    } else {
+                        await PrivilegeModelWithUser.updateSingleTable(
+                            'administration', 'add_privilege', 'yes', 'add_setup', 'yes', userid
+                        );
+                    }
+
+                    const sessionid = gf.getTimeStamp();
+                    const sessionResult = await SessionModel.insertTable([
+                        sessionid, gf.getDateTime(), null, userid, 'active',
+                    ]);
+
+                    if (sessionResult.affectedRows) {
+                        const token = gf.shuffle("qwertyuiopasdfghjklzxcvbnm");
+                        const melody1 = (token.slice(0, 4) + userid + token.slice(5, 7) + '-' + token.slice(7, 9) + sessionid + token.slice(10, 14)).toUpperCase();
+
+                        socket.emit('_businessSetup', {
+                            type: 'success',
+                            message: 'Account has been set up successfully, redirecting...',
+                            melody1,
+                            melody2: md5(userid),
+                        });
+                    }
+                }
+            } else {
+                
+                // Insert new setup
+                const setupid = gf.getTimeStamp();
+                const sessionid = gf.getTimeStamp();
                 const userid = gf.getTimeStamp();
-                const date_time = gf.getDateTime();
 
-                const nameParts = name.split(' ');
-                const firstName = nameParts[0];
-                const lastName = nameParts.slice(1).join(' '); // Join remaining parts as last name
+                const insertSetupResult = await SetupModel.insertTable([
+                    setupid, name, email, mobile, address, country, region, 'active',
+                    gf.getDateTime(), sessionid,
+                ]);
 
-                // Hash the password before storing (MD5 example)
-                const hashedPassword = crypto.createHash('md5').update('12345').digest('hex'); // Set default password as '12345'
+                if (insertSetupResult.affectedRows) {
+                    const insertUserResult = await UserModel.insertTable([
+                        userid, 'admin', md5('admin123'), 'active', gf.getDateTime(), null,
+                    ]);
 
-                const userColumns = [
-                    userid,
-                    firstName,          // first_name
-                    lastName || '',     // last_name
-                    mobile,             // phone
-                    email,              // email
-                    address,            // address
-                    email.split('@')[0],// username (basic example)
-                    hashedPassword,     // password (set as MD5 hashed)
-                    'active',           // status
-                    date_time           // date_time
-                ];
+                    if (insertUserResult.affectedRows) {
+                        const privilegeid = gf.getTimeStamp();
+                        const privilegeResult = await PrivilegeModel.insertTable(privilegeid, userid, 'admin');
 
-                await User.insertTable(userColumns);
+                        if (privilegeResult.affectedRows) {
+                            const sessionResult = await SessionModel.insertTable([
+                                sessionid, gf.getDateTime(), null, userid, 'active',
+                            ]);
+
+                            if (sessionResult.affectedRows) {
+                                const token = gf.shuffle("qwertyuiopasdfghjklzxcvbnm");
+                                const melody1 = (token.slice(0, 4) + userid + token.slice(5, 7) + '-' + token.slice(7, 9) + sessionid + token.slice(10, 14)).toUpperCase();
+
+                                socket.emit('_businessSetup', {
+                                    type: 'success',
+                                    message: 'Account has been set up successfully, redirecting...',
+                                    melody1,
+                                    melody2: md5(userid),
+                                });
+                            }
+                        }
+                    }
+                }
             }
-
-            // INSERT OR UPDATE SETUP
-            await insertOrUpdateHandler({
-                socket,
-                Database,
-                ModelClass: Setup,
-                PrivilegeClass: Privilege,
-                socketData: { hiddenid },
-                requiredFields: [name, email, mobile, country, region, address],
-                uniqueCheck: { email },
-                columnsToInsert: [
-                    gf.getTimeStamp(),
-                    name,
-                    email,
-                    mobile,
-                    address,
-                    country,
-                    region,
-                    '',
-                    '',
-                    logo || '',
-                    primary_color || '',
-                    'active',
-                    gf.getDateTime(),
-                    sessionid || ''
-                ],
-                columnsToUpdate: [
-                    { name: 'name', value: name },
-                    { name: 'email', value: email },
-                    { name: 'phone', value: mobile },
-                    { name: 'address', value: address },
-                    { name: 'country', value: country },
-                    { name: 'state_region', value: region },
-                    { name: 'logo', value: logo || '' },
-                    { name: 'primary_color', value: primary_color || '' }
-                ],
-                privilegeName: 'setup',
-                eventName: 'businessSetup'
-            });
-
-            socket.emit('success', { message: 'Business setup updated successfully.' });
 
         } catch (error) {
-            console.error(error);
-            socket.emit('error', { message: 'An error occurred during the setup process.' });
+            console.error('Account Setup Error:', error);
+            socket.emit('_businessSetup', {
+                type: 'error',
+                message: error.message || 'Unexpected error occurred',
+            });
         }
     });
 };
-

@@ -12,7 +12,7 @@ class User {
         this.Database = Database;
 
         //Table columns
-        this.columnsList = ['userid', 'first_name', 'last_name', 'phone', 'email', 'address', 'username', 'password', 'status', 'date_time'];
+        this.columnsList = ['userid', 'first_name', 'last_name', 'phone', 'email', 'address', 'username', 'password', 'status', 'date_time', 'sessionid'];
 
         //Call to create table if not exist
         this.createTable();
@@ -24,7 +24,7 @@ class User {
         try {
             if (result) {
                 let sql = `
-                    INSERT INTO user (${this.columnsList.toString()}) VALUES (?,?,?,?,?,?,?,?,?,?);
+                    INSERT INTO user (${this.columnsList.toString()}) VALUES (?,?,?,?,?,?,?,?,?,?,?);
                 `;
                 result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
                 return result;
@@ -70,10 +70,11 @@ class User {
                 phone varchar(50),
                 email varchar(255),
                 address varchar(255),
-                username varchar(50
+                username varchar(50),
                 password text,
                 status varchar(50),
-                date_time datetime
+                date_time datetime,
+                sessionid BIGINT(100)
             `),
 
             foreignKeyStatement: (`
