@@ -16,6 +16,7 @@ module.exports = (socket, Database) => {
         const SetupModel = new Setup(Database);
         const UserModel = new User(Database);
         const SessionModel = new Session(Database);
+        const PrivilegeModel = new Privilege(Database);
 
         try {
             // Validate input fields
@@ -30,7 +31,7 @@ module.exports = (socket, Database) => {
             // Ensure 'afrobuild' app is registered
             const appCheck = await AppsModel.preparedFetch({
                 sql: '1',
-                columns: ['afrobuild'],
+                columns: [],
             });
 
             if (!appCheck.length) {
@@ -51,11 +52,13 @@ module.exports = (socket, Database) => {
                 });
 
                 if (updateResult.affectedRows) {
+                    // Update the 'admin' user credentials
                     await UserModel.updateTable({
                         sql: 'username=?, password=?, status=?, date_time=? WHERE 1',
                         columns: ['admin', md5('admin123'), 'active', gf.getDateTime()],
                     });
 
+                    // Fetch the user data
                     const userFetch = await UserModel.preparedFetch({
                         sql: '1',
                         columns: [],
@@ -64,6 +67,7 @@ module.exports = (socket, Database) => {
                     const userid = userFetch?.[0]?.userid;
                     if (!userid) throw new Error('User ID not found');
 
+                    // Ensure privileges are set up for the user
                     const PrivilegeModelWithUser = new Privilege(Database, userid);
                     const privileges = await PrivilegeModelWithUser.getPrivileges();
 
@@ -76,6 +80,7 @@ module.exports = (socket, Database) => {
                         );
                     }
 
+                    // Insert session
                     const sessionid = gf.getTimeStamp();
                     const sessionResult = await SessionModel.insertTable([
                         sessionid, gf.getDateTime(), null, userid, 'active',
@@ -94,7 +99,6 @@ module.exports = (socket, Database) => {
                     }
                 }
             } else {
-                
                 // Insert new setup
                 const setupid = gf.getTimeStamp();
                 const sessionid = gf.getTimeStamp();
@@ -106,10 +110,8 @@ module.exports = (socket, Database) => {
                 ]);
 
                 if (insertSetupResult.affectedRows) {
-                    const insertUserResult = await UserModel.insertTable([
-                        userid, 'admin', md5('admin123'), 'active', gf.getDateTime(), null,
-                    ]);
-                    console.log('User Insert Result:', insertUserResult);
+                    const insertUserResult = await UserModel.insertTable([userid, 'admin', null, null, null, null, 'admin', md5('admin123'), 'active', gf.getDateTime(), null]);
+
                     if (insertUserResult.affectedRows) {
                         const privilegeid = gf.getTimeStamp();
                         const privilegeResult = await PrivilegeModel.insertTable(privilegeid, userid, 'admin');
@@ -134,7 +136,6 @@ module.exports = (socket, Database) => {
                     }
                 }
             }
-
         } catch (error) {
             console.error('Account Setup Error:', error);
             socket.emit('_businessSetup', {
