@@ -208,14 +208,14 @@ class PrivilegeFeature {
         if (apps.length > 0) {
             for (let i = 0; i < apps.length; i++) {
                 const app = apps[i];
-                if (app.app == 'account') {
-                    privilegeData['account'] = {};
+                if (app.app == 'afrobuild') {
+                    privilegeData['afrobuild'] = {};
                     let result = await this.fetchPrivilege('privilege_afrobuild');
                     let columnsList = PrivilegeAfrobuild.columnList;
                     if (columnsList.length > 0) {
                         for (let i = 0; i < columnsList.length; i++) {
                             const column = columnsList[i];
-                            privilegeData.account[column] = result[column];
+                            privilegeData.afrobuild[column] = result[column];
                             privilegeColumns[column] = result[column];
                         }
                     }
@@ -310,7 +310,7 @@ class PrivilegeFeature {
                 const app = apps[i];
                 let statement;
                 
-                if (app == 'account') {
+                if (app == 'afrobuild') {
                     statement = {
                         tableName: PrivilegeAfrobuild.tableName,
                         createTableStatement: PrivilegeAfrobuild.createTableStatement,

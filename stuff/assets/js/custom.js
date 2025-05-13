@@ -1,51 +1,74 @@
-$(document).ready(function () {
+$(document).ready(() => {
     const socket = io();
 
     $(document).on('submit', 'form.business-setup-form', function (e) {
         e.preventDefault();
 
         const $form = $(this);
+        const $submitBtn = $form.find('#submit');
 
-        // Extract form field values
-        const name = $('#name', $form).val();
-        const email = $('#email', $form).val();
-        const mobile = $('#mobile', $form).val();
-        const country = $('#country', $form).val();
-        const region = $('#region', $form).val();
-        const address = $('#address', $form).val();
+        const formData = getFormData($form, ['name', 'email', 'mobile', 'country', 'region', 'address']);
 
-        // Simple validation
-        if (!email || !mobile || !country || !region || !address) {
+        if (isMissingRequiredFields(formData)) {
             Swal.fire('Missing Info', 'Please fill in all required fields.', 'warning');
             return;
         }
 
-        const $submitBtn = $('#submit', $form);
-        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...');
+        showSubmitting($submitBtn);
 
-        // Emit the form data via socket
-        socket.emit('businessSetup', {
-            name,
-            email,
-            mobile,
-            country,
-            region,
-            address
-        });
+        socket.emit('businessSetup', formData);
 
-        // Handle server response
-        socket.once('businessSetupResponse', function (data) { // Use .once to listen for the response just once
-            if (data.type === 'success') {
-                Swal.fire('Success', data.message || 'Business setup completed.', 'success');
-                $form[0].reset(); // reset the form
-            } else if (data.type === 'caution') {
-                Swal.fire('Note', data.message || 'Something to be aware of.', 'warning');
-            } else {
-                Swal.fire('Error', data.message || 'Something went wrong.', 'error');
-            }
-
-            // Reset submit button
-            $submitBtn.prop('disabled', false).html('Submit');
-        });
+        socket.once('_businessSetup', (data) => handleResponse(data, $form, $submitBtn));
     });
+
+    function getFormData($form, fields) {
+        return fields.reduce((data, field) => {
+            data[field] = $form.find(`#${field}`).val().trim();
+            return data;
+        }, {});
+    }
+
+    function isMissingRequiredFields(data) {
+        return ['email', 'mobile', 'country', 'region', 'address'].some(key => !data[key]);
+    }
+
+    function showSubmitting($btn) {
+        $btn.prop('disabled', true).html(`
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...
+        `);
+    }
+
+    function resetButton($btn) {
+        $btn.prop('disabled', false).html('Submit');
+    }
+
+    function handleResponse(data, $form, $submitBtn) {
+        const types = {
+            success: { icon: 'success', title: 'Success' },
+            caution: { icon: 'warning', title: 'Note' },
+            error: { icon: 'error', title: 'Error' }
+        };
+
+        const { type = 'error', message = 'Something happened.', melody1, melody2 } = data;
+        const alertType = types[type] || types.error;
+
+        Swal.fire({
+            title: alertType.title,
+            text: message,
+            icon: alertType.icon,
+            timer: 3000,
+            showConfirmButton: false
+        });
+
+        if (type === 'success') {
+            $form[0].reset();
+            setTimeout(() => {
+                // Example: redirect to dashboard or use melody values
+                // window.location.href = `/welcome/${melody2}`;
+                window.location.reload(); 
+            }, 3000);
+        } else {
+            resetButton($submitBtn);
+        }
+    }
 });

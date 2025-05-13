@@ -62,8 +62,8 @@ class Session {
             createTableStatement: (`
                 sessionid BIGINT(100) PRIMARY KEY,
                 userid BIGINT(100),
-                datetime datetime,
-                status varchar(50)
+                activity VARCHAR(100),
+                datetime datetime
             `),
 
             foreignKeyStatement: (``),

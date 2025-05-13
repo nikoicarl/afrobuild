@@ -16,7 +16,6 @@ module.exports = (socket, Database) => {
         const SetupModel = new Setup(Database);
         const UserModel = new User(Database);
         const SessionModel = new Session(Database);
-        const PrivilegeModel = new Privilege(Database);
 
         try {
             // Validate input fields
@@ -113,13 +112,30 @@ module.exports = (socket, Database) => {
                     const insertUserResult = await UserModel.insertTable([userid, 'admin', null, null, null, null, 'admin', md5('admin123'), 'active', gf.getDateTime(), null]);
 
                     if (insertUserResult.affectedRows) {
-                        const privilegeid = gf.getTimeStamp();
-                        const privilegeResult = await PrivilegeModel.insertTable(privilegeid, userid, 'admin');
+                        //Get user details
+                        result = await UserModel.preparedFetch({
+                            sql: '1',
+                            columns: []
+                        });
+
+                        let userid = result.length > 0 ? result[0].userid : userid;
+                        const PrivilegeModel = new Privilege(Database, userid);
+                        
+                        //Get privilege data
+                        let privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData;
+
+                        
+                        if (privilegeData.afrobuild.add_privilege != undefined || privilegeData.afrobuild.add_privilege != 'no' || privilegeData.afrobuild.add_privilege != null || privilegeData.afrobuild.add_privilege != '' || privilegeData.afrobuild.add_privilege != ' ') {
+                            //Update Privilege
+                            privilegeResult = await PrivilegeModel.updateSingleTable('privilege_afrobuild', 'add_privilege', 'yes', 'add_setup', 'yes', userid);
+                        } else {
+                            //Insert Into Privilege
+                            let privilegeid = gf.getTimeStamp();
+                            privilegeResult = await PrivilegeModel.insertTable(privilegeid, userid, 'admin');
+                        }
 
                         if (privilegeResult.affectedRows) {
-                            const sessionResult = await SessionModel.insertTable([
-                                sessionid, gf.getDateTime(), null, userid, 'active',
-                            ]);
+                            const sessionResult = await SessionModel.insertTable([sessionid, userid, 'business setup', gf.getDateTime()]);
 
                             if (sessionResult.affectedRows) {
                                 const token = gf.shuffle("qwertyuiopasdfghjklzxcvbnm");
