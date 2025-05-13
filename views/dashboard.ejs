@@ -1,75 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
 
-<% String.prototype.fullDate = function() { %>
-    <% var inputDate = this; %> 
-    <% if (inputDate == "" || inputDate == null || inputDate == undefined) { %>
-        <% return ''; %>
-    <% } else { %>
-        <% var date = new Date(inputDate); %>
-        <% return date.toDateString(); %>
-    <% } %>
-<% } %>
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 240px;
+      background: #f7f7f7;
+      border-right: 1px solid #ececec;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      z-index: 100;
+    }
 
-<% String.prototype.toUcwords = function() { %>
-    <% let value = this; %>
-    <% if (value == "" || value == null || value == undefined) { %>
-        <% return ''; %>
-    <% } else { %>
-        <% return value.replace(/\w+/g, function(a){ %>
-            <% return a.charAt(0).toUpperCase() + a.slice(1).toLowerCase(); %>
-        <% }); %>
-    <% } %>
-<% } %>
+    .logo {
+      font-weight: bold;
+      padding: 35px 30px 20px;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
 
-<% String.prototype.formatNumber = function() { %>
-    <% let value = Number(this); %>
-    <% return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); %>
-<% } %>
+    .home-icon {
+      padding: 10px 0 10px 30px;
+      color: #888;
+      font-size: 18px;
+    }
 
-<% var queryString = 'pub='+pageNavigate.pub+'&med='+pageNavigate.med; %>
+    .sidebar-section {
+      color: #999;
+      font-size: 12px;
+      padding: 15px 30px 10px;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
 
-<%- include ('links/headlinks') %>
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-    <%- include ('navs/navbar') %>
+    .nav-item {
+      margin: 0;
+    }
 
-    <!--  BEGIN BREADCRUMB  -->
-    <%- include ('navs/breadcrumb') %>
-    <!--  END BREADCRUMB  -->
+    .nav-link {
+      display: flex;
+      align-items: center;
+      color: #333;
+      padding: 11px 30px;
+      text-decoration: none;
+      font-size: 14px;
+    }
 
-    <!--  BEGIN MAIN CONTAINER  -->
-    <div class="main-container" style="width: 100%;" id="container">
-        <!--  BEGIN SIDEBAR  -->
-        <%- include ('navs/sidebar') %>
-        <!--  END SIDEBAR  -->
-        
-        <!--  BEGIN CONTENT PART  -->
-        <div id="content" class="main-content">
-            <div class="row">
-                <div class="col-md-12 logig_progress_bar_div hide">
-                    <div class="progress br-10" style="margin: 0 1.5%; height: 8px; background-color: #ffe1e2;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info logig_progress_bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                </div>
-                <div class="col-md-12" id="logig_main_content_display"></div>
-            </div>
-            
-            <input type="hidden" class="hidden_user_email" value="<%= employData.email %> ">
-            <input type="hidden" class="hidden_user_fullname" value="<%= employData.first_name %> <%= employData.other_name %> <%= employData.last_name %>">
-            <input type="hidden" class="hidden_user_type" value="<%= userData.status %> ">
-            <input type="hidden" class="hidden_userid" value="<%= userData.userid %>">
-            <input type="hidden" class="hidden_delete_for_admin" value="<%= userData.status %>">
-            <input type="hidden" class="hidden_base_currency" value="<%= setupData.currency %>">
-            <input type="hidden" class="hidden_base_primarycolor" value="<%= setupData.primary_color %>">
-            <input type="hidden" class="logig_hidden_employeedata" value="<%= JSON.stringify(employData); %> ">
-            <input type="hidden" class="hidden_privilege_data" value="<%= JSON.stringify(privilege); %>">
-            <input type="hidden" class="hidden_setup_data" value="<%= JSON.stringify(setupData); %>">
-            
-            <!--  BEGIN FOOTER  -->
-            <%- include ('navs/footer') %>
-            <!--  END FOOTER  -->
-        </div>
-        <!--  END CONTENT PART  -->
+    .nav-link i {
+      width: 20px;
+      margin-right: 10px;
+      font-size: 18px;
+      color: #888;
+    }
 
+    .nav-link.active {
+      background-color: #f2f2f2;
+    }
+
+    .support-link {
+      margin-top: auto;
+      margin-bottom: 20px;
+      padding: 11px 30px;
+      display: flex;
+      align-items: center;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      border-top: 1px solid #ececec;
+    }
+
+    .support-link i {
+      width: 20px;
+      margin-right: 10px;
+      font-size: 18px;
+      color: #888;
+    }
+
+    .user-profile {
+      border-top: 1px solid #ececec;
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-profile i {
+      font-size: 20px;
+      color: #888;
+      margin-right: 15px;
+    }
+
+    .user-info {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .user-role {
+      color: #999;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 240px;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+      background: white;
+      border: 1px solid #ececec;
+      border-radius: 4px;
+      padding: 25px 30px;
+      height: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .stat-title {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 15px;
+      font-weight: 400;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .stat-subtitle {
+      color: #999;
+      font-size: 13px;
+    }
+
+    /* Table */
+    .table-container {
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #ececec;
+      margin-top: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .table-title {
+      padding: 20px 30px;
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+      border-bottom: 1px solid #ececec;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .custom-table th {
+      text-align: left;
+      padding: 15px 20px;
+      font-weight: normal;
+      color: #777;
+      background-color: #f9f9f9;
+      border: none;
+      font-size: 13px;
+    }
+
+    .custom-table td {
+      padding: 15px 20px;
+      border-top: 1px solid #f0f0f0;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .custom-table tr:first-child td {
+      border-top: none;
+    }
+
+    .status-done {
+      color: #21bf06;
+    }
+
+    .status-pending {
+      color: #ffb200;
+    }
+
+    .status-failed {
+      color: #ff4d6b;
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+      
+      .toggle-sidebar {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 999;
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Toggle button for mobile -->
+  <button class="btn btn-light d-lg-none toggle-sidebar" type="button">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">LOGO</div>
+    <div class="home-icon">
+      <i class="fas fa-home"></i>
     </div>
-    <!-- END MAIN CONTAINER -->
+    <div class="sidebar-section">DAILY OPERATION</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="#" class="nav-link active">
+          <i class="fas fa-th-large"></i>
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-users"></i>
+          Manage Users
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link">
+          <i class="fas fa-box"></i>
+          Manage Products
+        </a>
+      </li>
+    </ul>
+    <a href="#" class="support-link">
+      <i class="fas fa-headset"></i>
+      Support
+    </a>
+    <div class="user-profile">
+      <i class="fas fa-user"></i>
+      <div>
+        <div class="user-info">John Doe</div>
+        <div class="user-role">Admin</div>
+      </div>
+    </div>
+  </div>
 
-<%- include ('links/footlinks') %>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-title">Total no. of Products/Services</div>
+          <div class="stat-value">1200</div>
+          <div class="stat-subtitle">in 12 categories</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-title">Total no. of Merchants</div>
+          <div class="stat-value">150</div>
+          <div class="stat-subtitle">From 8 regions in Ghana</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-title">Total no. of Transactions</div>
+          <div class="stat-value">₵150,000,000.00</div>
+          <div class="stat-subtitle">From Aug 2023 to Mar 2025</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="table-container">
+      <div class="table-title">Recent Transactions</div>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>Transaction ID</th>
+              <th>Product/Service</th>
+              <th>Category</th>
+              <th>Customer Name</th>
+              <th>Date</th>
+              <th>Merchant Name</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-pending">Pending</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-failed">Failed</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-failed">Failed</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>AF1032993</td>
+              <td>Cement</td>
+              <td>Building</td>
+              <td>Kofi Owusu</td>
+              <td>12/03/23</td>
+              <td>Jane Doe</td>
+              <td>₵ 300.00</td>
+              <td class="status-done">Done</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Toggle sidebar on mobile
+    const toggleButton = document.querySelector('.toggle-sidebar');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (toggleButton) {
+      toggleButton.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    // Close sidebar when clicking outside (on mobile)
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) {
+        if (!sidebar.contains(e.target) && !toggleButton.contains(e.target) && sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
