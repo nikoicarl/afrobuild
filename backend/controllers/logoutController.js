@@ -8,9 +8,11 @@ const gf = new GeneralFunction();
 
 module.exports = function (socket, Database) {
     socket.on('logoutAction', async function (browserblob) {
+
         const { melody1, melody2 } = browserblob;
 
         const session = getSessionIDs(melody1);
+        
 
         if (!session || !session.userid || !session.sessionid) {
             return socket.emit(`${melody1}_logoutAction`, {
@@ -25,10 +27,13 @@ module.exports = function (socket, Database) {
 
         try {
             if (md5(userid.toString()) === melody2) {
+                console.log('true');
                 const result = await SessionModel.updateTable({
                     sql: 'logout=? WHERE sessionid=?',
                     columns: [gf.getDateTime(), sessionid]
                 });
+
+                console.log(sessionid);
 
                 if (result.affectedRows) {
                     return socket.emit(`${melody1}_logoutAction`, {
