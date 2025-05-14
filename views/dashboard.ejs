@@ -1,3 +1,32 @@
+
+<% String.prototype.fullDate = function() { %>
+    <% var inputDate = this; %> 
+    <% if (inputDate == "" || inputDate == null || inputDate == undefined) { %>
+        <% return ''; %>
+    <% } else { %>
+        <% var date = new Date(inputDate); %>
+        <% return date.toDateString(); %>
+    <% } %>
+<% } %>
+
+<% String.prototype.toUcwords = function() { %>
+    <% let value = this; %>
+    <% if (value == "" || value == null || value == undefined) { %>
+        <% return ''; %>
+    <% } else { %>
+        <% return value.replace(/\w+/g, function(a){ %>
+            <% return a.charAt(0).toUpperCase() + a.slice(1).toLowerCase(); %>
+        <% }); %>
+    <% } %>
+<% } %>
+
+<% String.prototype.formatNumber = function() { %>
+    <% let value = Number(this); %>
+    <% return value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); %>
+<% } %>
+
+<% var queryString = 'pub='+pageNavigate.pub+'&med='+pageNavigate.med; %>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -248,45 +277,9 @@
         <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">LOGO</div>
-        <div class="home-icon">
-            <i class="fas fa-home"></i>
-        </div>
-        <div class="sidebar-section">DAILY OPERATION</div>
-        <ul class="nav-menu">
-            <li class="nav-item " >
-                <a href="#" class="nav-link active ">
-                    <img src="/assets/img/Dashboard.svg" alt="">
-                        &nbsp;&nbsp;Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <img src="/assets/img/Manage accounts.svg" alt="">
-                        &nbsp;&nbsp;Manage Users
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <img src="/assets/img/Folder managed.svg" alt="">
-                        &nbsp;&nbsp;Manage Products
-                </a>
-            </li>
-        </ul>
-        <a href="#" class="support-link">
-            <img src="/assets/img/Support agent.svg" alt="">
-                        &nbsp;&nbsp;Support
-        </a>
-        <div class="user-profile">
-            <i class="fas fa-user"></i>
-            <div>
-                <div class="user-info">John Doe</div>
-                <div class="user-role">Admin</div>
-            </div>
-        </div>
-    </div>
+    <!--  BEGIN SIDEBAR  -->
+        <%- include ('navs/sidebar') %>
+    <!--  END SIDEBAR  -->
 
     <!-- Main Content -->
     <div class="main-content">
@@ -439,27 +432,9 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Toggle sidebar on mobile
-        const toggleButton = document.querySelector('.toggle-sidebar');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (toggleButton) {
-            toggleButton.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-            });
-        }
-
-        // Close sidebar when clicking outside (on mobile)
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth < 992) {
-                if (!sidebar.contains(e.target) && !toggleButton.contains(e.target) && sidebar.classList.contains('show')) {
-                    sidebar.classList.remove('show');
-                }
-            }
-        });
-    </script>
+    <!-- Footlinks -->
+    <%- include ('links/footlinks') %>
+    <!-- Footlinks -->
 </body>
 
 </html>

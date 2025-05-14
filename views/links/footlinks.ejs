@@ -1,46 +1,34 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Toggle sidebar on mobile
+    const toggleButton = document.querySelector('.toggle-sidebar');
+    const sidebar = document.querySelector('.sidebar');
 
-    <script src="assets/js/sweetalert2.min.js"></script>
-    <script src="assets/js/fn.fix-padStart.js"></script>
-    <script src="assets/js/snackbar.min.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/tooltip.js"></script>
-    <script src="assets/js/select2.min.js"></script>
-    <script src="assets/js/custom.js"></script>
-    <script src="assets/js/moment.min.js"></script>
-    <script src="assets/js/fullcalendar.min.js"></script>
-    <script src="assets/js/mDatatable.js"></script>
-    <script src="assets/thirdparty/logigListTable.min.js"></script>
-    <script src="assets/thirdparty/moment.min.js"></script>
-    <script src="assets/thirdparty/daterangepicker.js"></script>
-
-
-    <!-- 
-    <script src="assets/js/apexcharts.min.js"></script> 
-    <script src="assets/js/quill.js"></script>
-    <script src="assets/js/file-upload-with-preview.min.js"></script>
-    -->
-
-    <script>
-        $(document).ready(function() {
-            let copyrightDate = new Date();
-            $('.logig_copyright_year').text(copyrightDate.getUTCFullYear());
-            App.init();
+    if (toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
         });
-    </script>
+    }
 
-    <script src="assets/thirdparty/ejs.min.js"></script>
+    // Close sidebar when clicking outside (on mobile)
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth < 992) {
+            if (!sidebar.contains(e.target) && !toggleButton.contains(e.target) && sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+            }
+        }
+    });
+</script>
 
-    <script src="/socket.io/socket.io.js"></script>
 
-    <script src="assets/thirdparty/generalFunction.js"></script>
-    <script src="assets/thirdparty/compress-img.min.js"></script>
-    <script src="assets/thirdparty/currencies.js"></script>
-    <script src="assets/thirdparty/navigations.js"></script>
 
-    <script src="ajax/app/notificationAjax.js"></script>
-    <script src="ajax/app/remoteResponsesAjax.js"></script>
-    <script src="ajax/app/systemAjax.js"></script>
-    <script src="forms/administration/sidebar.js"></script>
-    <script src="ajax/app/logoutAjax.js"></script>
+<script src="assets/thirdparty/ejs.min.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="assets/thirdparty/generalFunction.js"></script>
+<script src="ajax/app/systemAjax.js"></script>
+<script src="ajax/app/logoutAjax.js"></script>
 </body>
+
 </html>
