@@ -84,6 +84,7 @@ body {
 
 .logout-link {
     display: flex;
+    cursor: pointer;
     align-items: center;
     font-weight: 500;
     color: #d9534f;

@@ -1,53 +1,61 @@
-let dateformat = require('dateformat');
-let getSessionIDs = require('./getSessionIDs');
-const Session = require('../../models/administration/SessionModel');
-const SessionActivity = require('../../models/administration/SessionActivityModel');
-const GeneralFunction = require('../../models/administration/GeneralFunctionModel');
-const gf = new GeneralFunction();
+const dateFormat = require('dateformat');
+const getSessionIDs = require('./getSessionIDs');
+const Session = require('../models/SessionModel');
+const GeneralFunction = require('../models/GeneralFunctionModel');
 const md5 = require('md5');
 
-module.exports = function(socket, Database) {
-    socket.on('logoutAction', async function(browserblob) {
-        let melody1 = browserblob.melody1;
+const gf = new GeneralFunction();
 
-        let session = getSessionIDs(melody1);
-        let userid = session.userid;
-        let sessionid = session.sessionid;
-        
-        const SessionModel = new Session(Database);
-        const SessionActivityModel = new SessionActivity(Database);
+module.exports = function (socket, Database) {
+    socket.on('logoutAction', async function (browserblob) {
+        const { melody1, melody2 } = browserblob;
 
-        if (md5(userid) == browserblob.melody2) {
-            let result = await SessionModel.updateTable({
-                sql: 'logout=? WHERE sessionid=?',
-                columns: [gf.getDateTime(), sessionid]
+        const session = getSessionIDs(melody1);
+
+        if (!session || !session.userid || !session.sessionid) {
+            return socket.emit(`${melody1}_logoutAction`, {
+                type: 'caution',
+                message: 'Invalid session. You are being logged out...',
+                timeout: 'yes'
             });
-            if (result.affectedRows) {
-                let session_activityid = gf.getTimeStamp();
-                result = await SessionActivityModel.insertTable([session_activityid, sessionid, 'logged out of system', 'active', gf.getDateTime()]);
+        }
+
+        const { userid, sessionid } = session;
+        const SessionModel = new Session(Database);
+
+        try {
+            if (md5(userid.toString()) === melody2) {
+                const result = await SessionModel.updateTable({
+                    sql: 'logout=? WHERE sessionid=?',
+                    columns: [gf.getDateTime(), sessionid]
+                });
+
                 if (result.affectedRows) {
-                    socket.emit(melody1+'_logoutAction', {
-                        'type': 'success',
-                        'message': 'Logging out...'
-                    });
-                } else {
-                    socket.emit(melody1+'_logoutAction', {
-                        type: 'error',
-                        message: 'Oops, something went wrong, try again later...'
+                    return socket.emit(`${melody1}_logoutAction`, {
+                        type: 'success',
+                        message: 'Logging out...'
                     });
                 }
-            } else {
-                socket.emit(melody1+'_logoutAction', {
+
+                socket.emit(`${melody1}_logoutAction`, {
                     type: 'error',
-                    message: 'Oops, something went wrong, try again later: '+result
+                    message: 'Could not complete logout.'
+                });
+
+            } else {
+                socket.emit(`${melody1}_logoutAction`, {
+                    type: 'caution',
+                    message: 'Session mismatch. Logging out...',
+                    timeout: 'yes'
                 });
             }
-        } else {
-            socket.emit(melody1+'_logoutAction', {
-                'type': 'caution',
-                'message': 'Sorry your session has expired, you are being logged out...',
-                'timeout': 'yes'
+
+        } catch (err) {
+            console.error('Logout error:', err);
+            socket.emit(`${melody1}_logoutAction`, {
+                type: 'error',
+                message: 'An error occurred while logging out.'
             });
         }
     });
-}
+};
