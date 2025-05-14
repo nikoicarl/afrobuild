@@ -216,6 +216,17 @@ body {
     border-bottom: 1px solid #ececec;
 }
 
+
+/* Striped rows */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Hover effect */
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
 .custom-table {
     width: 100%;
     border-collapse: collapse;
@@ -243,15 +254,15 @@ body {
 }
 
 .status-done {
-    color: #21bf06;
+    color: #21bf06!important;
 }
 
 .status-pending {
-    color: #ffb200;
+    color: #ffb200!important;
 }
 
 .status-failed {
-    color: #ff4d6b;
+    color: #ff4d6b!important;
 }
 
 @media (max-width: 991.98px) {
