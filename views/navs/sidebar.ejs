@@ -32,10 +32,17 @@
     <div class="user-profile">
         <i class="fas fa-user"></i>
         <div>
-            <div class="user-info">John Doe</div>
+            <div class="user-info">
+                <% if (userData.first_name || userData.last_name) { %>
+                    <%= [userData.first_name, userData.last_name].filter(Boolean).join(' ').toUcwords() %>
+                <% } else { %>
+                    &nbsp;
+                <% } %>
+            </div>
             <div class="user-role">Admin</div>
         </div>
     </div>
+
 
     <!-- Logout Button Styled as Menu Item -->
     <div class="logout-section">

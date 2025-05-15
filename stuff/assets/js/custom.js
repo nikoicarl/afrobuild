@@ -65,7 +65,9 @@ $(document).ready(() => {
             setTimeout(() => {
                 // Example: redirect to dashboard or use melody values
                 // window.location.href = `/welcome/${melody2}`;
-                window.location.reload(); 
+                window.location.reload();
+                window.localStorage.clear();
+                window.location.replace("/");
             }, 3000);
         } else {
             resetButton($submitBtn);

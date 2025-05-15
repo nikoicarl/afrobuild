@@ -69,7 +69,7 @@ $(document).ready(function () {
     });
 
     // Redirect on error from hidden error field
-    const hiddenError = $('.logig_hidden_url_error').val();
+    const hiddenError = $('.afrobuild_hidden_url_error').val();
     try {
         const err = JSON.parse(hiddenError);
         if (err.error) {
