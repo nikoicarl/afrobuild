@@ -4,11 +4,7 @@
         e.preventDefault();
 
         const $btn = $(this);
-        
-        // Animation for the button when clicked (spinner effect)
-        $btn.html('<div class="spinner-border text-white mr-2 align-self-center loader-sm"></div>')
-            .fadeOut(200) // Fade out the button
-            .fadeIn(200); // Fade it back in to show the spinner
+        $btn.html('<div class="spinner-border text-white mr-2 align-self-center loader-sm"></div>');
 
         // Retrieve melody from localStorage
         const melody = JSON.parse(localStorage.getItem('melody'));
@@ -28,16 +24,11 @@
             return;
         }
 
-        // Delay logout for UX with smooth transition
+        // Delay logout for UX
         setTimeout(() => {
             socket.emit('logoutAction', {
                 melody1: melody.melody1,
                 melody2: melody.melody2
-            });
-
-            // Page transition effect - fade out page and then redirect
-            $('body').fadeOut(1000, function() {
-                window.location.replace("/"); // redirect after fade
             });
         }, 500);
     });
@@ -63,18 +54,14 @@
                 // Clear client session after a delay
                 setTimeout(() => {
                     window.localStorage.clear();
-                    $('body').fadeOut(1000, function() {
-                        window.location.replace("/");
-                    });
+                    window.location.replace("/");
                 }, 1500);
             }
 
         } else if (data.type === "success") {
             $btn.html(data.message);
             window.localStorage.clear();
-            $('body').fadeOut(1000, function() {
-                window.location.replace("/");
-            });
+            window.location.replace("/");
         }
     });
 })();
