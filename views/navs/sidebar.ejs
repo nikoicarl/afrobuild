@@ -10,18 +10,22 @@
                 &nbsp;&nbsp;Dashboard
             </a>
         </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
+        <% if (privilege.afrobuild.add_user == "yes" || privilege.afrobuild.update_user == "yes" || privilege.afrobuild.deactivate_user == "yes") { %>
+            <li class="nav-item">
+            <a href="/user" class="nav-link" data-appname="afrobuild" class="nav-link logig_main_navigation_btn" data-navparent="crmnavbar" data-scripts="single::afrobuild/subCategoryAjax">
                 <img src="/assets/img/Manage accounts.svg" alt="">
                 &nbsp;&nbsp;Manage Users
             </a>
         </li>
+        <% } %>
+        <% if (privilege.afrobuild.add_product == "yes" || privilege.afrobuild.update_product == "yes" || privilege.afrobuild.deactivate_product == "yes") { %>
         <li class="nav-item">
             <a href="#" class="nav-link">
                 <img src="/assets/img/Folder managed.svg" alt="">
                 &nbsp;&nbsp;Manage Products
             </a>
         </li>
+        <% } %>
     </ul>
 
     <a href="#" class="support-link">
