@@ -70,12 +70,12 @@ module.exports = (socket, Database) => {
                     const PrivilegeModelWithUser = new Privilege(Database, userid);
                     const privileges = await PrivilegeModelWithUser.getPrivileges();
 
-                    if (!privileges.privilegeData?.afrobuild?.add_privilege) {
+                    if (!privileges.privilegeData?.administration?.add_privilege) {
                         const privilegeid = gf.getTimeStamp();
                         await PrivilegeModelWithUser.insertTable(privilegeid, userid, 'admin');
                     } else {
                         await PrivilegeModelWithUser.updateSingleTable(
-                            'afrobuild', 'add_privilege', 'yes', 'add_setup', 'yes', userid
+                            'administration', 'add_privilege', 'yes', 'add_setup', 'yes', userid
                         );
                     }
 
