@@ -1,6 +1,5 @@
 
 function User() {
-    setBreadcrumb('Manage Users', 'fas fa-user');
 
     return `
         <div class="layout-px-spacing mb-5">

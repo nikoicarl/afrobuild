@@ -1,6 +1,5 @@
 
 function Dashboard() {
-    setBreadcrumb('Dashboard', 'fas fa-home');
 
     return `
         <div class="layout-px-spacing mb-5">

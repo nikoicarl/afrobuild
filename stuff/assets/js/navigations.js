@@ -1,54 +1,51 @@
 (() => {
-    // Navigation control buttons event
-    // ====================================================================================================================== //
+    // Utility: Set active nav and breadcrumb
+    const activateNavAndBreadcrumb = ($navItem) => {
+        // Clear previous active states
+        $('.nav-menu .nav-item').removeClass('active');
 
-    // Navigations for main sidebar navs
+        // Activate current
+        $navItem.closest('.nav-item').addClass('active');
+
+        // Set breadcrumb
+        const iconHTML = $navItem.find('img').prop('outerHTML');
+        const breadcrumbText = $.trim($navItem.text());
+        setBreadcrumb(breadcrumbText, iconHTML);
+    };
+
+    // Navigation button click handler
     $(document).on('click.pagenavigation', 'a.afrobuild_main_navigation_btn', function (e) {
         e.preventDefault();
 
         const $this = $(this);
         const href = $this.attr('href');
+        const pageFileName = href.split('/')[1];
         const appname = $this.data('appname');
         const pageScripts = $this.data('scripts');
         const navparent = $this.data('navparent');
-        const pageFileName = href.split('/')[1];
 
-        // Remove all active highlights
-        $('.nav-menu .nav-item').removeClass('active');
+        activateNavAndBreadcrumb($this);
 
-        // Add active class to current clicked item's parent
-        $this.closest('.nav-item').addClass('active');
-
-        // Delay and then navigate
         setTimeout(() => {
             mainPagination(pageFileName, pageScripts, navparent);
         }, 100);
     });
 
+    // Page load: Restore last visited page or default to dashboard
+    const initPageLoad = () => {
+        const pagination = JSON.parse(window.localStorage.getItem('pagination'));
 
-    // ====================================================================================================================== //
+        const pageFileName = pagination?.pageFileName || 'dashboard';
+        const appname = pagination?.appname || 'afrobuild';
 
-    // By default when page loads, we're opening a page based on the URL's pagination. If there isn't any, the dashboard loads.
-    // ====================================================================================================================== //
+        openPage(pageFileName, appname);
 
-    // Getting current pagination data from browser's local storage
-    let pagination = JSON.parse(window.localStorage.getItem('pagination'));
+        const $navItem = $(`a.afrobuild_main_navigation_btn[href="/${pageFileName}"]`);
+        if ($navItem.length) {
+            activateNavAndBreadcrumb($navItem);
+        }
+    };
 
-    // Checking if such data exists
-    if (pagination) {
-        // Pagination data exists, so we're opening the page
-        openPage(pagination.pageFileName, pagination.appname);
-
-        // Add active class to corresponding nav item
-        $(`a.afrobuild_main_navigation_btn[href="/${pagination.pageFileName}"]`).closest('.nav-item').addClass('active');
-    } else {
-        // Open dashboard if there is no data in current pagination
-        openPage('dashboard', 'afrobuild');
-
-        // Default to dashboard
-        $(`a.afrobuild_main_navigation_btn[href="/dashboard"]`).closest('.nav-item').addClass('active');
-    }
-
-
-    // ====================================================================================================================== //
+    // Initialize
+    initPageLoad();
 })();

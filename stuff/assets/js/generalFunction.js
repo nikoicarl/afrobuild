@@ -585,12 +585,13 @@ function makeAllSelectLiveSearchModal(className, placeholder) {
     });
 }
 
-function setBreadcrumb(pageName, iconClass) {
+function setBreadcrumb(pageName, iconHTML) {
     $('.afrobuild_main_page_breadcrumb').html(`
-        <i class="breadcrumb-icon ${iconClass} me-2"></i>
-        <span class="breadcrumb-label">${pageName}</span>
+        ${iconHTML}
+        <span class="breadcrumb-label ms-2">${pageName}</span>
     `);
 }
+
 
 
 //Recreate table tag for mDataTable
