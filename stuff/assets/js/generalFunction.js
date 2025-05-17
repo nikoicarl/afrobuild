@@ -4,13 +4,18 @@ const socket = io();
 //Initialize melody here
 let melody = JSON.parse(window.localStorage.getItem('melody'));
 
+//  Toast Alert 
+let Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    heightAuto:true
+});
+
 if (melody && melody.melody2.length > 6) { } else {
     window.location.replace("/dashboard");
 }
-
-//Set general notification value
-let globalNotificationCount = 0;
-
 
 
 //Capitalize each word in a given string
@@ -59,9 +64,9 @@ String.prototype.fullDateTime = function() {
         return '';
     } else {
         let date = new Date(inputDate);
-        let hh = date.getUTCHours();
-        let min = date.getUTCMinutes();
-        let sec = date.getUTCSeconds();
+        let hh = date.getHours();
+        let min = date.getMinutes();
+        let sec = date.getSeconds();
         return date.toDateString()+' '+hh+':'+(min < 10 ? '0'+min : min)+':'+(sec < 10 ? '0'+sec : sec);
     }
 }
@@ -87,12 +92,12 @@ String.prototype.dbDateFormat = function() {
         return '';
     } else {
         let date = new Date(inputDate);
-        let dd = date.getUTCDate();
-        let mm = date.getUTCMonth()+1; 
-        let yyyy = date.getUTCFullYear();
-        let hh = date.getUTCHours();
-        let min = date.getUTCMinutes();
-        let sec = date.getUTCSeconds();
+        let dd = date.getDate();
+        let mm = date.getMonth()+1; 
+        let yyyy = date.getFullYear();
+        let hh = date.getHours();
+        let min = date.getMinutes();
+        let sec = date.getSeconds();
         return yyyy+'-'+mm+'-'+dd+' '+hh+':'+min+':'+sec;
     }
 }
@@ -156,149 +161,6 @@ function currencyToCoins(currency) {
     }
 }
 
-//Convert double to currency value
-function formatNumber(num) {
-    return num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-}
-
-function numberToWords(num) {
-    let a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
-    let b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
-    
-    if ((num = num.toString()).length > 9) return 'overflow';
-    n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-    if (!n) return; let str = '';
-    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Billion ' : '';
-    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Million ' : '';
-    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
-    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
-    str += (n[5] != 0) ? ((str != '') ? 'And ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
-    return str;
-}
-
-
-function findPosition(obj) { 
-    let currenttop = 0; 
-    if (obj.offsetParent) { 
-        do { 
-            currenttop += (obj.offsetTop - 100); 
-        } while ((obj = obj.offsetParent));
-        return [currenttop]; 
-    } 
-} 
-
-
-
-function thermalPrint(html){
-    let newWindow = window.open('', '', 'height=768, width=1024');
-    newWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-    `);
-    newWindow.document.write(`
-        </head>
-        <body class="bg-white p-5 m-0">
-        ${html}
-    `);
-    newWindow.document.write(`
-        <script>
-            (()=>{
-                setTimeout(()=>{
-                    window.print();
-                }, 1000);
-
-                window.onafterprint = function closeWindow() {
-                    window.close();
-                }
-            })();
-        </script>
-    `);
-    newWindow.document.write(` </body> `);
-    newWindow.focus();
-    newWindow.document.close();
-}
-
-
-function printable(printMe){
-    let docHead = document.head.innerHTML;
-    let printArea = document.getElementById(printMe).innerHTML;
-    let newWindow = window.open('', '', 'height=768, width=1024');
-    newWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-    `);
-    newWindow.document.write(docHead);
-    newWindow.document.write(`
-        </head>
-        <body class="bg-white p-5 m-0">
-    `);
-    newWindow.document.write(printArea);
-    newWindow.document.write(`
-        <script>
-            (()=>{
-                setTimeout(()=>{
-                    window.print();
-                }, 1000);
-
-                window.onafterprint = function closeWindow() {
-                    window.close();
-                }
-            })();
-        </script>
-    `);
-    newWindow.document.write(` </body> `);
-    newWindow.focus();
-    newWindow.document.close();
-}
-
-function printLandscape(printMe){
-    let docHead = document.head.innerHTML;
-    let printArea = document.getElementById(printMe).innerHTML;
-    let newWindow = window.open('', '', 'height=768, width=1024');
-    newWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-    `);
-    newWindow.document.write(docHead);
-    newWindow.document.write(`
-            <style>
-                body {
-                    background-image: none;
-                    background-repeat: no-repeat;
-                    background-color: #fff;
-                }
-            </style>
-            <style type="text/css" media="print">
-                @media print {
-                    @page{size:landscape;}
-                }
-            </style>
-        </head>
-        <body class="bg-white p-5 m-0">
-    `);
-    newWindow.document.write(printArea);
-    newWindow.document.write(`
-        <script>
-            (()=>{
-                setTimeout(()=>{
-                    window.print();
-                }, 1000);
-
-                window.onafterprint = function closeWindow() {
-                    window.close();
-                }
-            })();
-        </script>
-    `);
-    newWindow.document.write(` </body> `);
-    newWindow.focus();
-    newWindow.document.close();
-}
-
-
 function printContent(printDivIdName, footerMessage){
     let docHead = document.head.innerHTML;
     let printArea = document.getElementById(printDivIdName).innerHTML;
@@ -337,39 +199,38 @@ function printContent(printDivIdName, footerMessage){
     // }
 }
 
+//Convert double to currency value
+function formatNumber(num) {
+    return num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
 
-function printableWithHeaderFooter(printMe, header, footer){
-    let printPage = document.body.innerHTML;
+function numberToWords(num) {
+    let a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+    let b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
     
-    let printDiv = document.getElementById(printMe);
-    printDiv.style.position = "relative";
-
-    // let headerDiv = document.getElementById(header);
-    // headerDiv.style.position = "absolute";
-    // headerDiv.style.top = "0";
-
-    let footerDiv = document.getElementById(footer);
-    footerDiv.style.position = "absolute";
-    footerDiv.style.bottom = "0";
-
-    let printArea = document.getElementById(printMe).innerHTML;
-    document.body.innerHTML = printArea;
-
-    window.onbeforeprint = function() {
-        // let headerDiv = document.getElementById(header);
-        // headerDiv.style.position = "fixed";
-        // headerDiv.style.top = "0";
-        // console.log("Before print is initialized");
-    };
-    window.print();
-    document.body.innerHTML = printPage;
+    if ((num = num.toString()).length > 9) return 'overflow';
+    n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return; let str = '';
+    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Billion ' : '';
+    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Million ' : '';
+    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+    str += (n[5] != 0) ? ((str != '') ? 'And ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+    return str;
 }
 
-// Navigation Function
-function navigation(open, general){
-    $('.'+general).hide();
-    $('.'+open).show();
-}
+
+function findPosition(obj) { 
+    let currenttop = 0; 
+    if (obj.offsetParent) { 
+        do { 
+            currenttop += (obj.offsetTop - 100); 
+        } while ((obj = obj.offsetParent));
+        return [currenttop]; 
+    } 
+} 
+
+
 
 //set global variable
 let globalFiles, globalFilesSocket = [], globalFilesEventsSocket = [];
@@ -388,7 +249,6 @@ function customDropzone(dropzoneIdName, dropzoneInputIdName, dropzonePreviewIdNa
         if (mainFiles) {
             dropzonePreview.innerHTML = '<div class="row dropzone_preview_sub_div"> </div>';
             for (i = 0; i < mainFiles.length; i++) {
-                // console.log(mainFiles[i].type);
                 imageIdName = 'dropzoneImage_' + i;
                 let ext = mainFiles[i].type.split('/');
                 if (ext[1] == "png" || ext[1] == "jpg" || ext[1] == "jpeg") {
@@ -444,7 +304,6 @@ function customDropzone(dropzoneIdName, dropzoneInputIdName, dropzonePreviewIdNa
                 data: reader.result 
             });
         };
-        // console.log(memoAttachedFile);
     };
 
     // $(document).on('click', 'span.drozone_remove_image', function() {
@@ -564,7 +423,9 @@ async function readFileToUpload(file) {
 let navigationInterval;
 
 //Pagination
-function mainPagination(pageFileName, appname, pageScripts, navparent) {
+function mainPagination(pageFileName, pageScripts, navparent) {
+
+    console.log(pageFileName+'page', pageScripts+'script', navparent+'navparent');
     let previous_scripts = [];
 
     $(document).off('click.keyupevents');
@@ -577,9 +438,11 @@ function mainPagination(pageFileName, appname, pageScripts, navparent) {
     $(document).off('change.otherchange');
     $(document).off('keyup.otherkeyup');
 
+
+
     //Render ejs page 
-    openPage(pageFileName, appname);
-    previous_scripts.push(pageFileName+'*forms/'+appname);
+    openPage(pageFileName);
+    previous_scripts.push(pageFileName+'*forms/');
 
     //Iterate active links
     $('ul.menu-categories li.menu a.dropdown-toggle').removeAttr('data-active');
@@ -589,7 +452,7 @@ function mainPagination(pageFileName, appname, pageScripts, navparent) {
     let scriptsToRemove = JSON.parse(window.localStorage.getItem('previous_scripts'));
     if (Array.isArray(scriptsToRemove)) {
         for (let i = 0; i < scriptsToRemove.length; i++) {
-            removePageScript(scriptsToRemove[i].split("*")[0], scriptsToRemove[i].split("*")[1]);
+            removePageScript(scriptsToRemove[i].split("*")[0]);
         }
     }
 
@@ -613,7 +476,6 @@ function mainPagination(pageFileName, appname, pageScripts, navparent) {
 
     const pagination = {
         pageFileName: pageFileName,
-        appname: appname,
         scripts: pageScripts,
         navparent: navparent
     }
@@ -625,14 +487,16 @@ function mainPagination(pageFileName, appname, pageScripts, navparent) {
 }
 
 //A method to open page
-function openPage(pageFileName, appname){
-    $('#afrobuild_main_content_display').remove();
+function openPage(pageFileName){
+    // $('#afrobuild_main_content_display').remove();
 
     let pageScript = document.createElement("script");
+
     //Add script src to script tag
-    pageScript.setAttribute("src", "forms/"+appname+"/"+pageFileName+".js");
+    pageScript.setAttribute("src", "forms/"+pageFileName+".js");
     pageScript.setAttribute("id", pageFileName+"_script");
 
+    
     //Add created script to last part of body
     $('#content div.row').append(`
         <div class="col-md-12" id="afrobuild_main_content_display"></div>
@@ -653,8 +517,8 @@ function addPageScript(pageScriptFileName){
 }
 
 //A method to remove script(s) to document body
-function removePageScript(scriptName, directory) {
-    const scriptList = document.querySelectorAll("script[src='"+directory+"/"+scriptName+".js']");
+function removePageScript(scriptName) {
+    const scriptList = document.querySelectorAll("script[src='"+scriptName+".js']");
     const convertedNodeList = Array.from(scriptList);
     const testScript = convertedNodeList.find(script => script.id === scriptName+"_script");
     if (testScript !== undefined) {
@@ -722,6 +586,13 @@ function makeAllSelectLiveSearchModal(className, placeholder) {
     });
 }
 
+function setBreadcrumb(pageName, iconClass) {
+    $('.afrobuild_main_page_breadcrumb').html(`
+        <i class="breadcrumb-icon ${iconClass} me-2"></i>
+        <span class="breadcrumb-label">${pageName}</span>
+    `);
+}
+
 
 //Recreate table tag for mDataTable
 function reCreateMdataTable(tableClassName, parentClassName) {
@@ -753,6 +624,32 @@ function displayFileIcon(fileName) {
 
     return iconsHtml
 }
+
+// Load the Google Maps Places API script dynamically
+    function loadMaps() {
+
+        function loadGoogleMapsAPI() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB8sEX-yL1gcEnnCLM5jS4NQGS5c4n3nYI&libraries=places';
+            script.async = true;
+            script.defer = true;
+            script.onload = initAutocomplete;
+            document.head.appendChild(script);
+        }
+    
+        // Initialize the autocomplete function
+        function initAutocomplete() {
+            const input = document.getElementById('autocomplete');
+            if (input) {
+                const autocomplete = new google.maps.places.Autocomplete(input);
+                autocomplete.setFields(['address_component']);
+            }
+        }
+    
+        // Attach the loadGoogleMapsAPI function to the window load event
+        window.addEventListener('load', loadGoogleMapsAPI);
+    }
+
 
 socket.on('_no_remaining_sms_alert', (data) => {
     if (data.type == 'caution') {

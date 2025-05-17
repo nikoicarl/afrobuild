@@ -3,25 +3,39 @@
     <div class="logo">LOGO</div>
 
     <div class="sidebar-section">DAILY OPERATION</div>
-    <ul class="nav-menu">
+    <ul class="nav-menu" id="afroubuildnavbar" data-parent="#navbar_overall_parent">
         <li class="nav-item">
             <a href="#" class="nav-link active">
-                <img src="/assets/img/Dashboard.svg" alt="">
+                <img src="/assets/img/Dashboard.svg" alt="Dashboard Icon">
                 &nbsp;&nbsp;Dashboard
             </a>
         </li>
-        <% if (privilege.afrobuild.add_user == "yes" || privilege.afrobuild.update_user == "yes" || privilege.afrobuild.deactivate_user == "yes") { %>
-            <li class="nav-item">
-            <a href="/user" class="nav-link" data-appname="afrobuild" class="nav-link logig_main_navigation_btn" data-navparent="crmnavbar" data-scripts="single::afrobuild/subCategoryAjax">
-                <img src="/assets/img/Manage accounts.svg" alt="">
+
+        <% if (
+            privilege.afrobuild.add_user === "yes" ||
+            privilege.afrobuild.update_user === "yes" ||
+            privilege.afrobuild.deactivate_user === "yes"
+        ) { %>
+        <li class="nav-item">
+            <a href="/user" class="nav-link afrobuild_main_navigation_btn" 
+               data-appname="afrobuild" data-navparent="afroubuildnavbar" 
+               data-scripts="single::app/userAjax">
+                <img src="/assets/img/Manage accounts.svg" alt="Manage Users Icon">
                 &nbsp;&nbsp;Manage Users
             </a>
         </li>
         <% } %>
-        <% if (privilege.afrobuild.add_product == "yes" || privilege.afrobuild.update_product == "yes" || privilege.afrobuild.deactivate_product == "yes") { %>
+
+        <% if (
+            privilege.afrobuild.add_product === "yes" ||
+            privilege.afrobuild.update_product === "yes" ||
+            privilege.afrobuild.deactivate_product === "yes"
+        ) { %>
         <li class="nav-item">
-            <a href="#" class="nav-link">
-                <img src="/assets/img/Folder managed.svg" alt="">
+            <a href="/product" class="nav-link afrobuild_main_navigation_btn" 
+               data-appname="afrobuild" data-navparent="afroubuildnavbar" 
+               data-scripts="single::afrobuild/userAjax">
+                <img src="/assets/img/Folder managed.svg" alt="Manage Products Icon">
                 &nbsp;&nbsp;Manage Products
             </a>
         </li>
@@ -29,7 +43,7 @@
     </ul>
 
     <a href="#" class="support-link">
-        <img src="/assets/img/Support agent.svg" alt="">
+        <img src="/assets/img/Support agent.svg" alt="Support Icon">
         &nbsp;&nbsp;Support
     </a>
 
@@ -47,14 +61,11 @@
         </div>
     </div>
 
-
     <!-- Logout Button Styled as Menu Item -->
     <div class="logout-section">
         <a href="#" class="nav-link logout-link afrobuild_logout_btn">
-            <img src="/assets/img/logout.svg" alt="">
+            <img src="/assets/img/logout.svg" alt="Logout Icon">
             &nbsp;&nbsp;Logout
         </a>
-
     </div>
-
 </div>
