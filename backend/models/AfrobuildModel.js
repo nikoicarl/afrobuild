@@ -35,6 +35,7 @@ const PrivilegeAfrobuild = {
         'add_service', 'update_service', 'deactivate_service', 
         'add_vendor', 'update_vendor', 'deactivate_vendor',
         'add_product', 'update_product', 'deactivate_product',
+        'add_role', 'update_role', 'deactivate_role',
         'func_admin', 
         'afrobuild'
     ],
@@ -62,6 +63,9 @@ const PrivilegeAfrobuild = {
         add_product VARCHAR(5),
         update_product VARCHAR(5),
         deactivate_product VARCHAR(5),
+        add_role VARCHAR(5),
+        update_role VARCHAR(5),
+        deactivate_role VARCHAR(5),
         func_admin VARCHAR(5),
         afrobuild VARCHAR(5)
     `),
@@ -69,7 +73,7 @@ const PrivilegeAfrobuild = {
     /** 
      * @const {Array} alterTableStatement - Alter table sql statement as an array. EXAMPLE: ['name-varchar(5)', 'gender-varchar(5)']
     */
-    alterTableStatement: [],
+    alterTableStatement: ['add_role-varchar(5)', 'update_role-varchar(5)', 'deactivate_role-varchar(5)'],
 }
 
 module.exports = PrivilegeAfrobuild;
