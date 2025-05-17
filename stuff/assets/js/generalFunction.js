@@ -425,7 +425,6 @@ let navigationInterval;
 //Pagination
 function mainPagination(pageFileName, pageScripts, navparent) {
 
-    console.log(pageFileName+'page', pageScripts+'script', navparent+'navparent');
     let previous_scripts = [];
 
     $(document).off('click.keyupevents');
@@ -445,8 +444,8 @@ function mainPagination(pageFileName, pageScripts, navparent) {
     previous_scripts.push(pageFileName+'*forms/');
 
     //Iterate active links
-    $('ul.menu-categories li.menu a.dropdown-toggle').removeAttr('data-active');
-    $('li.afrobuild_sidebar_nav_parent_'+navparent+' a.dropdown-toggle').attr('data-active', 'true');
+    // $('ul.nav-menu li.menu a.dropdown-toggle').removeAttr('data-active');
+    // $('li.afrobuild_sidebar_nav_parent_'+navparent+' a.dropdown-toggle').attr('data-active', 'true');
 
     //Remove previous script
     let scriptsToRemove = JSON.parse(window.localStorage.getItem('previous_scripts'));
