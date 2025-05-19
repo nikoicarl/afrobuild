@@ -8,6 +8,72 @@ body {
     padding: 0;
 }
 
+.afrobuild_btn {
+    --btn-bg: #396827;
+    --btn-bg-hover: #315721;
+    /* A darker, muted green */
+    --btn-bg-active: #2a4a1b;
+    --btn-text: #ffffff;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.2rem;
+
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1;
+
+    border: none;
+    /* border-radius: 0.625rem; */
+
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition:
+        background-color 0.25s ease,
+        transform 0.15s ease,
+        box-shadow 0.25s ease;
+}
+
+.afrobuild_btn:hover {
+    filter: brightness(0.92);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.afrobuild_btn:active {
+    background-color: var(--btn-bg-active);
+    transform: scale(0.98);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.afrobuild_btn:focus-visible {
+    outline: 3px solid #a5d6a7;
+    outline-offset: 4px;
+}
+
+
+
+.form-control {
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+}
+
+.form-control:focus {
+    border-color: #396827;
+    box-shadow: 0 0 0 0.1rem rgba(57, 104, 39, 0.25);
+}
+
 /* Sidebar Styles */
 .sidebar {
     position: fixed;
@@ -69,6 +135,15 @@ body {
     width: 20px;
     font-size: 18px;
     color: #888;
+}
+
+.nav-link img {
+    /* border: 2px solid red; */
+    width: 26px;
+}
+
+.afrobuild_main_page_breadcrumb img {
+    width: 26px;
 }
 
 .nav-menu .nav-item.active>a {
