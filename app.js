@@ -14,6 +14,7 @@ const userController = require('./backend/controllers/userController');
 const tableFetchController = require('./backend/controllers/tableFetchController');
 const specificFetchController = require('./backend/controllers/specificFetchController');
 const deactivateController = require('./backend/controllers/deactivateController');
+const roleController = require('./backend/controllers/roleController');
 
 
 
@@ -52,6 +53,7 @@ async function startServer() {
                 tableFetchController(socket, Database);
                 specificFetchController(socket, Database);
                 deactivateController(socket, Database);
+                roleController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }

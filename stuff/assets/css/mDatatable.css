@@ -308,7 +308,7 @@
       background-color: #bfc9d4; }
     .m-datatable > .m-datatable__table > .m-datatable__head .m-datatable__row > .m-datatable__cell,
     .m-datatable > .m-datatable__table > .m-datatable__foot .m-datatable__row > .m-datatable__cell {
-      background-color: #396827; }
+      background-color: #009345; }
       .m-datatable > .m-datatable__table > .m-datatable__head .m-datatable__row > .m-datatable__cell > span,
       .m-datatable > .m-datatable__table > .m-datatable__foot .m-datatable__row > .m-datatable__cell > span {
         color: #fff;font-size: 1em; }
@@ -390,7 +390,7 @@
   .m-datatable.m-datatable--subtable > .m-datatable__table > .m-datatable__body .m-datatable__row-subtable {
     border-top: 0; }
     .m-datatable.m-datatable--subtable > .m-datatable__table > .m-datatable__body .m-datatable__row-subtable .m-datatable__pager {
-      background-color: #396827; }
+      background-color: #009345; }
   
   .m-datatable.m-datatable--default > .m-datatable__table > .m-datatable__body .m-datatable__row > .m-datatable__cell > span {
     color: #575962; }

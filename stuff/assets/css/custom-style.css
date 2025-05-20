@@ -16,7 +16,7 @@ body {
 }
 
 .afrobuild_btn {
-    --btn-bg: #396827;
+    --btn-bg: #009345;
     --btn-bg-hover: #315721;
     /* A darker, muted green */
     --btn-bg-active: #2a4a1b;
@@ -73,7 +73,7 @@ body {
 }
 
 .form-control:focus {
-    border-color: #396827;
+    border-color: #009345;
     box-shadow: 0 0 0 0.1rem rgba(57, 104, 39, 0.25);
 }
 
@@ -91,7 +91,7 @@ body {
     z-index: 100;
 }
 
-.logo {
+.logo img {
     font-weight: bold;
     font-size: 16px;
     padding: 35px 30px 20px;
@@ -105,7 +105,7 @@ body {
 }
 
 .sidebar-section {
-    margin-top: 70px;
+    margin-top: 9px;
     padding: 15px 30px 10px;
     font-size: 12px;
     font-weight: 500;
@@ -159,16 +159,18 @@ span.breadcrumb-label {
     /* Light gray background */
     color: #000;
     font-weight: bold;
-    border-left: 4px solid #396827;
+    border-left: 4px solid #009345;
     /* Highlight bar */
 }
 
 .logout-section {
-    /* margin-top: auto; */
     padding: 20px 30px;
     border-top: 1px solid #ececec;
     display: flex;
     align-items: center;
+    margin-top: auto;
+    /* Pushes it to the bottom */
+    position: relative;
 }
 
 .logout-link {
@@ -181,6 +183,8 @@ span.breadcrumb-label {
     border-radius: 6px;
     transition: background 0.3s, color 0.3s;
     width: 100%;
+    justify-content: center;
+    /* Centers the content horizontally */
 }
 
 .logout-link:hover {
@@ -389,7 +393,7 @@ span.breadcrumb-label {
 }
 
 .content-section h2 {
-    color: #396827;
+    color: #009345;
     font-weight: bold;
 }
 
@@ -411,7 +415,7 @@ span.breadcrumb-label {
 
 /* Buttons */
 .btn-custom {
-    background-color: #396827;
+    background-color: #009345;
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
@@ -459,7 +463,7 @@ span.breadcrumb-label {
 }
 
 .about-us-button {
-    background-color: #396827;
+    background-color: #009345;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -588,5 +592,75 @@ span.breadcrumb-label {
         position: static;
         width: 90%;
         height: auto;
+    }
+}
+
+/* Sidebar Logo */
+.sidebar-logo {
+    width: 100%;
+    /* Make logo responsive */
+    max-width: 250px;
+    /* Optional: Adjust to your logo size */
+    height: auto;
+    /* Maintain aspect ratio */
+    display: block;
+    /* Removes the bottom space typically found with images */
+    margin: 0 auto;
+    /* Center align */
+}
+
+/* Responsive Design for Sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: -250px;
+        /* Initially hidden on mobile */
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .sidebar-logo {
+        max-width: 150px;
+        /* Adjust the logo size for smaller screens */
+    }
+
+    .sidebar-section {
+        font-size: 1rem;
+        /* Make section titles more readable on small screens */
+    }
+
+    .nav-menu {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-menu li {
+        padding: 10px 0;
+    }
+
+    .nav-link {
+        font-size: 1rem;
+        /* Adjust font size for better readability */
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-profile i {
+        margin-right: 10px;
+    }
+
+    .logout-section {
+        position: absolute;
+        bottom: 20px;
+        width: 100%;
+        text-align: center;
     }
 }
