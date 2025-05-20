@@ -63,14 +63,28 @@ $(document).ready(function () {
                     showConfirmButton: !res.success,
                     timer: res.success ? 2000 : undefined
                 });
+                $submitBtn.html('Submit').removeAttr('disabled');
 
-                if (res.success)  $('#userForm').reset();  // Reset form if successful
-                $submitBtn.html('Submit').removeAttr('disabled');  // Re-enable the submit button
+                // If successful, reset the form and clean up
+                if (res.success) {
+                    resetUserForm();
+                    userTableFetch(); // Refresh the user table
+                }
+            });
+
+            socket.on('error', (err) => {
+                $submitBtn.html('Submit').removeAttr('disabled');
+                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
             });
         }, 300);
     });
 
 
+    function resetUserForm() {
+        $('#userForm')[0].reset();  // Reset the form fields
+        $('#user_hiddenid').val('');  // Clear the hidden ID field
+        $('.afrobuild_manage_user_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
+    }
 
     // Function to fetch and render the user table
     const userTableFetch = () => {
