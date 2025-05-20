@@ -8,14 +8,12 @@ body {
     padding: 0;
 }
 
-
 .afrobuild_btn.grey {
     --btn-bg: #b0b0b0;
     --btn-bg-hover: #9c9c9c;
     --btn-bg-active: #888888;
     --btn-text: #ffffff;
 }
-
 
 .afrobuild_btn {
     --btn-bg: #396827;
@@ -45,9 +43,7 @@ body {
     text-decoration: none;
 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition:
-        background-color 0.25s ease,
-        transform 0.15s ease,
+    transition: background-color 0.25s ease, transform 0.15s ease,
         box-shadow 0.25s ease;
 }
 
@@ -67,8 +63,6 @@ body {
     outline: 3px solid #a5d6a7;
     outline-offset: 4px;
 }
-
-
 
 .form-control {
     font-size: 14px;
@@ -513,6 +507,33 @@ span.breadcrumb-label {
     height: 220px;
     left: 40px;
     top: 350px;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 250px;
+    /* adjust as needed */
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px 8px 32px;
+    /* left space for icon */
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+    /* allow clicks through the icon */
 }
 
 /* Responsive Media Queries */

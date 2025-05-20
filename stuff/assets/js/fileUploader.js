@@ -1,0 +1,6 @@
+
+const fileUploader = (object) => {
+    return {
+        
+    }
+}
