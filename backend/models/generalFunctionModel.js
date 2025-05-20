@@ -1,4 +1,5 @@
 const dateformat = require('dateformat');
+const { randomUUID } = require('crypto');
 
 class GeneralFunction {
 
@@ -222,6 +223,10 @@ class GeneralFunction {
         } else {
             return 'December';
         }
+    }
+
+    uuid() {
+        return randomUUID(); // Generates a UUID v4
     }
 }
 

@@ -1,81 +1,77 @@
 const CreateUpdateModel = require('./CreateUpdateModel');
 
-//Intialize Class
 class Product {
-
-    //Constructor 
-    constructor (Database) {
+    constructor(Database) {
         this.Database = Database;
 
-        //Table columns
-        this.columnsList = ['productid', 'name', 'description', 'price', 'datetime', 'status'];
+        // Define table and columns
+        this.tableName = 'product';
+        this.columnsList = [
+            'productid', 'name', 'description', 
+            'price', 'documents', 'datetime', 'status'
+        ];
 
-        //Call to create table if not exist
+        // Ensure table exists on instantiation
         this.createTable();
     }
 
-    //Insert method
-    async insertTable (columns) {
-        let result = await this.createTable();
-        try {
-            if (result) {
-                let sql = `
-                    INSERT IGNORE INTO product (${this.columnsList.toString()}) VALUES (?,?,?,?,?,?);
-                `;
-                result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
-                return result;
-            } else {
-                return result;
-            }
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Update method
-    async updateTable (object) {
-        try {
-            let sql = 'UPDATE product SET '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Fetch for prepared statement
-    async preparedFetch (object) {
-        try {
-            let sql = 'SELECT * FROM product WHERE '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
-        } catch (error) {
-            return error;
-        }
-    }
-
-    //Create table method
+    // Create table if it doesn't exist
     async createTable() {
         const CreateUpdateTable = new CreateUpdateModel(this.Database, {
-            tableName: 'product',
-
-            createTableStatement: (`
+            tableName: this.tableName,
+            createTableStatement: `
                 productid BIGINT(100) PRIMARY KEY,
-                name varchar(255),
-                description varchar(255),
-                price double(10,2),
-                datetime datetime,
-                status varchar(50)
-            `),
-
-            foreignKeyStatement: (``),
-
+                name VARCHAR(255),
+                description VARCHAR(255),
+                price DOUBLE(10,2),
+                documents LONGTEXT,
+                datetime DATETIME,
+                status VARCHAR(50)
+            `,
+            foreignKeyStatement: '',
             alterTableStatement: []
         });
-        let result = await CreateUpdateTable.checkTableExistence();
-        return result;
+
+        return await CreateUpdateTable.checkTableExistence();
     }
 
+    // Insert a new record
+    async insertTable(values) {
+        try {
+            const tableReady = await this.createTable();
+            if (!tableReady) throw new Error('Table creation failed or does not exist.');
+
+            const placeholders = this.columnsList.map(() => '?').join(', ');
+            const sql = `INSERT IGNORE INTO ${this.tableName} (${this.columnsList.join(', ')}) VALUES (${placeholders})`;
+
+            return await this.Database.setupConnection({ sql, columns: values }, 'object');
+        } catch (error) {
+            console.error('[insertTable Error]:', error);
+            return error;
+        }
+    }
+
+    // Update existing record(s)
+    async updateTable({ sql, columns }) {
+        try {
+            const query = `UPDATE ${this.tableName} SET ${sql}`;
+            return await this.Database.setupConnection({ sql: query, columns }, 'object');
+        } catch (error) {
+            console.error('[updateTable Error]:', error);
+            return error;
+        }
+    }
+
+    // Fetch with custom WHERE condition
+    async preparedFetch({ sql, columns }) {
+        try {
+            const query = `SELECT * FROM ${this.tableName} WHERE ${sql}`;
+            return await this.Database.setupConnection({ sql: query, columns }, 'object');
+        } catch (error) {
+            console.error('[preparedFetch Error]:', error);
+            return error;
+        }
+    }
 }
 
 module.exports = Product;

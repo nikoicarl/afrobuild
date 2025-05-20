@@ -10,6 +10,7 @@ const dashboardRouter = require('./backend/routers/dashboardRouter');
 const setupController = require('./backend/controllers/setupController');
 const loginController = require('./backend/controllers/loginController');
 const logoutController = require('./backend/controllers/logoutController');
+const userController = require('./backend/controllers/userController');
 
 
 async function startServer() {
@@ -42,6 +43,7 @@ async function startServer() {
                 setupController(socket, Database);
                 loginController(socket, Database);
                 logoutController(socket, Database, io);
+                userController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }
