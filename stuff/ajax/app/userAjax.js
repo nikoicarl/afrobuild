@@ -163,13 +163,14 @@ $(document).ready(function () {
         });
     }
 
-    // Update User
+    // Update User on Click
     $(document).on('click', '.afrobuild_user_table_edit_btn', function (e) {
         const action = $(this).data('getname');
         const userId = $(this).data('getid');
         const username = $(this).data('getdata');
-        const isActivate = $(this).data('activate') === 'activate';
+        const isActivate = $(this).data('activate'); // Checks if it's an 'activate' action
 
+        // Specific User Action
         if (action === 'specific_user') {
             socket.emit('specific', {
                 "melody1": melody.melody1,
@@ -186,16 +187,14 @@ $(document).ready(function () {
                     $('#afrobuild_manage_user_table_btn').html('View All Users');
                     $('#afrobuild_manage_user_table_btn').data('open', "table");
                     $('.user_submit_btn').html('Update');
-
-                    // Call the function to populate the form with the fetched user data
-                    populateUserForm(res.userResult);
-
+                    populateUserForm(res.userResult);  // Populate the form with user data
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching user details', 'error');
                 }
             });
         }
 
+        // Deactivate or Activate User Action
         if (action === 'deactivate_user' || action === 'activate_user') {
             const userStatus = isActivate ? 'active' : 'deactivated';
             const actionText = isActivate ? 'Reactivate' : 'Deactivate';
@@ -211,11 +210,23 @@ $(document).ready(function () {
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    socket.emit(action, { userId, userStatus });
+                    // Emit deactivate or activate action
+                    socket.off('deactivate');
+                    socket.off(`${melody.melody1}_${action}`); // Ensure the previous event listeners are removed
+
+                    socket.emit('deactivate', {
+                        melody1: melody.melody1,
+                        melody2: melody.melody2,
+                        param: action,
+                        dataId: userId,
+                        checker: isActivate // Set the user status (activate/deactivate)
+                    });
+
+                    // Listen for the response from the server
                     socket.once(`${melody.melody1}_${action}`, (res) => {
                         if (res.success) {
                             Swal.fire('Success', res.message || `User ${actionText}d successfully.`, 'success');
-                            userTableFetch();  // Refresh the user table after action
+                            userTableFetch(); // Refresh the user table after the action
                         } else {
                             Swal.fire('Error', res.message || `Failed to ${actionText} user.`, 'error');
                         }
@@ -224,6 +235,7 @@ $(document).ready(function () {
             });
         }
     });
+
 
     // Function to populate the user form with data
     function populateUserForm(user) {
