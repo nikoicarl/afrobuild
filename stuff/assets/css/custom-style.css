@@ -599,7 +599,7 @@ span.breadcrumb-label {
 .sidebar-logo {
     width: 100%;
     /* Make logo responsive */
-    max-width: 250px;
+    max-width: 220px;
     /* Optional: Adjust to your logo size */
     height: auto;
     /* Maintain aspect ratio */

@@ -5,94 +5,116 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AfroBuild Portal - Secure Sign In" />
+    <meta name="keywords" content="AfroBuild, Sign In, Login, Portal" />
+    <meta name="author" content="AfroBuild Team" />
     <title>
-        <%= (!setupData?.name || setupData.name==="" ) ? 'AfroBuild' : setupData.name %> || Portal
+        <%= (!setupData?.name || setupData.name === "") ? 'AfroBuild' : setupData.name %> | Portal
     </title>
 
     <% if (setupData?.logo) { %>
         <link rel="icon" href="uploads/<%= setupData.logo %>" type="image/x-icon" />
-        <% } else { %>
-            <link rel="icon" href="assets/img/afrobuild.png" type="image/x-icon" />
-            <% } %>
+    <% } else { %>
+        <link rel="icon" href="assets/img/logo.svg" type="image/x-icon" />
+    <% } %>
 
-                <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-                <style>
-                    body,
-                    html {
-                        height: 100%;
-                        margin: 0;
-                        background-color: #f8f9fa;
-                    }
+    <!-- Bootstrap CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 
-                    .login-container {
-                        min-height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 15px;
-                    }
+    <style>
+        /* Global Styles */
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
 
-                    .login-box {
-                        width: 100%;
-                        max-width: 400px;
-                        padding: 30px;
-                        background: #fff;
-                        border-radius: 10px;
-                        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-                        text-align: center;
-                    }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
 
-                    .logo {
-                        max-width: 150px;
-                        margin-bottom: 20px;
-                    }
+        .login-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 45px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-                    .form-control:focus {
-                        box-shadow: none;
-                        border-color: #198754;
-                    }
+        .login-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+        }
 
-                    @media (max-width: 576px) {
-                        .login-box {
-                            padding: 20px;
-                        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
 
-                        .logo {
-                            max-width: 120px;
-                        }
-                    }
-                </style>
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #198754;
+        }
+
+        .btn-success {
+            background-color: #198754;
+            border-color: #198754;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #155d27;
+            border-color: #155d27;
+        }
+
+        /* Media Queries for Mobile */
+        @media (max-width: 576px) {
+            .login-box {
+                padding: 20px;
+            }
+
+            .logo {
+                max-width: 120px;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <div class="login-container">
         <div class="login-box">
-            <% if (setupData?.logo) { %>
-                <img src="uploads/<%= setupData.logo %>" alt="Logo" class="logo" />
-                <% } %>
+            <!-- Logo and Branding -->
+            <img src="assets/img/logo.svg" alt="Logo" class="logo" />
+            <h3 class="mb-4">Sign In</h3>
 
-                    <h3 class="mb-4">Sign In</h3>
-                    <form action="" class="text-start afrobuild-login-submit">
-                        <div class="mb-3">
-                            <input type="text" name="username" class="form-control username" placeholder="Username"
-                                required />
-                        </div>
-                        <div class="mb-3 position-relative">
-                            <input type="password" id="password" name="password" class="form-control password"
-                                placeholder="Password" required />
-                            <!-- Optional: password visibility toggle icon can be added here -->
-                        </div>
-                        <button type="submit" class="btn btn-success w-100 afrobuild-login-form-btn">Sign In</button>
-                    </form>
+            <!-- Login Form -->
+            <form action="" class="text-start afrobuild-login-submit">
+                <div class="mb-3">
+                    <input type="text" name="username" class="form-control username" placeholder="Username" required aria-label="Username" />
+                </div>
+                <div class="mb-3 position-relative">
+                    <input type="password" id="password" name="password" class="form-control password" placeholder="Password" required aria-label="Password" />
+                    <!-- Optional: password visibility toggle can be added here -->
+                </div>
+                <button type="submit" class="btn btn-success w-100 afrobuild-login-form-btn">Sign In</button>
+            </form>
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/ajax/app/loginAjax.js"></script>
+    <!-- JavaScript Libraries (load after page content) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" defer></script>
+    <script src="assets/js/bootstrap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="/ajax/app/loginAjax.js" defer></script>
 </body>
 
 </html>

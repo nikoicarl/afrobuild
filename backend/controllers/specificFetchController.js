@@ -1,4 +1,5 @@
 const User = require('../models/UserModel');
+const Role = require('../models/RoleModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -37,6 +38,28 @@ module.exports = (socket, Database) => {
                     // Emit user data back to the client
                     socket.emit(`${melody1}_${param}`, {
                         userResult: userResult[0] // User data
+                    });
+                } else {
+                    socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                    });
+                }
+            } else if (param === 'specific_role') {
+                // Initialize the role model
+                const RoleModel = new Role(Database);
+
+                // Fetch role details by userId
+                const roleResult = await RoleModel.preparedFetch({
+                    sql: 'roleid = ?',
+                    columns: [dataId]
+                });
+
+
+                if (Array.isArray(roleResult) && roleResult.length > 0) {
+                    // Emit role data back to the client
+                    socket.emit(`${melody1}_${param}`, {
+                        roleResult: roleResult[0] // Role data
                     });
                 } else {
                     socket.emit(`${melody1}_${param}`, {
