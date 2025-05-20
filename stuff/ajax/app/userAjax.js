@@ -111,8 +111,8 @@ $(document).ready(function () {
                     field: 'status',
                     title: "Status",
                     template: row => row.status === 'active'
-                        ? `<span class="badge badge-success">Active</span>`
-                        : `<span class="badge badge-danger">${row.status.toUcwords()}</span>`
+                        ? `<span class="badge text-bg-success">Active</span>`
+                        : `<span class="badge text-bg-danger">${row.status.toUcwords()}</span>`
                 },
                 {
                     field: 'action',
@@ -129,7 +129,7 @@ $(document).ready(function () {
                         return `
                             <div class="dropdown">
                                 <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
-                                    <i class="icon-menu7" style="font-size:20px"></i>
+                                    <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
                                     <a class="afrobuild_user_table_edit_btn dropdown-item" href="#" data-getid="${row.userid}" data-getname="specific_user"><i class="icon-pencil"></i>Edit Details</a>
