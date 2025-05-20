@@ -1,5 +1,15 @@
-// Renders the product container section
-function Product() {
+// Renders the product container section with breadcrumb
+function renderProductContainer() {
+    $('.afrobuild_main_page_breadcrumb_navigation').html(`
+        <div class="page-header">
+            <div class="page-title">
+                <h3 class="afrobuild_btn grey" id="afrobuild_manage_product_table_btn" role="button" data-open="table">
+                    View All Products
+                </h3>
+            </div>
+        </div>
+    `);
+
     return `
         <div class="layout-px-spacing mb-5">
             <div class="row layout-top-spacing">
@@ -9,7 +19,8 @@ function Product() {
     `;
 }
 
-function ProductForm() {
+// Renders the product creation form
+function renderProductForm() {
     return `
         <div class="row">
             <div class="col-12 layout-spacing">
@@ -50,12 +61,16 @@ function ProductForm() {
     `;
 }
 
-
-// Immediately Invoked Function Expression (IIFE) to render the form
+// Immediately Invoked Function Expression (IIFE) to render the full product page
 (() => {
-    const formHtml = ProductForm(); // No EJS rendering needed unless using EJS tags
-    $('#afrobuild_main_content_display').html(formHtml);
+    // Render breadcrumb and container layout
+    const productContainerHTML = renderProductContainer();
+    $('#afrobuild_main_content_display').html(productContainerHTML);
 
-    // Load page-specific scripts
+    // Inject the form into the dedicated div inside the container
+    const formHtml = renderProductForm();
+    $('#afrobuild_product_page_form_display').html(formHtml);
+
+    // Load page-specific logic
     addPageScript('app/productAjax');
 })();

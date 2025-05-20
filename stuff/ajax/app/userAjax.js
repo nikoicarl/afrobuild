@@ -1,8 +1,6 @@
 $(document).ready(function () {
     const socket = io();
 
-    
-
     // Handle user registration form submission
     $('#userForm').submit(function (e) {
         e.preventDefault();

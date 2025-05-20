@@ -1,6 +1,6 @@
-
-function Dashboard() {
-
+// Renders the dashboard main layout container
+function renderDashboardContainer() {
+    $('.afrobuild_main_page_breadcrumb_navigation').html(``);
     return `
         <div class="layout-px-spacing mb-5">
             <div class="row layout-top-spacing">
@@ -10,11 +10,11 @@ function Dashboard() {
     `;
 }
 
-
-function StatsAndTransTable() {
+// Renders stats cards and recent transactions table
+function renderStatsAndTransactionTable() {
     return `
         <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+            <div class="col-12 layout-spacing">
                 <div class="row g-4 mb-4">
                     <div class="col-md-4">
                         <div class="stat-card">
@@ -38,13 +38,13 @@ function StatsAndTransTable() {
                         </div>
                     </div>
                 </div>
+
                 <div class="table-container">
                     <div class="table-title">Recent Transactions</div>
                     <div class="table-responsive">
                         <table class="custom-table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox"></th>
                                     <th>Transaction ID</th>
                                     <th>Product/Service</th>
                                     <th>Category</th>
@@ -56,105 +56,21 @@ function StatsAndTransTable() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-pending">Pending</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-failed">Failed</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-failed">Failed</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>AF1032993</td>
-                                    <td>Cement</td>
-                                    <td>Building</td>
-                                    <td>Kofi Owusu</td>
-                                    <td>12/03/23</td>
-                                    <td>Jane Doe</td>
-                                    <td>₵ 300.00</td>
-                                    <td class="status-done">Done</td>
-                                </tr>
+                                ${[...Array(9)].map((_, i) => {
+                                    const statusClass = i === 5 || i === 6 ? 'status-failed' : (i === 2 ? 'status-pending' : 'status-done');
+                                    return `
+                                        <tr>
+                                            <td>AF1032993</td>
+                                            <td>Cement</td>
+                                            <td>Building</td>
+                                            <td>Kofi Owusu</td>
+                                            <td>12/03/23</td>
+                                            <td>Jane Doe</td>
+                                            <td>₵ 300.00</td>
+                                            <td class="${statusClass}">${statusClass.split('-')[1]}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>
@@ -164,10 +80,16 @@ function StatsAndTransTable() {
     `;
 }
 
-(()=>{
-    let html = ejs.render(Dashboard(), {});
-    $('#afrobuild_main_content_display').html(html);
+// Immediately Invoked Function Expression (IIFE) to render the dashboard
+(() => {
+    // Render the dashboard container
+    const dashboardHTML = renderDashboardContainer();
+    $('#afrobuild_main_content_display').html(dashboardHTML);
 
-    //Add page ajax file(s)
+    // Inject stats and transactions into the dashboard section
+    const statsAndTableHTML = renderStatsAndTransactionTable();
+    $('#afrobuild_dashboard_page_form_display').html(statsAndTableHTML);
+
+    // Load any dashboard-specific scripts
     addPageScript('app/dashboardAjax');
 })();
