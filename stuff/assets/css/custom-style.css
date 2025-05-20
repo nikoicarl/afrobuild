@@ -8,6 +8,15 @@ body {
     padding: 0;
 }
 
+
+.afrobuild_btn.grey {
+    --btn-bg: #b0b0b0;
+    --btn-bg-hover: #9c9c9c;
+    --btn-bg-active: #888888;
+    --btn-text: #ffffff;
+}
+
+
 .afrobuild_btn {
     --btn-bg: #396827;
     --btn-bg-hover: #315721;
@@ -29,7 +38,7 @@ body {
     line-height: 1;
 
     border: none;
-    /* border-radius: 0.625rem; */
+    border-radius: 0.1rem;
 
     cursor: pointer;
     user-select: none;
@@ -143,7 +152,12 @@ body {
 }
 
 .afrobuild_main_page_breadcrumb img {
-    width: 26px;
+    width: 1.6em;
+}
+
+span.breadcrumb-label {
+    font-size: 1.2em;
+    font-weight: 500;
 }
 
 .nav-menu .nav-item.active>a {

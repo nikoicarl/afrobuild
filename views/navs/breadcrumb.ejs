@@ -1,13 +1,16 @@
 <nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="/dashboard" class="afrobuild_main_page_breadcrumb">
-                <i class="breadcrumb-icon  me-2"></i>
-                <span class="breadcrumb-label"></span>
-            </a>
-        </li>
-    </ol>
+    <div class="d-flex justify-content-between align-items-center w-100">
+        <!-- Left: Main breadcrumb -->
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a href="/dashboard" class="afrobuild_main_page_breadcrumb">
+                    <i class="breadcrumb-icon me-2"></i>
+                    <span class="breadcrumb-label"></span>
+                </a>
+            </li>
+        </ol>
 
-    <ol class="navbar-nav flex-row ml-auto logig_main_page_breadcrumb_navigation"></ol>
+        <!-- Right: Extra breadcrumb actions -->
+        <div class="d-flex align-items-center afrobuild_main_page_breadcrumb_navigation"></div>
+    </div>
 </nav>
-
