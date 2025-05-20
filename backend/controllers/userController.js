@@ -51,6 +51,7 @@ module.exports = function (socket, Database) {
                 ? privilegeData?.afrobuild?.add_user
                 : privilegeData?.afrobuild?.update_user;
 
+
             if (privilege !== 'yes') {
                 return socket.emit(`${melody1}_create_user`, {
                     success: false,
@@ -114,7 +115,6 @@ module.exports = function (socket, Database) {
                     null // logout field remains null
                 ]);
 
-                socket.broadcast.emit('userBroadcast', 'user changed');
                 return socket.emit(`${melody1}_create_user`, {
                     success: true,
                     message: isNewUser

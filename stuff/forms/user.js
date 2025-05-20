@@ -67,7 +67,7 @@ function renderUserForm() {
 
                         <div class="row">
                             <div class="col-12 text-end">
-                                <button type="submit" class="btn afrobuild_btn user_submit_btn" role="button">Submit</button>
+                                <button type="submit" class="btn afrobuild_btn afrobuild_manage_user_submit_btn user_submit_btn" role="button">Submit</button>
                             </div>
                         </div>
                     </form>

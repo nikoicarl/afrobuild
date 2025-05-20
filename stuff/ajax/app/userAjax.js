@@ -1,6 +1,5 @@
 $(document).ready(function () {
     const socket = io();
-
     const $formDisplay = $('#afrobuild_user_page_form_display');
     const $toggleBtn = $('#afrobuild_manage_user_table_btn');
     const $userForm = $('#userForm');
@@ -19,8 +18,6 @@ $(document).ready(function () {
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Users';
 
-
-
         // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
 
@@ -28,9 +25,9 @@ $(document).ready(function () {
         if (isTableView) userTableFetch();
     });
 
-    // Handle user form submission for creating a new user
-    $userForm.submit(function (e) {
-        e.preventDefault();
+    // Handle user form submission for creating or updating a user
+    $(document).on('click', '.afrobuild_manage_user_submit_btn', function (e) {
+        e.preventDefault();  // Prevent the default action of the button
 
         const userData = {
             first_name: $('#first_name').val().trim(),
@@ -46,25 +43,34 @@ $(document).ready(function () {
             melody2: melody.melody2
         };
 
-        const $submitBtn = $('.user_submit_btn').html('<div class="spinner-border loader-sm" role="status"></div>').attr('disabled', true);
+        const $submitBtn = $('.afrobuild_manage_user_submit_btn')
+            .html('<div class="spinner-border loader-sm" role="status"></div>')
+            .attr('disabled', true);
 
         setTimeout(() => {
+            // Determine if it's create or update action based on user_hiddenid
+            const action = userData.user_hiddenid ? 'update_user' : 'create_user';
+
+            // Emit the respective socket event
             socket.emit('create_user', userData);
 
-            socket.once(`${userData.melody1}_create_user`, (res) => {
+            // Handle response based on action
+            socket.once(`${userData.melody1}_${'create_user'}`, (res) => {
                 Swal.fire({
                     title: res.success ? 'Success' : 'Error',
-                    text: res.message || (res.success ? 'User created successfully!' : 'Failed to create user.'),
+                    text: res.message || (res.success ? `User ${action === 'create_user' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_user' ? 'create' : 'update'} user.`),
                     icon: res.success ? 'success' : 'error',
                     showConfirmButton: !res.success,
                     timer: res.success ? 2000 : undefined
                 });
 
-                if (res.success) $userForm[0].reset();
-                $submitBtn.html('Submit').removeAttr('disabled');
+                if (res.success)  $('#userForm').reset();  // Reset form if successful
+                $submitBtn.html('Submit').removeAttr('disabled');  // Re-enable the submit button
             });
         }, 300);
     });
+
+
 
     // Function to fetch and render the user table
     const userTableFetch = () => {
@@ -143,5 +149,77 @@ $(document).ready(function () {
         });
     }
 
-    // Other helper functions for update, deactivate, delete actions...
+    // Update User
+    $(document).on('click', '.afrobuild_user_table_edit_btn', function (e) {
+        const action = $(this).data('getname');
+        const userId = $(this).data('getid');
+        const username = $(this).data('getdata');
+        const isActivate = $(this).data('activate') === 'activate';
+
+        if (action === 'specific_user') {
+            socket.emit('specific', {
+                "melody1": melody.melody1,
+                "melody2": melody.melody2,
+                "melody3": melody.melody3,
+                "param": action,
+                "dataId": userId
+            });
+
+            socket.on(`${melody.melody1}_specific_user`, (res) => {
+                if (res.userResult) {
+                    const html = ejs.render(renderUserForm(), {});
+                    document.getElementById('afrobuild_user_page_form_display').innerHTML = html;
+                    $('#afrobuild_manage_user_table_btn').html('View All Users');
+                    $('#afrobuild_manage_user_table_btn').data('open', "table");
+                    $('.user_submit_btn').html('Update');
+
+                    // Call the function to populate the form with the fetched user data
+                    populateUserForm(res.userResult);
+
+                } else {
+                    Swal.fire('Error', res.message || 'Error fetching user details', 'error');
+                }
+            });
+        }
+
+        if (action === 'deactivate_user' || action === 'activate_user') {
+            const userStatus = isActivate ? 'active' : 'deactivated';
+            const actionText = isActivate ? 'Reactivate' : 'Deactivate';
+            const confirmText = isActivate ? 'Reactivate' : 'Deactivate';
+
+            Swal.fire({
+                title: `Are you sure you want to ${actionText} this user?`,
+                text: `This will change the status of the user ${username}.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    socket.emit(action, { userId, userStatus });
+                    socket.once(`${melody.melody1}_${action}`, (res) => {
+                        if (res.success) {
+                            Swal.fire('Success', res.message || `User ${actionText}d successfully.`, 'success');
+                            userTableFetch();  // Refresh the user table after action
+                        } else {
+                            Swal.fire('Error', res.message || `Failed to ${actionText} user.`, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    // Function to populate the user form with data
+    function populateUserForm(user) {
+        $('#first_name').val(user.first_name);
+        $('#last_name').val(user.last_name);
+        $('#email').val(user.email);
+        $('#phone').val(user.phone);
+        $('#address').val(user.address);
+        $('#username').val(user.username);
+        $('#user_hiddenid').val(user.userid);
+        // If you need more fields, populate them here
+    }
 });
