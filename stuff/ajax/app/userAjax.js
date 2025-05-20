@@ -210,6 +210,7 @@ $(document).ready(function () {
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const actionMessage = isActivate === 'activate' ? 'activate' : 'deactivate';
                     // Emit deactivate or activate action
                     socket.off('deactivate');
                     socket.off(`${melody.melody1}_${action}`); // Ensure the previous event listeners are removed
@@ -223,14 +224,16 @@ $(document).ready(function () {
                     });
 
                     // Listen for the response from the server
-                    socket.once(`${melody.melody1}_${action}`, (res) => {
-                        if (res.success) {
-                            Swal.fire('Success', res.message || `User ${actionText}d successfully.`, 'success');
-                            userTableFetch(); // Refresh the user table after the action
-                        } else {
-                            Swal.fire('Error', res.message || `Failed to ${actionText} user.`, 'error');
-                        }
+                    socket.once(`${melody.melody1}_${'deactivate_user'}`, (res) => {
+                        Swal.fire({
+                            title: res.type === 'success' ? 'Success' : 'Error',
+                            text: res.message || `User ${actionMessage}d successfully!`,
+                            icon: res.type === 'success' ? 'success' : 'error',
+                            showConfirmButton: true
+                        });
+                        userTableFetch();  // Refresh table after action
                     });
+
                 }
             });
         }

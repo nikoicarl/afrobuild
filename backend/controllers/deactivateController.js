@@ -8,7 +8,6 @@ const gf = new GeneralFunction();
 module.exports = (socket, Database) => {
     socket.on('deactivate', async (browserblob) => {
         const { param, melody1, dataId, checker } = browserblob;
-        console.log(browserblob);
         
         if (!param) {
             return socket.emit(`${melody1}_${param}`, {
