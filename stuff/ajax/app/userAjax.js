@@ -196,46 +196,45 @@ $(document).ready(function () {
 
         // Deactivate or Activate User Action
         if (action === 'deactivate_user' || action === 'activate_user') {
-            const userStatus = isActivate ? 'active' : 'deactivated';
-            const actionText = isActivate ? 'Reactivate' : 'Deactivate';
-            const confirmText = isActivate ? 'Reactivate' : 'Deactivate';
+            const isActivating = isActivate === 'activate';
+            const actionVerb = isActivating ? 'Reactivate' : 'Deactivate';
+            const pastTenseVerb = isActivating ? 'reactivated' : 'deactivated';
+
 
             Swal.fire({
-                title: `Are you sure you want to ${actionText} this user?`,
+                title: `Are you sure you want to ${actionVerb} this user?`,
                 text: `This will change the status of the user ${username}.`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: confirmText,
+                confirmButtonText: actionVerb,
                 cancelButtonText: 'Cancel',
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const actionMessage = isActivate === 'activate' ? 'activate' : 'deactivate';
                     // Emit deactivate or activate action
                     socket.off('deactivate');
-                    socket.off(`${melody.melody1}_${action}`); // Ensure the previous event listeners are removed
+                    socket.off(`${melody.melody1}_${action}`);
 
                     socket.emit('deactivate', {
                         melody1: melody.melody1,
                         melody2: melody.melody2,
                         param: action,
                         dataId: userId,
-                        checker: isActivate // Set the user status (activate/deactivate)
+                        checker: isActivate
                     });
 
-                    // Listen for the response from the server
-                    socket.once(`${melody.melody1}_${'deactivate_user'}`, (res) => {
+                    socket.once(`${melody.melody1}_${action}`, (res) => {
                         Swal.fire({
-                            title: res.type === 'success' ? 'Success' : 'Error',
-                            text: res.message || `User ${actionMessage}d successfully!`,
-                            icon: res.type === 'success' ? 'success' : 'error',
+                            title: res.success ? 'Success' : 'Error',
+                            text: res.message || `User ${pastTenseVerb} successfully!`,
+                            icon: res.success ? 'success' : 'error',
                             showConfirmButton: true
                         });
                         userTableFetch();  // Refresh table after action
                     });
-
                 }
             });
+
         }
     });
 

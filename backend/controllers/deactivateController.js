@@ -1,6 +1,6 @@
 const User = require('../models/UserModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
-const RoleModel = require('../models/RoleModel');  // Import RoleModel
+const Role = require('../models/RoleModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -47,12 +47,12 @@ module.exports = (socket, Database) => {
             } else if (param === "deactivate_role") {
                 // Check user privilege for deactivating roles
                 if (privilegeData?.afrobuild.deactivate_role === "yes") {
-                    const roleStatus = checker === "deactivate" ? 'inactive' : 'active';
-                    const RoleModelInstance = new RoleModel(Database);
+                    const roleStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const RoleModel = new Role(Database);
 
                     // Update role status using RoleModel
-                    result = await RoleModelInstance.updateRoleStatus({
-                        sql: 'role_status=? WHERE userid=?',
+                    result = await RoleModel.updateTable({
+                        sql: 'status=? WHERE roleid=?',
                         columns: [roleStatus, dataId]
                     });
                     message = result?.affectedRows
