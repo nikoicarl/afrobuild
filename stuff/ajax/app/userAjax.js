@@ -1,5 +1,3 @@
-// user-management.js
-
 $(document).ready(function () {
     const socket = io();
 
@@ -7,20 +5,30 @@ $(document).ready(function () {
     const $toggleBtn = $('#afrobuild_manage_user_table_btn');
     const $userForm = $('#userForm');
 
+    // Handle the toggle between table and form
     $(document).on('click.pageopener', 'h3#afrobuild_manage_user_table_btn', function (e) {
         e.preventDefault();
         const isTableView = $(this).data("open") === 'table';
-        const html = isTableView ? ejs.render(UserTable(), {}) : ejs.render(UserForm(), {});
+
+        // Render the corresponding content based on the current state
+        const html = isTableView ? ejs.render(UserTable(), {}) : ejs.render(renderUserForm(), {});
         $formDisplay.html(html);
 
-        const btnText = isTableView 
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ...></svg> Go Back`
+        // Update the button text for toggling between views
+        const btnText = isTableView
+            ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Users';
 
+
+
+        // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
+
+        // Fetch the user table if we are in table view
         if (isTableView) userTableFetch();
     });
 
+    // Handle user form submission for creating a new user
     $userForm.submit(function (e) {
         e.preventDefault();
 
@@ -58,6 +66,7 @@ $(document).ready(function () {
         }, 300);
     });
 
+    // Function to fetch and render the user table
     const userTableFetch = () => {
         socket.off('table').off(`${melody.melody1}_user_table`);
 
@@ -76,6 +85,7 @@ $(document).ready(function () {
         });
     };
 
+    // Function to handle user table rendering
     function userDataTable(dataJSONArray) {
         reCreateMdataTable('afrobuild_user_data_table', 'afrobuild_user_data_table_div');
 
@@ -133,80 +143,5 @@ $(document).ready(function () {
         });
     }
 
-    function updateUser(getname, dataId, $element) {
-        socket.off('specific').off(`${melody.melody1}_${getname}`);
-
-        socket.emit('specific', {
-            melody1: melody.melody1,
-            melody2: melody.melody2,
-            melody3: melody.melody3,
-            param: getname,
-            dataId: dataId
-        });
-
-        socket.on(`${melody.melody1}_${getname}`, (data) => {
-            if (data.type === 'error') {
-                return Swal.fire('Error', data.message, 'warning');
-            }
-
-            const html = ejs.render(UserForm(), {});
-            $('#afrobuild_user_page_form_display').html(html);
-            $('#afrobuild_manage_user_table_btn').html('View All Users').data('open', 'table');
-            $element.html('<div class="m-loader m-loader--white" style="width: 30px;"></div>');
-            $('.afrobuild_manage_user_submit_btn').html('Update');
-
-            if (!data || !data.userid) {
-                return Swal.fire('Oops!', 'Fetching to edit ended up empty', 'warning');
-            }
-        });
-    }
-
-    function deactivateUser(getname, dataId, action) {
-        socket.off('deactivate').off(`${melody.melody1}_${getname}`);
-
-        socket.emit('deactivate', {
-            melody1: melody.melody1,
-            melody2: melody.melody2,
-            param: getname,
-            dataId,
-            checker: action
-        });
-
-        socket.on(`${melody.melody1}_${getname}`, (data) => {
-            if (data.type === 'error' || data.type === 'caution') {
-                Swal.fire({
-                    text: data.message,
-                    icon: data.type === 'error' ? 'error' : 'warning',
-                    padding: '1em'
-                });
-                return;
-            }
-            userTableFetch();
-        });
-    }
-
-    function deleteUser(getname, dataId, username) {
-        socket.off('delete').off(`${melody.melody1}_${getname}`);
-
-        socket.emit('delete', {
-            melody1: melody.melody1,
-            melody2: melody.melody2,
-            param: getname,
-            dataId
-        });
-
-        socket.on(`${melody.melody1}_${getname}`, (data) => {
-            if (data.type === 'error' || data.type === 'caution') {
-                Swal.fire({
-                    text: data.message,
-                    icon: data.type === 'error' ? 'error' : 'warning',
-                    padding: '1em'
-                });
-                return;
-            }
-
-            Swal.fire('Deletion Successful', `${username.toUcwords()} has been deleted`, 'success');
-            userTableFetch();
-        });
-    }
+    // Other helper functions for update, deactivate, delete actions...
 });

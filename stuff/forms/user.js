@@ -3,7 +3,7 @@ function renderUserContainer() {
     $('.afrobuild_main_page_breadcrumb_navigation').html(`
         <div class="page-header">
             <div class="page-title">
-                <h3 class=" afrobuild_btn grey" id="afrobuild_manage_user_table_btn" role="button" data-open="table">
+                <h3 class="afrobuild_btn grey" id="afrobuild_manage_user_table_btn" role="button" data-open="table">
                     View All Users
                 </h3>
             </div>
@@ -77,27 +77,28 @@ function renderUserForm() {
     `;
 }
 
+// Renders the user table section
 function UserTable() {
     return `
-    <!-- BEGIN USER TABLE -->
-    <div class="row">
-        <div class="col-md-12 mt-3">
-            <div class="card">
-                <div class="card-body afrobuild_user_data_table_div">
-                    <div class="search-wrapper">
-  <input type="text" id="afrobuild_user_general_search" class="search-input" placeholder="Search table...">
-  <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-</div>
+        <!-- BEGIN USER TABLE -->
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <div class="card">
+                    <div class="card-body afrobuild_user_data_table_div">
+                        <div class="search-wrapper">
+                            <input type="text" id="afrobuild_user_general_search" class="search-input" placeholder="Search table...">
+                            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
 
-                    <table class="afrobuild_user_data_table" style="text-align:left"></table>
+                        <table class="afrobuild_user_data_table" style="text-align:left"></table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- END USER TABLE -->
+        <!-- END USER TABLE -->
     `;
 }
 
@@ -112,5 +113,9 @@ function UserTable() {
     $('#afrobuild_user_page_form_display').html(formHtml);
 
     // Load page-specific logic
-    addPageScript('app/userAjax');
+    if (typeof addPageScript === 'function') {
+        addPageScript('app/userAjax');
+    } else {
+        console.warn('addPageScript is not defined');
+    }
 })();
