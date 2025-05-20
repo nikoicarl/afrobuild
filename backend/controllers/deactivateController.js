@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
+const RoleModel = require('../models/RoleModel');  // Import RoleModel
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -8,7 +9,7 @@ const gf = new GeneralFunction();
 module.exports = (socket, Database) => {
     socket.on('deactivate', async (browserblob) => {
         const { param, melody1, dataId, checker } = browserblob;
-        
+
         if (!param) {
             return socket.emit(`${melody1}_${param}`, {
                 type: 'error',
@@ -27,7 +28,7 @@ module.exports = (socket, Database) => {
             let result = null;
 
             if (param === "deactivate_user") {
-                // Check user privilege for deactivating
+                // Check user privilege for deactivating user
                 if (privilegeData?.afrobuild.deactivate_user === "yes") {
                     const status = checker === "deactivate" ? 'deactivated' : 'active';
                     const UserModel = new User(Database);
@@ -37,16 +38,31 @@ module.exports = (socket, Database) => {
                         sql: 'status=? WHERE userid=?',
                         columns: [status, dataId]
                     });
+                    message = result?.affectedRows
+                        ? 'User status updated successfully.'
+                        : 'Failed to update user status.';
                 } else {
                     message = 'You do not have the required privileges to perform this task.';
                 }
-            }
+            } else if (param === "deactivate_role") {
+                // Check user privilege for deactivating roles
+                if (privilegeData?.afrobuild.deactivate_role === "yes") {
+                    const roleStatus = checker === "deactivate" ? 'inactive' : 'active';
+                    const RoleModelInstance = new RoleModel(Database);
 
-            // Default message if no custom message was set
-            if (!message) {
-                message = result?.affectedRows
-                    ? 'User status updated successfully.'
-                    : 'Failed to update user status.';
+                    // Update role status using RoleModel
+                    result = await RoleModelInstance.updateRoleStatus({
+                        sql: 'role_status=? WHERE userid=?',
+                        columns: [roleStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Role status updated successfully.'
+                        : 'Failed to update role status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate roles.';
+                }
+            } else {
+                message = 'Invalid parameter provided.';
             }
 
             // Emit the response based on result

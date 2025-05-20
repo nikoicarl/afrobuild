@@ -17,21 +17,21 @@ function renderStatsAndTransactionTable() {
             <div class="col-12 layout-spacing">
                 <div class="row g-4 mb-4">
                     <div class="col-md-4">
-                        <div class="stat-card">
+                        <div class="stat-card card-products">
                             <div class="stat-title">Total no. of Products/Services</div>
                             <div class="stat-value">1200</div>
                             <div class="stat-subtitle">in 12 categories</div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card">
+                        <div class="stat-card card-merchants">
                             <div class="stat-title">Total no. of Merchants</div>
                             <div class="stat-value">150</div>
                             <div class="stat-subtitle">From 8 regions in Ghana</div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card">
+                        <div class="stat-card card-transactions">
                             <div class="stat-title">Total no. of Transactions</div>
                             <div class="stat-value">₵150,000,000.00</div>
                             <div class="stat-subtitle">From Aug 2023 to Mar 2025</div>
