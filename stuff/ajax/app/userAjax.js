@@ -198,7 +198,7 @@ $(document).ready(function () {
         if (action === 'deactivate_user' || action === 'activate_user') {
             const isActivating = isActivate === 'activate';
             const actionVerb = isActivating ? 'Reactivate' : 'Deactivate';
-            const pastTenseVerb = isActivating ? 'reactivated' : 'deactivated';
+            const pastTenseVerb = isActivate === 'activate' ? 'reactivated' : 'deactivated';
 
 
             Swal.fire({
@@ -225,9 +225,9 @@ $(document).ready(function () {
 
                     socket.once(`${melody.melody1}_${action}`, (res) => {
                         Swal.fire({
-                            title: res.success ? 'Success' : 'Error',
+                            title: res.type ? 'Success' : 'Error',
                             text: res.message || `User ${pastTenseVerb} successfully!`,
-                            icon: res.success ? 'success' : 'error',
+                            icon: res.type ? 'success' : 'error',
                             showConfirmButton: true
                         });
                         userTableFetch();  // Refresh table after action
