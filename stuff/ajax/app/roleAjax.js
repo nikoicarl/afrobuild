@@ -4,34 +4,30 @@ $(document).ready(function () {
     const $toggleBtn = $('#afrobuild_manage_role_table_btn');
     const $roleForm = $('#roleForm');
 
-    // Handle the toggle between table and form
-    $(document).on('click.pageopener', 'h3#afrobuild_manage_role_table_btn', function (e) {
+    // Toggle between role form and role table
+    $(document).on('click.pageopener', '#afrobuild_manage_role_table_btn', function (e) {
         e.preventDefault();
-        const isTableView = $(this).data("open") === 'table';
+        const isTableView = $(this).data('open') === 'table';
 
-        // Render the corresponding content based on the current state
         const html = isTableView ? ejs.render(RoleTable(), {}) : ejs.render(renderRoleForm(), {});
         $formDisplay.html(html);
 
-        // Update the button text for toggling between views
         const btnText = isTableView
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Roles';
 
-        // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
 
-        // Fetch the role table if we are in table view
         if (isTableView) roleTableFetch();
     });
 
-    // Handle role form submission for creating or updating a role
+    // Handle form submission for creating or updating role
     $(document).on('click', '.afrobuild_manage_role_submit_btn', function (e) {
-        e.preventDefault();  // Prevent the default action of the button
+        e.preventDefault();
 
         const roleData = {
             name: $('#role_name').val().trim(),
-            description: $('#role_description').val().trim(),
+            description: $('#role_description').val().trim(), // Added this
             role_hiddenid: $('#role_hiddenid').val().trim(),
             melody1: melody.melody1,
             melody2: melody.melody2
@@ -42,14 +38,11 @@ $(document).ready(function () {
             .attr('disabled', true);
 
         setTimeout(() => {
-            // Determine if it's create or update action based on role_hiddenid
             const action = roleData.role_hiddenid ? 'update_role' : 'create_role';
 
-            // Emit the respective socket event
             socket.emit('create_role', roleData);
 
-            // Handle response based on action
-            socket.once(`${roleData.melody1}_${'create_role'}`, (res) => {
+            socket.once(`${roleData.melody1}_create_role`, (res) => {
                 Swal.fire({
                     title: res.success ? 'Success' : 'Error',
                     text: res.message || (res.success ? `Role ${action === 'create_role' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_role' ? 'create' : 'update'} role.`),
@@ -59,10 +52,9 @@ $(document).ready(function () {
                 });
                 $submitBtn.html('Submit').removeAttr('disabled');
 
-                // If successful, reset the form and clean up
                 if (res.success) {
                     resetRoleForm();
-                    roleTableFetch(); // Refresh the role table
+                    roleTableFetch();
                 }
             });
 
@@ -73,14 +65,14 @@ $(document).ready(function () {
         }, 300);
     });
 
-    // Function to reset the role form
     function resetRoleForm() {
-        $('#roleForm')[0].reset();  // Reset the form fields
-        $('#role_hiddenid').val('');  // Clear the hidden ID field
-        $('.afrobuild_manage_role_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
+        $roleForm[0].reset();
+        $('#role_hiddenid').val('');
+        $('#role_name').val('');
+        $('#role_description').val('');
+        $('.afrobuild_manage_role_submit_btn').html('Submit').removeAttr('disabled');
     }
 
-    // Function to fetch and render the role table
     const roleTableFetch = () => {
         socket.off('table').off(`${melody.melody1}_role_table`);
 
@@ -99,7 +91,6 @@ $(document).ready(function () {
         });
     };
 
-    // Function to handle role table rendering
     function roleDataTable(dataJSONArray) {
         reCreateMdataTable('afrobuild_role_data_table', 'afrobuild_role_data_table_div');
 
@@ -113,17 +104,17 @@ $(document).ready(function () {
             columns: [
                 {
                     field: 'name',
-                    title: "Role",
+                    title: 'Role Name',
                     template: row => row.name.toUcwords()
                 },
                 {
                     field: 'description',
-                    title: "Description",
-                    template: row => row.description.toUcwords()
+                    title: 'Description',
+                    template: row => row.description || 'No description provided'
                 },
                 {
                     field: 'status',
-                    title: "Status",
+                    title: 'Status',
                     template: row => row.status === 'active'
                         ? `<span class="badge text-bg-success">Active</span>`
                         : `<span class="badge text-bg-danger">${row.status.toUcwords()}</span>`
@@ -157,21 +148,20 @@ $(document).ready(function () {
         });
     }
 
-    // Update Role on Click
+    // Edit role
     $(document).on('click', '.afrobuild_role_table_edit_btn', function (e) {
         const action = $(this).data('getname');
         const roleId = $(this).data('getid');
         const roleName = $(this).data('getdata');
-        const isActivate = $(this).data('activate'); // Checks if it's an 'activate' action
+        const isActivate = $(this).data('activate');
 
-        // Specific Role Action
         if (action === 'specific_role') {
             socket.emit('specific', {
-                "melody1": melody.melody1,
-                "melody2": melody.melody2,
-                "melody3": melody.melody3,
-                "param": action,
-                "dataId": roleId
+                melody1: melody.melody1,
+                melody2: melody.melody2,
+                melody3: melody.melody3,
+                param: action,
+                dataId: roleId
             });
 
             socket.on(`${melody.melody1}_specific_role`, (res) => {
@@ -179,82 +169,59 @@ $(document).ready(function () {
                     const html = ejs.render(renderRoleForm(), {});
                     document.getElementById('afrobuild_role_page_form_display').innerHTML = html;
                     $('#afrobuild_manage_role_table_btn').html('View All Roles');
-                    $('#afrobuild_manage_role_table_btn').data('open', "table");
-                    $('.role_submit_btn').html('Update');
-                    populateRoleForm(res.roleResult);  // Populate the form with role data
+                    $('#afrobuild_manage_role_table_btn').data('open', 'table');
+                    $('.afrobuild_manage_role_submit_btn').html('Update');
+                    populateRoleForm(res.roleResult);
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching role details', 'error');
                 }
             });
         }
 
-        // Deactivate or Activate Role Action
         if (action === 'deactivate_role' || action === 'activate_role') {
-            const roleStatus = isActivate ? 'active' : 'deactivated';
-            const actionText = isActivate ? 'Reactivate' : 'Deactivate';
-            const confirmText = isActivate ? 'Reactivate' : 'Deactivate';
+            const isActivating = isActivate === 'activate';
+            const actionVerb = isActivating ? 'Reactivate' : 'Deactivate';
+            const pastTenseVerb = isActivate === 'activate' ? 'reactivated' : 'deactivated';
 
             Swal.fire({
-                title: `Are you sure you want to ${actionText} the role "${roleName}"?`,
-                showCancelButton: true,
-                confirmButtonText: confirmText
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    socket.emit(`${action}`, {
-                        roleId: roleId,
-                        status: roleStatus
-                    });
-
-                    socket.once('role_update', (res) => {
-                        Swal.fire({
-                            title: res.success ? 'Success' : 'Error',
-                            text: res.success ? `${actionText}d successfully!` : `Failed to ${actionText} role.`,
-                            icon: res.success ? 'success' : 'error',
-                            showConfirmButton: !res.success,
-                            timer: res.success ? 2000 : undefined
-                        });
-
-                        // Refresh role table on success
-                        if (res.success) roleTableFetch();
-                    });
-                }
-            });
-        }
-
-        // Delete Role Action
-        if (action === 'delete_role') {
-            Swal.fire({
-                title: 'Are you sure you want to delete this role?',
-                text: `You will not be able to restore the role "${roleName}" once deleted.`,
+                title: `Are you sure you want to ${actionVerb} this role?`,
+                text: `This will change the status of the role ${roleName}.`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                confirmButtonColor: '#d33'
+                confirmButtonText: actionVerb,
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    socket.emit('delete_role', { roleId });
+                    socket.off('deactivate');
+                    socket.off(`${melody.melody1}_${action}`);
 
-                    socket.once('role_deleted', (res) => {
+                    socket.emit('deactivate', {
+                        melody1: melody.melody1,
+                        melody2: melody.melody2,
+                        param: action,
+                        dataId: roleId,
+                        checker: isActivate
+                    });
+
+                    socket.once(`${melody.melody1}_${action}`, (res) => {
                         Swal.fire({
-                            title: res.success ? 'Success' : 'Error',
-                            text: res.success ? `Role deleted successfully!` : `Failed to delete role.`,
-                            icon: res.success ? 'success' : 'error',
-                            showConfirmButton: !res.success,
-                            timer: res.success ? 2000 : undefined
+                            title: res.type ? 'Success' : 'Error',
+                            text: res.message || `Role ${pastTenseVerb} successfully!`,
+                            icon: res.type ? 'success' : 'error',
+                            showConfirmButton: true
                         });
-
-                        // Refresh role table on success
-                        if (res.success) roleTableFetch();
+                        roleTableFetch();
                     });
                 }
             });
         }
     });
 
-    // Populate the role form for editing
     function populateRoleForm(role) {
-        $('#role_hiddenid').val(role.roleid);
         $('#role_name').val(role.name);
-        $('#role_description').val(role.description);
+        $('#role_description').val(role.description); // Add this
+        $('#role_hiddenid').val(role.roleid);
     }
+
 });

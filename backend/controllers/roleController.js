@@ -30,7 +30,7 @@ module.exports = function (socket, Database) {
         const SessionActivityModel = new SessionActivity(Database);
 
         const isNewRole = !role_hiddenid || role_hiddenid.trim() === '';
-        const requiredFields = isNewRole ? [name, description] : [name];
+        const requiredFields = isNewRole ? [name] : [name];
 
         // Check for empty fields
         const checkEmpty = gf.ifEmpty(requiredFields);
