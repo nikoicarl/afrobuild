@@ -1,12 +1,11 @@
 const fs = require('fs')
-const path = require('path');
 
 class UploadFile {
 
     constructor(fileNames, namesForRename) {
-        this.fileNames = fileNames;
-        this.namesForRename = namesForRename;
-        this.filePath = path.join(__dirname, '../../stuffs/uploads/');
+        this.fileNames = fileNames
+        this.namesForRename = namesForRename
+        this.filePath = __dirname+'/../../stuff/uploads/'
     }
 
     _uploadFiles() {

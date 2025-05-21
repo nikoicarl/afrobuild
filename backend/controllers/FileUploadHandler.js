@@ -4,7 +4,7 @@ const md5 = require('md5');
 
 const FileDataHolder = {};
 
-const UPLOAD_DIR = path.join(__dirname, '../../../stuff/uploads');
+const UPLOAD_DIR = path.join(__dirname, '../../stuff/uploads/');
 
 module.exports = (socket) => {
     socket.on('ovasyte_general_file_upload', async (fileData, cb) => {
