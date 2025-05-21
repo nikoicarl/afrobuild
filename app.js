@@ -15,6 +15,10 @@ const tableFetchController = require('./backend/controllers/tableFetchController
 const specificFetchController = require('./backend/controllers/specificFetchController');
 const deactivateController = require('./backend/controllers/deactivateController');
 const roleController = require('./backend/controllers/roleController');
+const productController = require('./backend/controllers/productController');
+const FileUploadHandler = require('./backend/controllers/FileUploadHandler');
+
+
 
 
 
@@ -54,6 +58,8 @@ async function startServer() {
                 specificFetchController(socket, Database);
                 deactivateController(socket, Database);
                 roleController(socket, Database);
+                productController(socket, Database);
+                FileUploadHandler(socket);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }

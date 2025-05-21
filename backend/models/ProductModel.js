@@ -35,18 +35,20 @@ class Product {
         return await CreateUpdateTable.checkTableExistence();
     }
 
-    // Insert a new record
-    async insertTable(values) {
+    //Insert method
+    async insertTable (columns) {
+        let result = await this.createTable();
         try {
-            const tableReady = await this.createTable();
-            if (!tableReady) throw new Error('Table creation failed or does not exist.');
-
-            const placeholders = this.columnsList.map(() => '?').join(', ');
-            const sql = `INSERT IGNORE INTO ${this.tableName} (${this.columnsList.join(', ')}) VALUES (${placeholders})`;
-
-            return await this.Database.setupConnection({ sql, columns: values }, 'object');
+            if (result) {
+                let sql = `
+                    INSERT IGNORE INTO product (${this.columnsList.toString()}) VALUES (?,?,?,?,?, ?,?);
+                `;
+                result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
+                return result;
+            } else {
+                return result;
+            }
         } catch (error) {
-            console.error('[insertTable Error]:', error);
             return error;
         }
     }

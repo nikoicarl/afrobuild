@@ -609,6 +609,26 @@ span.breadcrumb-label {
     /* Center align */
 }
 
+.afrobuild_dropzone.afrobuild_dragover {
+    border-color: #000;
+    color: #000;
+}
+
+.afrobuild_dropzone.afrobuild_dropzone_inner {
+    width: 100%;
+    /*padding: 10% 30%;*/
+    /*position: absolute;*/
+}
+
+input.afrobuild_dropzone_input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
 /* Responsive Design for Sidebar */
 @media (max-width: 768px) {
     .sidebar {

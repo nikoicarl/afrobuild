@@ -3,7 +3,7 @@ function renderProductContainer() {
     $('.afrobuild_main_page_breadcrumb_navigation').html(`
         <div class="page-header">
             <div class="page-title">
-                <h3 class="afrobuild_btn grey" id="afrobuild_manage_product_table_btn" role="button" data-open="table">
+                <h3 class="afrobuild_btn " id="afrobuild_manage_product_table_btn" role="button" data-open="table">
                     View All Products
                 </h3>
             </div>
@@ -27,6 +27,7 @@ function renderProductForm() {
                 <div class="stat-card p-4">
                     <h4 class="mb-4">Create New Product</h4>
                     <form id="productForm" enctype="multipart/form-data" novalidate>
+                        <input type="hidden" id="afrobuild_manage_product_hiddenid">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <input type="text" class="form-control" id="product_name" placeholder="Product Name" required>
@@ -43,15 +44,21 @@ function renderProductForm() {
                         </div>
 
                         <div class="row">
-                            <div class="col-12 mb-3">
-                                <label for="product_documents" class="form-label">Upload Documents</label>
-                                <input type="file" class="form-control" id="product_documents" multiple>
+                            <div class="col-md-12">
+                                <div class="row mb-4">
+                                    <div class="col-md-12 mt-3">
+                                        <label for=""> Upload Images</label>
+                                        <div class="w-100 afrobuild_manage_product_drop_zone" id="afrobuild_manage_product_drop_zone"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
+                        
+
                         <div class="row">
                             <div class="col-12 text-end">
-                                <button type="submit" class="btn afrobuild_btn product_submit_btn">Submit Product</button>
+                                <button type="submit" class="btn afrobuild_btn afrobuild_manage_product_submit_btn">Submit Product</button>
                             </div>
                         </div>
                     </form>
@@ -71,6 +78,7 @@ function renderProductForm() {
     const formHtml = renderProductForm();
     $('#afrobuild_product_page_form_display').html(formHtml);
 
-    // Load page-specific logic
+    // Load page-specific logic/
+    addExternalScript('assets/js/DropZone.js');
     addPageScript('app/productAjax');
 })();
