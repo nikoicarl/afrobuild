@@ -2,6 +2,7 @@ const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
+const Service = require('../models/ServiceModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -13,7 +14,7 @@ module.exports = (socket, Database) => {
         const melody1 = browserblob.melody1 || '';
 
         // Check if param is neither user_table nor role_table
-        if (param !== 'user_table' && param !== 'role_table'  && param !== 'product_table') return;
+        if (param !== 'user_table' && param !== 'role_table'  && param !== 'product_table'  && param !== 'service_table') return;
 
         try {
             const session = getSessionIDs(melody1);
@@ -109,6 +110,33 @@ module.exports = (socket, Database) => {
 
                 // Emit raw roles data
                 return socket.emit(`${melody1}_${param}`, products);
+            }
+
+            if (param === 'service_table') {
+                const hasServicePermission = ['add_service', 'update_service', 'deactivate_service'].some(
+                    perm => afrobuildPerms[perm] === 'yes'
+                );
+
+                if (!hasServicePermission) {
+                    return socket.emit(`${melody1}_${param}`, []);
+                }
+
+                // Fetch service data using preparedFetch
+                const ServiceModel = new Service(Database);  // Assuming Service is a table in your DB
+                const services = await ServiceModel.preparedFetch({
+                    sql: 'status != ? ORDER BY name ASC',  // Adjust SQL query as needed
+                    columns: ['inactive']
+                });
+
+                if (!Array.isArray(services)) {
+                    return socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: 'Database error while fetching services.'
+                    });
+                }
+
+                // Emit raw roles data
+                return socket.emit(`${melody1}_${param}`, services);
             }
 
         } catch (err) {
