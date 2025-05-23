@@ -141,6 +141,20 @@ $(document).ready(function () {
                     template: row => row.description
                 },
                 {
+                    field: 'documents',
+                    title: "Image",
+                    type: 'text',
+                    template: function (row) {
+                        let img = row.documents && row.documents ? (row.documents.split(',') ? row.documents.split(',')[0] : row.documents) : ''
+                        if (img && img != '') {
+                            img = (`
+                                    <img src="uploads/${img}" style="max-width: 40px; max-height: 40px; border-radius: 4px; cursor: pointer;" />
+                                `)
+                        }
+                        return img
+                    }
+                },
+                {
                     field: 'status',
                     title: "Status",
                     template: row => row.status === 'active'
