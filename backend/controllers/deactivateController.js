@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const Role = require('../models/RoleModel');
+const Product = require('../models/ProductModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -60,6 +61,23 @@ module.exports = (socket, Database) => {
                         : 'Failed to update role status.';
                 } else {
                     message = 'You do not have the required privileges to deactivate roles.';
+                }
+            } else if (param === "deactivate_product") {
+                // Check user privilege for deactivating products
+                if (privilegeData?.afrobuild.deactivate_product === "yes") {
+                    const productStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const ProductModel = new Product(Database);
+
+                    // Update product status using ProductModel
+                    result = await ProductModel.updateTable({
+                        sql: 'status=? WHERE productid=?',
+                        columns: [productStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Product status updated successfully.'
+                        : 'Failed to update product status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate products.';
                 }
             } else {
                 message = 'Invalid parameter provided.';
