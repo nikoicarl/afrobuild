@@ -68,6 +68,29 @@ function renderProductForm() {
     `;
 }
 
+// Renders the product table section
+function ProductTable() {
+    return `
+        <!-- BEGIN PRODUCT TABLE -->
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <div class="stat-card afrobuild_product_data_table_div">
+                    <div class="search-wrapper">
+                        <input type="text" id="afrobuild_product_general_search" class="search-input" placeholder="Search table...">
+                        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+
+                    <table class="afrobuild_product_data_table" style="text-align:left"></table>
+                </div>
+            </div>
+        </div>
+        <!-- END PRODUCT TABLE -->
+    `;
+}
+
 // Immediately Invoked Function Expression (IIFE) to render the full product page
 (() => {
     // Render breadcrumb and container layout

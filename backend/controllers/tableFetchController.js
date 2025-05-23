@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
+const Product = require('../models/ProductModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
@@ -12,7 +13,7 @@ module.exports = (socket, Database) => {
         const melody1 = browserblob.melody1 || '';
 
         // Check if param is neither user_table nor role_table
-        if (param !== 'user_table' && param !== 'role_table') return;
+        if (param !== 'user_table' && param !== 'role_table'  && param !== 'product_table') return;
 
         try {
             const session = getSessionIDs(melody1);
@@ -81,6 +82,33 @@ module.exports = (socket, Database) => {
 
                 // Emit raw roles data
                 return socket.emit(`${melody1}_${param}`, roles);
+            }
+
+            if (param === 'product_table') {
+                const hasProductPermission = ['add_product', 'update_product', 'deactivate_product'].some(
+                    perm => afrobuildPerms[perm] === 'yes'
+                );
+
+                if (!hasProductPermission) {
+                    return socket.emit(`${melody1}_${param}`, []);
+                }
+
+                // Fetch product data using preparedFetch
+                const ProductModel = new Product(Database);  // Assuming Product is a table in your DB
+                const products = await ProductModel.preparedFetch({
+                    sql: 'status != ? ORDER BY name ASC',  // Adjust SQL query as needed
+                    columns: ['inactive']
+                });
+
+                if (!Array.isArray(products)) {
+                    return socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: 'Database error while fetching products.'
+                    });
+                }
+
+                // Emit raw roles data
+                return socket.emit(`${melody1}_${param}`, products);
             }
 
         } catch (err) {

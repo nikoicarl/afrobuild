@@ -63,7 +63,7 @@ module.exports = (socket, Database) => {
                     });
                 }
 
-                const UploadFileHandler = new UploadFile(DocumentsForUpdate, '');
+                const UploadFileHandler = new UploadFile(DocumentsForUpdate, name);
                 const documentNames = UploadFileHandler._getFileNames().toString();
                 let result;
 

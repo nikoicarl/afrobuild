@@ -123,14 +123,20 @@ $(document).ready(function () {
             search: { input: $('#afrobuild_product_general_search') },
             columns: [
                 {
-                    field: 'first_name',
-                    title: "Product",
-                    template: row => `${row.first_name} ${row.last_name}`.toUcwords()
+                    field: 'name',
+                    title: "Product ",
+                    template: row => row.name.toUcwords()
                 },
                 {
-                    field: 'productname',
-                    title: "Productname",
-                    template: row => row.productname.toUcwords()
+                    field: 'price',
+                    title: "Price ",
+                    template: row => row.price
+                },
+
+                {
+                    field: 'description',
+                    title: "Description ",
+                    template: row => row.description
                 },
                 {
                     field: 'status',
@@ -144,11 +150,11 @@ $(document).ready(function () {
                     title: 'Action',
                     template: row => {
                         const statusBtn = row.status === "deactivated"
-                            ? `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="deactivate_product" data-getdata="${row.productname.toUcwords()}" data-activate="activate"><i class="icon-checkmark3"></i> Reactivate</a>`
-                            : `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="deactivate_product" data-getdata="${row.productname.toUcwords()}" data-activate="deactivate"><i class="icon-blocked"></i> Deactivate</a>`;
+                            ? `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="deactivate_product" data-getdata="${row.name.toUcwords()}" data-activate="activate"><i class="icon-checkmark3"></i> Reactivate</a>`
+                            : `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="deactivate_product" data-getdata="${row.name.toUcwords()}" data-activate="deactivate"><i class="icon-blocked"></i> Deactivate</a>`;
 
                         const deleteBtn = $('.hidden_delete_for_admin').val() === 'admin'
-                            ? `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="delete_product" data-getdata="${row.productname.toUcwords()}"><i class="icon-close2"></i> Delete</a>`
+                            ? `<a href="#" class="dropdown-item afrobuild_product_table_edit_btn" data-getid="${row.productid}" data-getname="delete_product" data-getdata="${row.name.toUcwords()}"><i class="icon-close2"></i> Delete</a>`
                             : '';
 
                         return `
@@ -172,7 +178,7 @@ $(document).ready(function () {
     $(document).on('click', '.afrobuild_product_table_edit_btn', function (e) {
         const action = $(this).data('getname');
         const productId = $(this).data('getid');
-        const productname = $(this).data('getdata');
+        const name = $(this).data('getdata');
         const isActivate = $(this).data('activate'); // Checks if it's an 'activate' action
 
         // Specific Product Action
@@ -208,7 +214,7 @@ $(document).ready(function () {
 
             Swal.fire({
                 title: `Are you sure you want to ${actionVerb} this product?`,
-                text: `This will change the status of the product ${productname}.`,
+                text: `This will change the status of the product ${name}.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: actionVerb,
@@ -246,13 +252,10 @@ $(document).ready(function () {
 
     // Function to populate the product form with data
     function populateProductForm(product) {
-        $('#first_name').val(product.first_name);
-        $('#last_name').val(product.last_name);
-        $('#email').val(product.email);
-        $('#phone').val(product.phone);
-        $('#address').val(product.address);
-        $('#productname').val(product.productname);
-        $('#product_hiddenid').val(product.productid);
+        $('#afrobuild_manage_product_hiddenid').val(product.productid);
+        $('#product_name').val(product.name);
+        $('#product_price').val(product.price);
+        $('#product_description').val(product.description);
         // If you need more fields, populate them here
     }
 
