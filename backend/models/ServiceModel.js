@@ -1,17 +1,38 @@
 const CreateUpdateModel = require('./CreateUpdateModel');
 
-//Intialize Class
 class Service {
-
-    //Constructor 
-    constructor (Database) {
+    constructor(Database) {
         this.Database = Database;
 
-        //Table columns
-        this.columnsList = ['serviceid', 'name', 'description', 'datetime', 'status'];
+        // Define table and columns
+        this.tableName = 'service';
+        this.columnsList = [
+            'serviceid', 'name', 'description', 
+            'price', 'documents', 'datetime', 'status'
+        ];
 
-        //Call to create table if not exist
+        // Ensure table exists on instantiation
         this.createTable();
+    }
+
+    // Create table if it doesn't exist
+    async createTable() {
+        const CreateUpdateTable = new CreateUpdateModel(this.Database, {
+            tableName: this.tableName,
+            createTableStatement: `
+                serviceid BIGINT(100) PRIMARY KEY,
+                name VARCHAR(255),
+                description VARCHAR(255),
+                price DOUBLE(10,2),
+                documents LONGTEXT,
+                datetime DATETIME,
+                status VARCHAR(50)
+            `,
+            foreignKeyStatement: '',
+            alterTableStatement: []
+        });
+
+        return await CreateUpdateTable.checkTableExistence();
     }
 
     //Insert method
@@ -20,7 +41,7 @@ class Service {
         try {
             if (result) {
                 let sql = `
-                    INSERT IGNORE INTO service (${this.columnsList.toString()}) VALUES (?,?,?,?,?);
+                    INSERT IGNORE INTO service (${this.columnsList.toString()}) VALUES (?,?,?,?,?, ?,?);
                 `;
                 result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
                 return result;
@@ -32,49 +53,27 @@ class Service {
         }
     }
 
-    //Update method
-    async updateTable (object) {
+    // Update existing record(s)
+    async updateTable({ sql, columns }) {
         try {
-            let sql = 'UPDATE service SET '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
+            const query = `UPDATE ${this.tableName} SET ${sql}`;
+            return await this.Database.setupConnection({ sql: query, columns }, 'object');
         } catch (error) {
+            console.error('[updateTable Error]:', error);
             return error;
         }
     }
 
-    //Fetch for prepared statement
-    async preparedFetch (object) {
+    // Fetch with custom WHERE condition
+    async preparedFetch({ sql, columns }) {
         try {
-            let sql = 'SELECT * FROM service WHERE '+object.sql;
-            let result = await this.Database.setupConnection({sql: sql, columns: object.columns}, 'object');
-            return result;
+            const query = `SELECT * FROM ${this.tableName} WHERE ${sql}`;
+            return await this.Database.setupConnection({ sql: query, columns }, 'object');
         } catch (error) {
+            console.error('[preparedFetch Error]:', error);
             return error;
         }
     }
-
-    //Create table method
-    async createTable() {
-        const CreateUpdateTable = new CreateUpdateModel(this.Database, {
-            tableName: 'service',
-
-            createTableStatement: (`
-                serviceid BIGINT(100) PRIMARY KEY,
-                name varchar(255),
-                description varchar(255),
-                datetime datetime,
-                status varchar(50)
-            `),
-
-            foreignKeyStatement: (``),
-
-            alterTableStatement: []
-        });
-        let result = await CreateUpdateTable.checkTableExistence();
-        return result;
-    }
-
 }
 
 module.exports = Service;

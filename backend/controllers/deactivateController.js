@@ -2,6 +2,7 @@ const User = require('../models/UserModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
+const Service = require('../models/ServiceModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -79,7 +80,24 @@ module.exports = (socket, Database) => {
                 } else {
                     message = 'You do not have the required privileges to deactivate products.';
                 }
-            } else {
+            } else if (param === "deactivate_service") {
+                // Check user privilege for deactivating services
+                if (privilegeData?.afrobuild.deactivate_service === "yes") {
+                    const serviceStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const ServiceModel = new Service(Database);
+
+                    // Update service status using ServiceModel
+                    result = await ServiceModel.updateTable({
+                        sql: 'status=? WHERE serviceid=?',
+                        columns: [serviceStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Service status updated successfully.'
+                        : 'Failed to update service status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate services.';
+                }
+            }else {
                 message = 'Invalid parameter provided.';
             }
 
