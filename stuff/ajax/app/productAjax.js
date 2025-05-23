@@ -215,6 +215,13 @@ $(document).ready(function () {
                     $('#afrobuild_manage_product_table_btn').data('open', "table");
                     $('.product_submit_btn').html('Update');
                     populateProductForm(res.productResult);  // Populate the form with product data
+                    FileNamesHolder = []
+                    if (res.productresult) {
+                        let list = res.productresult.split(',') ? res.productresult.split(',') : [res.productresult]
+                        for (let i = 0; i < list.length; i++) {
+                            FileNamesHolder.push(list[i] + '*^*^any_div')
+                        }
+                    }
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching product details', 'error');
                 }
