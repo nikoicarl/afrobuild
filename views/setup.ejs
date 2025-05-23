@@ -13,13 +13,15 @@
     <style>
         .login-container {
             display: flex;
-            height: 100vh;
+            flex-wrap: wrap;
+            /* Makes sections stack on small screens */
+            min-height: 100vh;
         }
 
         .image-section {
             background: url('assets/img/login-img.png') no-repeat top center;
             background-size: cover;
-            flex: 0.6;
+            flex: 1 1 50%;
             display: flex;
             align-items: end;
             justify-content: left;
@@ -27,18 +29,21 @@
             text-align: center;
             padding: 40px;
             border-radius: 0px 50px 50px 0px;
+            min-height: 300px;
+            
         }
 
         .login-section {
-            flex: 1;
+            flex: 1 1 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            padding: 20px;
         }
 
         .login-box {
-            width: 90%;
+            width: 100%;
             max-width: 470px;
             padding: 30px;
             border-radius: 10px;
@@ -46,18 +51,19 @@
             background: white;
         }
 
-        .form-buttons {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 30px;
-        }
+        @media (max-width: 768px) {
+            .image-section {
+                border-radius: 0;
+                justify-content: center;
+                text-align: center;
+            }
 
-        .hide {
-            display: none;
+            .login-container {
+                flex-direction: column;
+            }
         }
     </style>
+
 </head>
 
 <body>
@@ -89,13 +95,13 @@
                                 required>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
+                        <div class="row ">
+                            <div class="col-md-6 mb-3">
                                 <select class="form-select" id="country" name="country" required>
                                     <option value="" disabled selected>Loading...</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <select class="form-select" id="region" name="region" required>
                                     <option value="">Select Region</option>
                                     <option value="ashanti">Ashanti</option>
@@ -124,13 +130,10 @@
                                 required></textarea>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 offset-md-6">
-                                <div class="form-buttons text-end">
-                                    <button type="submit" id="submit" class="btn btn-success">Submit</button>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" id="submit" class="btn btn-success">Submit</button>
                         </div>
+
                     </div>
                 </form>
             </div>
