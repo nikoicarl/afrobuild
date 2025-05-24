@@ -3,6 +3,8 @@ const Privilege = require('../models/PrivilegeFeaturesModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
 const Service = require('../models/ServiceModel');
+const Merchant = require('../models/MerchantModel');
+const Vendor = require('../models/VendorModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -97,7 +99,41 @@ module.exports = (socket, Database) => {
                 } else {
                     message = 'You do not have the required privileges to deactivate services.';
                 }
-            }else {
+            } else if (param === "deactivate_vendor") {
+                // Check user privilege for deactivating vendors
+                if (privilegeData?.afrobuild.deactivate_vendor === "yes") {
+                    const vendorStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const VendorModel = new Vendor(Database);
+
+                    // Update vendor status using VendorModel
+                    result = await VendorModel.updateTable({
+                        sql: 'status=? WHERE vendorid=?',
+                        columns: [vendorStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Vendor status updated successfully.'
+                        : 'Failed to update vendor status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate vendors.';
+                }
+            } else if (param === "deactivate_merchant") {
+                // Check user privilege for deactivating merchants
+                if (privilegeData?.afrobuild.deactivate_merchant === "yes") {
+                    const merchantStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const MerchantModel = new Merchant(Database);
+
+                    // Update merchant status using MerchantModel
+                    result = await MerchantModel.updateTable({
+                        sql: 'status=? WHERE merchantid=?',
+                        columns: [merchantStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Merchant status updated successfully.'
+                        : 'Failed to update merchant status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate merchants.';
+                }
+            } else {
                 message = 'Invalid parameter provided.';
             }
 

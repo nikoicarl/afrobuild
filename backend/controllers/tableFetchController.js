@@ -3,22 +3,62 @@ const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const Service = require('../models/ServiceModel');
+const Merchant = require('../models/MerchantModel');
+const Vendor = require('../models/VendorModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
 const gf = new GeneralFunction();
 
+const tableConfigs = {
+    user_table: {
+        model: User,
+        permissions: ['add_user', 'update_user', 'deactivate_user'],
+        sql: 'status != ? ORDER BY date_time DESC',
+        columns: ['inactive']
+    },
+    role_table: {
+        model: Role,
+        permissions: ['add_role', 'update_role', 'deactivate_role'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    },
+    product_table: {
+        model: Product,
+        permissions: ['add_product', 'update_product', 'deactivate_product'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    },
+    service_table: {
+        model: Service,
+        permissions: ['add_service', 'update_service', 'deactivate_service'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    },
+    merchant_table: {
+        model: Merchant,
+        permissions: ['add_merchant', 'update_merchant', 'deactivate_merchant'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    },
+    vendor_table: {
+        model: Vendor,
+        permissions: ['add_vendor', 'update_vendor', 'deactivate_vendor'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    }
+};
+
 module.exports = (socket, Database) => {
     socket.on('table', async (browserblob) => {
-        const param = browserblob.param;
-        const melody1 = browserblob.melody1 || '';
+        const { param, melody1 = '' } = browserblob;
 
-        // Check if param is neither user_table nor role_table
-        if (param !== 'user_table' && param !== 'role_table'  && param !== 'product_table'  && param !== 'service_table') return;
+        const config = tableConfigs[param];
+        if (!config) return;
 
         try {
             const session = getSessionIDs(melody1);
-            if (!session || !session.userid) {
+            if (!session?.userid) {
                 return socket.emit(`${melody1}_${param}`, {
                     type: 'error',
                     message: 'Invalid session.'
@@ -30,114 +70,28 @@ module.exports = (socket, Database) => {
             const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
             const afrobuildPerms = privilegeData.afrobuild || {};
 
-            // Check permissions and handle fetching for user_table and role_table
-            if (param === 'user_table') {
-                const hasUserPermission = ['add_user', 'update_user', 'deactivate_user'].some(
-                    perm => afrobuildPerms[perm] === 'yes'
-                );
+            const hasPermission = config.permissions.some(
+                perm => afrobuildPerms[perm] === 'yes'
+            );
 
-                if (!hasUserPermission) {
-                    return socket.emit(`${melody1}_${param}`, []);
-                }
-
-                // Fetch user data using preparedFetch
-                const UserModel = new User(Database);
-                const users = await UserModel.preparedFetch({
-                    sql: 'status != ? ORDER BY date_time DESC',
-                    columns: ['inactive']
-                });
-
-                if (!Array.isArray(users)) {
-                    return socket.emit(`${melody1}_${param}`, {
-                        type: 'error',
-                        message: 'Database error while fetching users.'
-                    });
-                }
-
-                // Emit raw users data
-                return socket.emit(`${melody1}_${param}`, users);
+            if (!hasPermission) {
+                return socket.emit(`${melody1}_${param}`, []);
             }
 
-            if (param === 'role_table') {
-                const hasRolePermission = ['add_role', 'update_role', 'deactivate_role'].some(
-                    perm => afrobuildPerms[perm] === 'yes'
-                );
+            const Model = new config.model(Database);
+            const data = await Model.preparedFetch({
+                sql: config.sql,
+                columns: config.columns
+            });
 
-                if (!hasRolePermission) {
-                    return socket.emit(`${melody1}_${param}`, []);
-                }
-
-                // Fetch role data using preparedFetch
-                const RoleModel = new Role(Database);  // Assuming Role is a table in your DB
-                const roles = await RoleModel.preparedFetch({
-                    sql: 'status != ? ORDER BY name ASC',  // Adjust SQL query as needed
-                    columns: ['inactive']
+            if (!Array.isArray(data)) {
+                return socket.emit(`${melody1}_${param}`, {
+                    type: 'error',
+                    message: `Database error while fetching ${param.replace('_table', '')}.`
                 });
-
-                if (!Array.isArray(roles)) {
-                    return socket.emit(`${melody1}_${param}`, {
-                        type: 'error',
-                        message: 'Database error while fetching roles.'
-                    });
-                }
-
-                // Emit raw roles data
-                return socket.emit(`${melody1}_${param}`, roles);
             }
 
-            if (param === 'product_table') {
-                const hasProductPermission = ['add_product', 'update_product', 'deactivate_product'].some(
-                    perm => afrobuildPerms[perm] === 'yes'
-                );
-
-                if (!hasProductPermission) {
-                    return socket.emit(`${melody1}_${param}`, []);
-                }
-
-                // Fetch product data using preparedFetch
-                const ProductModel = new Product(Database);  // Assuming Product is a table in your DB
-                const products = await ProductModel.preparedFetch({
-                    sql: 'status != ? ORDER BY name ASC',  // Adjust SQL query as needed
-                    columns: ['inactive']
-                });
-
-                if (!Array.isArray(products)) {
-                    return socket.emit(`${melody1}_${param}`, {
-                        type: 'error',
-                        message: 'Database error while fetching products.'
-                    });
-                }
-
-                // Emit raw roles data
-                return socket.emit(`${melody1}_${param}`, products);
-            }
-
-            if (param === 'service_table') {
-                const hasServicePermission = ['add_service', 'update_service', 'deactivate_service'].some(
-                    perm => afrobuildPerms[perm] === 'yes'
-                );
-
-                if (!hasServicePermission) {
-                    return socket.emit(`${melody1}_${param}`, []);
-                }
-
-                // Fetch service data using preparedFetch
-                const ServiceModel = new Service(Database);  // Assuming Service is a table in your DB
-                const services = await ServiceModel.preparedFetch({
-                    sql: 'status != ? ORDER BY name ASC',  // Adjust SQL query as needed
-                    columns: ['inactive']
-                });
-
-                if (!Array.isArray(services)) {
-                    return socket.emit(`${melody1}_${param}`, {
-                        type: 'error',
-                        message: 'Database error while fetching services.'
-                    });
-                }
-
-                // Emit raw roles data
-                return socket.emit(`${melody1}_${param}`, services);
-            }
+            return socket.emit(`${melody1}_${param}`, data);
 
         } catch (err) {
             socket.emit(`${melody1}_${param}`, {

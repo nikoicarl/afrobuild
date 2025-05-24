@@ -1,6 +1,9 @@
 const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
+const Service = require('../models/ServiceModel');
+const Merchant = require('../models/MerchantModel');
+const Vendor = require('../models/VendorModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -83,6 +86,72 @@ module.exports = (socket, Database) => {
                     // Emit product data back to the client
                     socket.emit(`${melody1}_${param}`, {
                         productResult: productResult[0] // Product data
+                    });
+                } else {
+                    socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                    });
+                }
+            } else if (param === 'specific_service') {
+                // Initialize the service model
+                const ServiceModel = new Service(Database);
+
+                // Fetch service details by userId
+                const serviceResult = await ServiceModel.preparedFetch({
+                    sql: 'serviceid = ?',
+                    columns: [dataId]
+                });
+
+
+                if (Array.isArray(serviceResult) && serviceResult.length > 0) {
+                    // Emit service data back to the client
+                    socket.emit(`${melody1}_${param}`, {
+                        serviceResult: serviceResult[0] // Service data
+                    });
+                } else {
+                    socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                    });
+                }
+            } else if (param === 'specific_merchant') {
+                // Initialize the merchant model
+                const MerchantModel = new Merchant(Database);
+
+                // Fetch merchant details by userId
+                const merchantResult = await MerchantModel.preparedFetch({
+                    sql: 'merchantid = ?',
+                    columns: [dataId]
+                });
+
+
+                if (Array.isArray(merchantResult) && merchantResult.length > 0) {
+                    // Emit merchant data back to the client
+                    socket.emit(`${melody1}_${param}`, {
+                        merchantResult: merchantResult[0] // Merchant data
+                    });
+                } else {
+                    socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                    });
+                }
+            } else if (param === 'specific_vendor') {
+                // Initialize the vendor model
+                const VendorModel = new Vendor(Database);
+
+                // Fetch vendor details by userId
+                const vendorResult = await VendorModel.preparedFetch({
+                    sql: 'vendorid = ?',
+                    columns: [dataId]
+                });
+
+
+                if (Array.isArray(vendorResult) && vendorResult.length > 0) {
+                    // Emit vendor data back to the client
+                    socket.emit(`${melody1}_${param}`, {
+                        vendorResult: vendorResult[0] // Vendor data
                     });
                 } else {
                     socket.emit(`${melody1}_${param}`, {
