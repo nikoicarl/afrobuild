@@ -88,10 +88,10 @@ module.exports = function (socket, Database) {
 
                 await SessionActivityModel.insertTable([
                     activityId,
-                    sessionid,
+                    userid,
                     activityMessage,
                     gf.getDateTime(),
-                    null // logout field remains null
+                    null
                 ]);
 
                 return socket.emit(`${melody1}_create_role`, {

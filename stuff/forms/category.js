@@ -4,7 +4,7 @@ function renderCategoryContainer() {
         <div class="page-header">
             <div class="page-title">
                 <h3 class="afrobuild_btn" id="afrobuild_manage_category_table_btn" category="button" data-open="table">
-                    View All Categorys
+                    View All Categories
                 </h3>
             </div>
         </div>

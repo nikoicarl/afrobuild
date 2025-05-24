@@ -14,7 +14,7 @@ $(document).ready(function () {
 
         const btnText = isTableView
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
-            : 'View All Categorys';
+            : 'View All Categories';
 
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
 
@@ -168,7 +168,7 @@ $(document).ready(function () {
                 if (res.categoryResult) {
                     const html = ejs.render(renderCategoryForm(), {});
                     document.getElementById('afrobuild_category_page_form_display').innerHTML = html;
-                    $('#afrobuild_manage_category_table_btn').html('View All Categorys');
+                    $('#afrobuild_manage_category_table_btn').html('View All Categories');
                     $('#afrobuild_manage_category_table_btn').data('open', 'table');
                     $('.afrobuild_manage_category_submit_btn').html('Update');
                     populateCategoryForm(res.categoryResult);

@@ -33,7 +33,7 @@ module.exports = function (socket, Database) {
 
         const isNewMerchant = !merchant_hiddenid || merchant_hiddenid.trim() === '';
         const requiredFields = [name, email, phone, address, location];
-        
+
         if (gf.ifEmpty(requiredFields).includes('empty')) {
             return socket.emit(`${melody1}_create_merchant`, {
                 success: false,
@@ -88,7 +88,7 @@ module.exports = function (socket, Database) {
 
                 await SessionActivityModel.insertTable([
                     activityId,
-                    sessionid,
+                    userid,
                     activityMessage,
                     gf.getDateTime(),
                     null

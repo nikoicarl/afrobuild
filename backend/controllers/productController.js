@@ -78,9 +78,9 @@ module.exports = (socket, Database) => {
                         gf.getDateTime(),
                         'active'
                     ]);
-                    
 
-                    
+
+
                 } else {
                     const updateColumns = [
                         name,
@@ -117,10 +117,10 @@ module.exports = (socket, Database) => {
 
                     await SessionActivityModel.insertTable([
                         activityId,
-                        sessionid,
+                        userid,
                         activityMsg,
-                        'active',
-                        gf.getDateTime()
+                        gf.getDateTime(),
+                        null
                     ]);
 
                     return socket.emit(`${melody1}_create_product`, {
