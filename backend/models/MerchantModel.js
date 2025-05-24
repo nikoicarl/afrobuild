@@ -1,12 +1,12 @@
 const CreateUpdateModel = require('./CreateUpdateModel');
 
-class Vendor {
+class Merchant {
     constructor(Database) {
         this.Database = Database;
 
-        // Columns in the 'vendor' table
+        // Columns in the 'merchant' table
         this.columnsList = [
-            'vendorid', 'name',  'phone', 'email',
+            'merchantid', 'name',  'phone', 'email',
             'address', 'location', 'status', 'date_time', 'sessionid'
         ];
 
@@ -16,9 +16,9 @@ class Vendor {
 
     async createTable() {
         const CreateUpdateTable = new CreateUpdateModel(this.Database, {
-            tableName: 'vendor',
+            tableName: 'merchant',
             createTableStatement: `
-                vendorid BIGINT(100) PRIMARY KEY,
+                merchantid BIGINT(100) PRIMARY KEY,
                 name VARCHAR(255),
                 phone VARCHAR(50),
                 email VARCHAR(100),
@@ -29,7 +29,7 @@ class Vendor {
                 sessionid BIGINT(100)
             `,
             foreignKeyStatement: `
-                ALTER TABLE vendor ADD FOREIGN KEY(sessionid) REFERENCES session(sessionid)
+                ALTER TABLE merchant ADD FOREIGN KEY(sessionid) REFERENCES session(sessionid)
             `,
             alterTableStatement: []
         });
@@ -41,52 +41,52 @@ class Vendor {
         await this.createTable();
         try {
             const placeholders = this.columnsList.map(() => '?').join(',');
-            const sql = `INSERT INTO vendor (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const sql = `INSERT INTO merchant (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             const result = await this.Database.setupConnection({ sql, columns }, 'object');
             return result;
         } catch (error) {
-            console.error('Insert Vendor Error:', error);
+            console.error('Insert Merchant Error:', error);
             return { error: true, message: error.message };
         }
     }
 
     async updateTable({ sql, columns }) {
         try {
-            const fullSql = `UPDATE vendor SET ${sql}`;
+            const fullSql = `UPDATE merchant SET ${sql}`;
             const result = await this.Database.setupConnection({ sql: fullSql, columns }, 'object');
             return result;
         } catch (error) {
-            console.error('Update Vendor Error:', error);
+            console.error('Update Merchant Error:', error);
             return { error: true, message: error.message };
         }
     }
 
     async preparedFetch({ sql, columns }) {
         try {
-            const fullSql = `SELECT * FROM vendor WHERE ${sql}`;
+            const fullSql = `SELECT * FROM merchant WHERE ${sql}`;
             const result = await this.Database.setupConnection({ sql: fullSql, columns }, 'object');
             return result;
         } catch (error) {
-            console.error('Fetch Vendor Error:', error);
+            console.error('Fetch Merchant Error:', error);
             return { error: true, message: error.message };
         }
     }
 
-    // Optional: Get a vendor by name
-    async getVendorByVendorname(name) {
+    // Optional: Get a merchant by merchantname
+    async getMerchantByMerchantname(merchantname) {
         return await this.preparedFetch({
-            sql: 'name = ?',
-            columns: [name]
+            sql: 'merchantname = ?',
+            columns: [merchantname]
         });
     }
 
-    // Optional: Soft-delete vendor by setting status
-    async deactivateVendor(vendorid) {
+    // Optional: Soft-delete merchant by setting status
+    async deactivateMerchant(merchantid) {
         return await this.updateTable({
-            sql: 'status = ? WHERE vendorid = ?',
-            columns: ['inactive', vendorid]
+            sql: 'status = ? WHERE merchantid = ?',
+            columns: ['inactive', merchantid]
         });
     }
 }
 
-module.exports = Vendor;
+module.exports = Merchant;
