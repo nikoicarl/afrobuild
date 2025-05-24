@@ -4,6 +4,7 @@ const Product = require('../models/ProductModel');
 const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
+const Category = require('../models/CategoryModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -152,6 +153,28 @@ module.exports = (socket, Database) => {
                     // Emit vendor data back to the client
                     socket.emit(`${melody1}_${param}`, {
                         vendorResult: vendorResult[0] // Vendor data
+                    });
+                } else {
+                    socket.emit(`${melody1}_${param}`, {
+                        type: 'error',
+                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                    });
+                }
+            } else if (param === 'specific_category') {
+                // Initialize the category model
+                const CategoryModel = new Category(Database);
+
+                // Fetch category details by userId
+                const categoryResult = await CategoryModel.preparedFetch({
+                    sql: 'categoryid = ?',
+                    columns: [dataId]
+                });
+
+
+                if (Array.isArray(categoryResult) && categoryResult.length > 0) {
+                    // Emit category data back to the client
+                    socket.emit(`${melody1}_${param}`, {
+                        categoryResult: categoryResult[0] // Category data
                     });
                 } else {
                     socket.emit(`${melody1}_${param}`, {

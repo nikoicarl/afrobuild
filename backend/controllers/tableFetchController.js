@@ -5,6 +5,7 @@ const Privilege = require('../models/PrivilegeFeaturesModel');
 const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
+const Category = require('../models/CategoryModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -44,6 +45,12 @@ const tableConfigs = {
     vendor_table: {
         model: Vendor,
         permissions: ['add_vendor', 'update_vendor', 'deactivate_vendor'],
+        sql: 'status != ? ORDER BY name ASC',
+        columns: ['inactive']
+    },
+    category_table: {
+        model: Category,
+        permissions: ['add_category', 'update_category', 'deactivate_category'],
         sql: 'status != ? ORDER BY name ASC',
         columns: ['inactive']
     }

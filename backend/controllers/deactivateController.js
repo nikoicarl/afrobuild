@@ -5,6 +5,7 @@ const Product = require('../models/ProductModel');
 const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
+const Category = require('../models/CategoryModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
@@ -132,6 +133,23 @@ module.exports = (socket, Database) => {
                         : 'Failed to update merchant status.';
                 } else {
                     message = 'You do not have the required privileges to deactivate merchants.';
+                }
+            } else if (param === "deactivate_category") {
+                // Check user privilege for deactivating category
+                if (privilegeData?.afrobuild.deactivate_category === "yes") {
+                    const categoryStatus = checker === "deactivate" ? 'deactivated' : 'active';
+                    const CategoryModel = new Category(Database);
+
+                    // Update category status using CategoryModel
+                    result = await CategoryModel.updateTable({
+                        sql: 'status=? WHERE categoryid=?',
+                        columns: [categoryStatus, dataId]
+                    });
+                    message = result?.affectedRows
+                        ? 'Category status updated successfully.'
+                        : 'Failed to update category status.';
+                } else {
+                    message = 'You do not have the required privileges to deactivate category.';
                 }
             } else {
                 message = 'Invalid parameter provided.';
