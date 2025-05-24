@@ -88,7 +88,9 @@ body {
     border-right: 1px solid #ececec;
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* Ensures bottom space for logout */
     z-index: 100;
+    overflow-y: auto; /* Optional: scroll sidebar if content overflows */
 }
 
 .logo img {
