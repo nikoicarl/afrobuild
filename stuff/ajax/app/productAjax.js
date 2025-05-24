@@ -26,10 +26,10 @@ $(document).ready(function () {
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Products';
 
-        pageDropZone();
-
         // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
+         // Initialize DropZone if switching to form view
+        if (!isTableView) pageDropZone();
 
         // Fetch the product table if we are in table view
         if (isTableView) productTableFetch();
@@ -215,13 +215,14 @@ $(document).ready(function () {
                     $('#afrobuild_manage_product_table_btn').data('open', "table");
                     $('.product_submit_btn').html('Update');
                     populateProductForm(res.productResult);  // Populate the form with product data
-                    FileNamesHolder = []
-                    if (res.productresult) {
-                        let list = res.productresult.split(',') ? res.productresult.split(',') : [res.productresult]
+                    FileNamesHolder = [];
+                    if (res.productResult) {
+                        let list = res.productResult.documents.split(',') ? res.productResult.documents.split(',') : [res.productResult.documents];
                         for (let i = 0; i < list.length; i++) {
                             FileNamesHolder.push(list[i] + '*^*^any_div')
                         }
                     }
+                    pageDropZone();
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching product details', 'error');
                 }

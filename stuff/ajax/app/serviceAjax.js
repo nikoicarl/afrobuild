@@ -26,10 +26,10 @@ $(document).ready(function () {
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Services';
 
-        pageDropZone();
-
         // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
+         // Initialize DropZone if switching to form view
+        if (!isTableView) pageDropZone();
 
         // Fetch the service table if we are in table view
         if (isTableView) serviceTableFetch();
@@ -141,6 +141,20 @@ $(document).ready(function () {
                     template: row => row.description
                 },
                 {
+                    field: 'documents',
+                    title: "Image",
+                    type: 'text',
+                    template: function (row) {
+                        let img = row.documents && row.documents ? (row.documents.split(',') ? row.documents.split(',')[0] : row.documents) : ''
+                        if (img && img != '') {
+                            img = (`
+                                    <img src="uploads/${img}" style="max-width: 40px; max-height: 40px; border-radius: 4px; cursor: pointer;" />
+                                `)
+                        }
+                        return img
+                    }
+                },
+                {
                     field: 'status',
                     title: "Status",
                     template: row => row.status === 'active'
@@ -201,6 +215,14 @@ $(document).ready(function () {
                     $('#afrobuild_manage_service_table_btn').data('open', "table");
                     $('.service_submit_btn').html('Update');
                     populateServiceForm(res.serviceResult);  // Populate the form with service data
+                    FileNamesHolder = [];
+                    if (res.serviceResult) {
+                        let list = res.serviceResult.documents.split(',') ? res.serviceResult.documents.split(',') : [res.serviceResult.documents];
+                        for (let i = 0; i < list.length; i++) {
+                            FileNamesHolder.push(list[i] + '*^*^any_div')
+                        }
+                    }
+                    pageDropZone();
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching service details', 'error');
                 }
@@ -261,7 +283,7 @@ $(document).ready(function () {
         // If you need more fields, populate them here
     }
 
-    pageDropZone()
+    pageDropZone();
     function pageDropZone() {
         const primary_color = '#009345';
         setTimeout(function () {
