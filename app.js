@@ -22,11 +22,7 @@ const merchantController = require('./backend/controllers/merchantController');
 const FileUploadHandler = require('./backend/controllers/FileUploadHandler');
 
 
-
-
-
-
-
+// Initialize the server
 async function startServer() {
     try {
         const app = express();
