@@ -26,7 +26,6 @@ function PrivilegeForm(data) {
                 <div class="mb-4">
                     <div class="row">
                         <div class="col-md-4">
-                            <label class="form-label">Select User</label>
                             <select class="form-control basic afrobuild_privilege_user afrobuild_assign_privilege_user">
                                 <!-- Dynamically loaded -->
                             </select>
@@ -46,7 +45,7 @@ function displayPrivilege(main) {
         .filter(item => item !== main.allCheckBox && item !== main.funcName)
         .map(item => `
             <div class="col-md-3 mb-3">
-                <label class="form-check-label d-block mb-1 fw-semibold">${item.replace(/_/g, ' ').toUpperCase()}</label>
+                <label class="form-check-label d-block mb-1 ">${item.replace(/_/g, ' ').toUpperCase()}</label>
                 <label class="switch s-dark">
                     <input type="checkbox" id="${item}" class="${item} checkBox group_${main.allCheckBox}"
                         name="${item}" value="yes"
@@ -59,14 +58,14 @@ function displayPrivilege(main) {
 
     return `
         <fieldset class="border p-3 mb-4 rounded bg-light">
-            <legend class="w-auto px-2 font-weight-bold  text-dark d-flex justify-content-between align-items-center">
-                <span>${main.icon} ${main.tableTitle.toUpperCase()+'&nbsp'}</span>
+            <legend class="w-auto px-2  text-dark d-flex justify-content-between align-items-center">
+                
                 <div class="d-flex align-items-center">
                     <div class="form-check form-switch me-3">
                         <input class="form-check-input checkBoxAll ${main.allCheckBox}" type="checkbox"
                             id="${main.allCheckBox}" name="${main.allCheckBox}" value="yes"
                             data-column="${main.allCheckBox}" data-table="${main.tableName}">
-                        <label class="form-check-label" for="${main.allCheckBox}">All</label>
+                        <label class="form-check-label" for="${main.allCheckBox}">Select All</label>
                     </div>
                     <a href="#" class="text-secondary" data-toggle="collapse" data-target="#all_${main.tableName}" aria-expanded="false">
                         <i class="icon-circle-down2"></i>

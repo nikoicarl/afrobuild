@@ -4,7 +4,7 @@
     // FORM SUBMIT
 
     //Set privilege
-    $(document).on('click.otherclicks', 'input.checkBox', function() {
+    $(document).on('click.otherclicks', 'input.checkBox', function () {
         let columnName = $(this).data("column");
         let user_privilege = $('.afrobuild_privilege_user').val();
         let group_privilege = $('.afrobuild_privilege_group').val();
@@ -43,7 +43,7 @@
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes'
-        }).then(function(result) {
+        }).then(function (result) {
             if (result.value) {
                 singleCheckbox(table, columnName, category, dataValue, user_privilege, group_privilege);
             } else {
@@ -71,7 +71,7 @@
             param: 'set_one_privilege'
         });
 
-        socket.on(melody.melody1+'_set_one_privilege', (data) => {
+        socket.on(melody.melody1 + '_set_one_privilege', (data) => {
             if (data.type == "error") {
                 if ($('.' + columnName).is(':checked')) {
                     $('.' + columnName).prop('checked', false);
@@ -91,7 +91,7 @@
         });
     }
 
-    $(document).on('click.otherclicks', 'input.checkBoxAll', function() {
+    $(document).on('click.otherclicks', 'input.checkBoxAll', function () {
         let column = $(this).data('column');
         let user = $('.afrobuild_privilege_user').val();
         let group = $('.afrobuild_privilege_group').val();
@@ -119,7 +119,7 @@
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes'
-        }).then(function(result) {
+        }).then(function (result) {
             if (result.value) {
                 checkUncheckAll(column, dataValue);
                 activateDeactivateCheckbox(table, column, group, user, dataValue);
@@ -144,7 +144,7 @@
             dataValue: dataValue
         });
 
-        socket.on(melody.melody1+'_set_all_privilege', (data) => {
+        socket.on(melody.melody1 + '_set_all_privilege', (data) => {
             if (data.type == 'error') {
                 if ($('.' + column).is(':checked')) {
                     checkUncheckAll(column, 'no');
@@ -186,7 +186,15 @@
             } else {
                 $('.afrobuild_privilege_user').html('<option value="" selected>Select User</option>');
                 data.forEach(item => {
-                    let fullname = item.first_name + ' ' + ((item.other_name == "" || item.other_name == undefined) ? '' : item.other_name) + ' ' + item.last_name;
+                    function capitalize(word) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }
+
+                    let firstName = item.first_name ? capitalize(item.first_name.trim()) : '';
+                    let lastName = item.last_name ? capitalize(item.last_name.trim()) : '';
+
+                    let fullname = firstName + (lastName ? ' ' + lastName : '');
+
                     $('.afrobuild_privilege_user').append(`<option value="${item.userid}"> ${fullname.toUcwords()} </option>`);
                 });
                 makeAllSelectLiveSearch('afrobuild_privilege_user', 'Select User');
@@ -194,7 +202,7 @@
         });
     }
 
-    $(document).on('change', 'select.afrobuild_assign_privilege_user, select.afrobuild_assign_privilege_group', function() {
+    $(document).on('change', 'select.afrobuild_assign_privilege_user, select.afrobuild_assign_privilege_group', function () {
         let dataId = $(this).val();
         if (dataId == "") {
             $('input.checkBox, input.checkBoxAll').prop('checked', false);
