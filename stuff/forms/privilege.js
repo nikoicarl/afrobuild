@@ -24,6 +24,7 @@ function PrivilegeForm(data) {
         <div class="card shadow-sm border-0 p-4">
             <form class="afrobuild_manage_privilege_form">
                 <div class="mb-4">
+                <h4 class=" mb-3">Assign User Privilege</h4>
                     <div class="row">
                         <div class="col-md-4">
                             <select class="form-control basic afrobuild_privilege_user afrobuild_assign_privilege_user">
@@ -58,23 +59,9 @@ function displayPrivilege(main) {
 
     return `
         <fieldset class="border p-3 mb-4 rounded bg-light">
-            <legend class="w-auto px-2  text-dark d-flex justify-content-between align-items-center">
-                
-                <div class="d-flex align-items-center">
-                    <div class="form-check form-switch me-3">
-                        <input class="form-check-input checkBoxAll ${main.allCheckBox}" type="checkbox"
-                            id="${main.allCheckBox}" name="${main.allCheckBox}" value="yes"
-                            data-column="${main.allCheckBox}" data-table="${main.tableName}">
-                        <label class="form-check-label" for="${main.allCheckBox}">Select All</label>
-                    </div>
-                    <a href="#" class="text-secondary" data-toggle="collapse" data-target="#all_${main.tableName}" aria-expanded="false">
-                        <i class="icon-circle-down2"></i>
-                    </a>
-                </div>
-            </legend>
-            <div class="collapse" id="all_${main.tableName}">
-                <div class="row mt-3">
-                    ${checkboxes}
+            <div class="pt-2" id="all_${main.tableName}">
+                <div class="row g-2">
+                ${checkboxes}
                 </div>
             </div>
         </fieldset>
