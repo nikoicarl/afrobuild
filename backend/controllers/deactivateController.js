@@ -7,15 +7,17 @@ const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
+const SessionActivity = require('../models/SessionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
+
 const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
     socket.on('deactivate', async (browserblob) => {
         const { param, melody1, dataId, checker } = browserblob;
 
-        if (!param) {
+        if (!param || !dataId || !melody1) {
             return socket.emit(`${melody1}_${param}`, {
                 type: 'error',
                 message: 'Invalid parameters provided.'
@@ -24,147 +26,105 @@ module.exports = (socket, Database) => {
 
         const session = getSessionIDs(melody1);
         const { userid, sessionid } = session;
+        console.log(session);
 
         try {
             const PrivilegeModel = new Privilege(Database, userid);
             const { privilegeData } = await PrivilegeModel.getPrivileges();
 
-            let message = '';
-            let result = null;
-
-            if (param === "deactivate_user") {
-                // Check user privilege for deactivating user
-                if (privilegeData?.afrobuild.deactivate_user === "yes") {
-                    const status = checker === "deactivate" ? 'deactivated' : 'active';
-                    const UserModel = new User(Database);
-
-                    // Update user status
-                    result = await UserModel.updateTable({
-                        sql: 'status=? WHERE userid=?',
-                        columns: [status, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'User status updated successfully.'
-                        : 'Failed to update user status.';
-                } else {
-                    message = 'You do not have the required privileges to perform this task.';
+            const entityMap = {
+                deactivate_user: {
+                    model: User,
+                    idField: 'userid',
+                    privilege: 'deactivate_user',
+                    name: 'User'
+                },
+                deactivate_role: {
+                    model: Role,
+                    idField: 'roleid',
+                    privilege: 'deactivate_role',
+                    name: 'Role'
+                },
+                deactivate_product: {
+                    model: Product,
+                    idField: 'productid',
+                    privilege: 'deactivate_product',
+                    name: 'Product'
+                },
+                deactivate_service: {
+                    model: Service,
+                    idField: 'serviceid',
+                    privilege: 'deactivate_service',
+                    name: 'Service'
+                },
+                deactivate_merchant: {
+                    model: Merchant,
+                    idField: 'merchantid',
+                    privilege: 'deactivate_merchant',
+                    name: 'Merchant'
+                },
+                deactivate_vendor: {
+                    model: Vendor,
+                    idField: 'vendorid',
+                    privilege: 'deactivate_vendor',
+                    name: 'Vendor'
+                },
+                deactivate_category: {
+                    model: Category,
+                    idField: 'categoryid',
+                    privilege: 'deactivate_category',
+                    name: 'Category'
                 }
-            } else if (param === "deactivate_role") {
-                // Check user privilege for deactivating roles
-                if (privilegeData?.afrobuild.deactivate_role === "yes") {
-                    const roleStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const RoleModel = new Role(Database);
+            };
 
-                    // Update role status using RoleModel
-                    result = await RoleModel.updateTable({
-                        sql: 'status=? WHERE roleid=?',
-                        columns: [roleStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Role status updated successfully.'
-                        : 'Failed to update role status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate roles.';
-                }
-            } else if (param === "deactivate_product") {
-                // Check user privilege for deactivating products
-                if (privilegeData?.afrobuild.deactivate_product === "yes") {
-                    const productStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const ProductModel = new Product(Database);
-
-                    // Update product status using ProductModel
-                    result = await ProductModel.updateTable({
-                        sql: 'status=? WHERE productid=?',
-                        columns: [productStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Product status updated successfully.'
-                        : 'Failed to update product status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate products.';
-                }
-            } else if (param === "deactivate_service") {
-                // Check user privilege for deactivating services
-                if (privilegeData?.afrobuild.deactivate_service === "yes") {
-                    const serviceStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const ServiceModel = new Service(Database);
-
-                    // Update service status using ServiceModel
-                    result = await ServiceModel.updateTable({
-                        sql: 'status=? WHERE serviceid=?',
-                        columns: [serviceStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Service status updated successfully.'
-                        : 'Failed to update service status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate services.';
-                }
-            } else if (param === "deactivate_vendor") {
-                // Check user privilege for deactivating vendors
-                if (privilegeData?.afrobuild.deactivate_vendor === "yes") {
-                    const vendorStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const VendorModel = new Vendor(Database);
-
-                    // Update vendor status using VendorModel
-                    result = await VendorModel.updateTable({
-                        sql: 'status=? WHERE vendorid=?',
-                        columns: [vendorStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Vendor status updated successfully.'
-                        : 'Failed to update vendor status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate vendors.';
-                }
-            } else if (param === "deactivate_merchant") {
-                // Check user privilege for deactivating merchants
-                if (privilegeData?.afrobuild.deactivate_merchant === "yes") {
-                    const merchantStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const MerchantModel = new Merchant(Database);
-
-                    // Update merchant status using MerchantModel
-                    result = await MerchantModel.updateTable({
-                        sql: 'status=? WHERE merchantid=?',
-                        columns: [merchantStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Merchant status updated successfully.'
-                        : 'Failed to update merchant status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate merchants.';
-                }
-            } else if (param === "deactivate_category") {
-                // Check user privilege for deactivating category
-                if (privilegeData?.afrobuild.deactivate_category === "yes") {
-                    const categoryStatus = checker === "deactivate" ? 'deactivated' : 'active';
-                    const CategoryModel = new Category(Database);
-
-                    // Update category status using CategoryModel
-                    result = await CategoryModel.updateTable({
-                        sql: 'status=? WHERE categoryid=?',
-                        columns: [categoryStatus, dataId]
-                    });
-                    message = result?.affectedRows
-                        ? 'Category status updated successfully.'
-                        : 'Failed to update category status.';
-                } else {
-                    message = 'You do not have the required privileges to deactivate category.';
-                }
-            } else {
-                message = 'Invalid parameter provided.';
+            if (!entityMap[param]) {
+                return socket.emit(`${melody1}_${param}`, {
+                    type: 'error',
+                    message: 'Invalid parameter provided.'
+                });
             }
 
-            // Emit the response based on result
+            const { model, idField, privilege, name } = entityMap[param];
+
+            if (privilegeData?.afrobuild?.[privilege] !== 'yes') {
+                return socket.emit(`${melody1}_${param}`, {
+                    type: 'error',
+                    message: `You do not have the required privileges to deactivate ${name.toLowerCase()}s.`
+                });
+            }
+
+            const status = checker === 'deactivate' ? 'deactivated' : 'active';
+            const EntityModel = new model(Database);
+
+            const result = await EntityModel.updateTable({
+                sql: 'status=? WHERE ' + idField + '=?',
+                columns: [status, dataId]
+            });
+
+            const actionMessage = result?.affectedRows
+                ? `${name} with ID ${dataId} ${status}.`
+                : `Attempt to update ${name.toLowerCase()} with ID ${dataId} failed.`;
+
+            // Insert session activity
+            const SessionActivityModel = new SessionActivity(Database);
+            await SessionActivityModel.insertTable([
+                sessionid,
+                userid,
+                actionMessage,
+                gf.getDateTime(),
+                null
+            ]);
+
+            // Send socket response
             socket.emit(`${melody1}_${param}`, {
                 type: result?.affectedRows ? 'success' : 'caution',
-                message: message
+                message: result?.affectedRows
+                    ? `${name} status updated successfully.`
+                    : `Failed to update ${name.toLowerCase()} status.`
             });
 
         } catch (error) {
-            // Log the error for debugging purposes (optional)
             console.error('Error in deactivate:', error);
-
             socket.emit(`${melody1}_${param}`, {
                 type: 'error',
                 message: 'An unexpected error occurred. Please try again later.'
