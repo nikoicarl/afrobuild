@@ -91,7 +91,7 @@ module.exports = (socket, Database) => {
                 if (!insertSetupResult.affectedRows) throw new Error('Failed to insert setup');
 
                 const insertUserResult = await UserModel.insertTable([
-                    userid, 'admin', null, null, null, null,
+                    userid, 'system', 'administrator', null, null, null,
                     'admin', md5('admin123'), 'active', gf.getDateTime(), null,
                 ]);
 
