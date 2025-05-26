@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
+const Privilege = require('../models/PrivilegeFeaturesModel');
 const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
@@ -182,7 +183,13 @@ module.exports = (socket, Database) => {
                         message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
                     });
                 }
-            }
+            } else if (param === "specific_privilege") {
+
+                let dataId = browserBlob.dataId;
+                const PrivilegeModel = new Privilege(Database, dataId);
+                result = (await PrivilegeModel.getPrivileges()).privilegeColumns;
+                socket.emit(melody1 + '_' + param, result);
+            } 
 
         } catch (error) {
             console.error('Error handling specific user request:', error);

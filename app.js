@@ -21,6 +21,8 @@ const serviceController = require('./backend/controllers/serviceController');
 const vendorController = require('./backend/controllers/vendorController');
 const merchantController = require('./backend/controllers/merchantController');
 const FileUploadHandler = require('./backend/controllers/FileUploadHandler');
+const PrivilegeController = require('./backend/controllers/privilegeController');
+const DropdownController = require('./backend/controllers/dropdownController');
 
 
 // Initialize the server
@@ -65,6 +67,8 @@ async function startServer() {
                 vendorController(socket, Database);
                 merchantController(socket, Database);
                 categoryController(socket, Database);
+                PrivilegeController(socket, Database);
+                DropdownController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }
