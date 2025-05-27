@@ -15,20 +15,16 @@ class Session {
     }
 
     //Insert method
-    async insertTable (columns) {
-        let result = await this.createTable();
+    async insertTable(columns) {
+        await this.createTable();
         try {
-            if (result) {
-                let sql = `
-                    INSERT IGNORE INTO session (${this.columnsList.toString()}) VALUES (?,?,?,?,?);
-                `;
-                result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
-                return result;
-            } else {
-                return result;
-            }
+            const placeholders = this.columnsList.map(() => '?').join(',');
+            const sql = `INSERT INTO session (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const result = await this.Database.setupConnection({ sql, columns }, 'object');
+            return result;
         } catch (error) {
-            return error;
+            console.error('Insert Session Error:', error);
+            return { error: true, message: error.message };
         }
     }
 

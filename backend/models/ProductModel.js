@@ -8,7 +8,7 @@ class Product {
         this.tableName = 'product';
         this.columnsList = [
             'productid', 'name', 'description', 
-            'price', 'documents', 'datetime', 'status'
+            'price', 'categoryid', 'documents', 'datetime', 'status'
         ];
 
         // Ensure table exists on instantiation
@@ -24,6 +24,7 @@ class Product {
                 name VARCHAR(255),
                 description VARCHAR(255),
                 price DOUBLE(10,2),
+                categoryid BIGINT(100),
                 documents LONGTEXT,
                 datetime DATETIME,
                 status VARCHAR(50)
@@ -36,20 +37,16 @@ class Product {
     }
 
     //Insert method
-    async insertTable (columns) {
-        let result = await this.createTable();
+    async insertTable(columns) {
+        await this.createTable();
         try {
-            if (result) {
-                let sql = `
-                    INSERT IGNORE INTO product (${this.columnsList.toString()}) VALUES (?,?,?,?,?, ?,?);
-                `;
-                result = await this.Database.setupConnection({sql: sql, columns: columns}, 'object');
-                return result;
-            } else {
-                return result;
-            }
+            const placeholders = this.columnsList.map(() => '?').join(',');
+            const sql = `INSERT INTO product (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const result = await this.Database.setupConnection({ sql, columns }, 'object');
+            return result;
         } catch (error) {
-            return error;
+            console.error('Insert Product Error:', error);
+            return { error: true, message: error.message };
         }
     }
 

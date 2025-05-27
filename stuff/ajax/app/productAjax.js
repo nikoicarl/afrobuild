@@ -30,6 +30,7 @@ $(document).ready(function () {
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
          // Initialize DropZone if switching to form view
         if (!isTableView) pageDropZone();
+        if (!isTableView) categoryDropdown();
 
         // Fetch the product table if we are in table view
         if (isTableView) productTableFetch();
@@ -42,6 +43,7 @@ $(document).ready(function () {
         const productData = {
             name: $('#product_name').val().trim(),
             price: $('#product_price').val().trim(),
+            category: $('#product_category').val().trim(),
             description: $('#product_description').val().trim(),
             product_hiddenid: $('#afrobuild_manage_product_hiddenid').val().trim(),
             DocumentsForUpdate: FilterFileNames(FileNamesHolder),
@@ -300,5 +302,33 @@ $(document).ready(function () {
             $('.afrobuild_manage_product_drop_zone_inner').addClass('mt-4');
         }, 200)
     }
+
+    //Category dropdown
+    categoryDropdown();
+        function categoryDropdown() {
+            socket.off('dropdown');
+            socket.off(melody.melody1 + '_category');
+
+            socket.emit('dropdown', {
+                melody1: melody.melody1,
+                melody2: melody.melody2,
+                param: 'category'
+            });
+
+            socket.on(melody.melody1 + '_category', (data) => {
+                if (data.type == "error") {
+                    console.log(data.message);
+                } else {
+                    $('.product_category').html(`<option value=""> Select Category </option>`);
+                    for (let i = 0; i < data.length; i++) {
+                        const item = data[i];
+                        $('.product_category').append(`
+                                <option value="${item.categoryid}" > ${item.name.toUcwords()} </option>
+                            `);
+                    }
+                    makeAllSelectLiveSearch('product_category', 'Select Category');
+                }
+            });
+        }
 });
 

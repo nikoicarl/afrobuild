@@ -1,44 +1,42 @@
 const User = require('../models/UserModel');
+const Category = require('../models/CategoryModel');
 
 module.exports = (socket, Database) => {
     socket.on('dropdown', async (browserblob) => {
         const { param = '', melody1 = '' } = browserblob;
 
+        const emitError = (message) => {
+            socket.emit(`${melody1}_${param}`, { type: 'error', message });
+        };
+
         if (!param) {
-            return socket.emit(`${melody1}_${param}`, {
-                type: 'error',
-                message: 'Oops, something went wrong. No parameter provided.'
-            });
+            return emitError('No parameter provided.');
         }
 
-        try {
-            if (param === 'user') {
-                const UserModel = new User(Database);
+        const fetchData = async (ModelClass, sql, columns) => {
+            const model = new ModelClass(Database);
+            const result = await model.preparedFetch({ sql, columns });
 
-                const result = await UserModel.preparedFetch({
-                    sql: 'status = ? ORDER BY first_name ASC',
-                    columns: ['active']
-                });
-
-                if (Array.isArray(result)) {
-                    socket.emit(`${melody1}_${param}`, result);
-                } else {
-                    socket.emit(`${melody1}_${param}`, {
-                        type: 'error',
-                        message: `Error fetching users: ${result?.sqlMessage || 'Unknown database error'}`
-                    });
-                }
+            if (Array.isArray(result)) {
+                socket.emit(`${melody1}_${param}`, result);
             } else {
-                socket.emit(`${melody1}_${param}`, {
-                    type: 'error',
-                    message: `Invalid parameter: ${param}`
-                });
+                emitError(`Error fetching ${param}s: ${result?.sqlMessage || 'Unknown database error'}`);
+            }
+        };
+
+        try {
+            switch (param) {
+                case 'user':
+                    await fetchData(User, 'status = ? ORDER BY first_name ASC', ['active']);
+                    break;
+                case 'category':
+                    await fetchData(Category, 'status = ? ORDER BY name ASC', ['active']);
+                    break;
+                default:
+                    emitError(`Invalid parameter: ${param}`);
             }
         } catch (error) {
-            socket.emit(`${melody1}_${param}`, {
-                type: 'error',
-                message: `Exception occurred: ${error.message || error}`
-            });
+            emitError(`Exception occurred: ${error.message || error}`);
         }
     });
 };

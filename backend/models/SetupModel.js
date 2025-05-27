@@ -11,20 +11,15 @@ class Setup {
 
     // Insert method
     async insertTable(columns) {
+        await this.createTable();
         try {
-            const tableExists = await this.createTable();
-            if (!tableExists) throw new Error('Table creation failed.');
-
-            const sql = `
-                INSERT INTO setup (${this.columnsList.join(',')})
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-            `;
-
+            const placeholders = this.columnsList.map(() => '?').join(',');
+            const sql = `INSERT INTO setup (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             const result = await this.Database.setupConnection({ sql, columns }, 'object');
             return result;
         } catch (error) {
-            console.error('Insert error:', error);
-            return error;
+            console.error('Insert Setup Error:', error);
+            return { error: true, message: error.message };
         }
     }
 
