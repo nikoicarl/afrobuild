@@ -26,7 +26,6 @@ module.exports = (socket, Database) => {
 
         const session = getSessionIDs(melody1);
         const { userid, sessionid } = session;
-        console.log(session);
 
         try {
             const PrivilegeModel = new Privilege(Database, userid);

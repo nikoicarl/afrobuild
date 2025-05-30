@@ -77,7 +77,7 @@ $(document).ready(function () {
                 if (res.success) {
                     resetProductForm();
                     productTableFetch();
-                    pageDropZone() // Refresh the product table
+                    pageDropZone();
                 }
             });
 
@@ -213,6 +213,10 @@ $(document).ready(function () {
                 if (res.productResult) {
                     const html = ejs.render(renderProductForm(), {});
                     document.getElementById('afrobuild_product_page_form_display').innerHTML = html;
+
+                    pageDropZone();
+                    categoryDropdown();
+                    
                     $('#afrobuild_manage_product_table_btn').html('View All Products');
                     $('#afrobuild_manage_product_table_btn').data('open', "table");
                     $('.product_submit_btn').html('Update');
@@ -224,7 +228,6 @@ $(document).ready(function () {
                             FileNamesHolder.push(list[i] + '*^*^any_div')
                         }
                     }
-                    pageDropZone();
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching product details', 'error');
                 }
@@ -279,6 +282,8 @@ $(document).ready(function () {
     // Function to populate the product form with data
     function populateProductForm(product) {
         $('#afrobuild_manage_product_hiddenid').val(product.productid);
+        holdProductCategory = product.categoryid;
+        $('#product_category').val(product.categoryid).change();
         $('#product_name').val(product.name);
         $('#product_price').val(product.price);
         $('#product_description').val(product.description);
@@ -303,32 +308,34 @@ $(document).ready(function () {
         }, 200)
     }
 
-    //Category dropdown
+    
+
+    let holdProductCategory;
+    //ProductCategory dropdown
     categoryDropdown();
-        function categoryDropdown() {
-            socket.off('dropdown');
-            socket.off(melody.melody1 + '_category');
+    function categoryDropdown() {
+        socket.off('dropdown');
+        socket.off(melody.melody1 + '_category');
 
-            socket.emit('dropdown', {
-                melody1: melody.melody1,
-                melody2: melody.melody2,
-                param: 'category'
-            });
+        socket.emit('dropdown', {
+            melody1: melody.melody1,
+            melody2: melody.melody2,
+            param: 'category'
+        });
 
-            socket.on(melody.melody1 + '_category', (data) => {
-                if (data.type == "error") {
-                    console.log(data.message);
-                } else {
-                    $('.product_category').html(`<option value=""> Select Category </option>`);
-                    for (let i = 0; i < data.length; i++) {
-                        const item = data[i];
-                        $('.product_category').append(`
-                                <option value="${item.categoryid}" > ${item.name.toUcwords()} </option>
-                            `);
-                    }
-                    makeAllSelectLiveSearch('product_category', 'Select Category');
-                }
-            });
-        }
+        //Get dropdown data
+        socket.on(melody.melody1 + '_category', function (data) {
+            //Get json content from login code
+            if (data.type == "error") {
+                console.log(data.message);
+            } else {
+                $('.product_category').html(`<option value="" ${holdProductCategory !== undefined ? '' : 'selected'}> Select Category </option>`);
+                data.forEach(function (item, index) {
+                    $('.product_category').append(`<option value="${item.categoryid}" ${item.categoryid == holdProductCategory ? 'selected' : ''}> ${item.name.toUcwords()} </option>`);
+                });
+            }
+            makeAllSelectLiveSearch('product_category', 'Select Category')
+        });
+    }
 });
 
