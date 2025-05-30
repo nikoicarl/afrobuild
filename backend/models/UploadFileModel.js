@@ -1,90 +1,94 @@
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 
 class UploadFile {
-
     constructor(fileNames, namesForRename) {
-        this.fileNames = fileNames
-        this.namesForRename = namesForRename
-        this.filePath = __dirname+'/../../stuff/uploads/'
+        this.fileNames = fileNames;
+        this.namesForRename = namesForRename;
+        this.filePath = path.resolve(__dirname, '../../stuff/uploads/');
     }
 
-    _uploadFiles() {
+    upload() {
         if (Array.isArray(this.fileNames) && this.fileNames.length > 0) {
             for (let i = 0; i < this.fileNames.length; i++) {
-                const fileName = this.fileNames[i]
-                let txtFileName = this._getTxtFileExtension(fileName)
-                let rename = this._getNewName(fileName, this.namesForRename, i)
-                this._readData(txtFileName, rename)
+                const originalName = this.fileNames[i];
+                const txtFileName = this._getTxtFileName(originalName);
+                const newFileName = this._getNewName(originalName, this.namesForRename, i);
+                this._readAndConvert(txtFileName, newFileName);
             }
-        }
-    }
-
-    _getFileNames() {
-        let names = []
-        if (Array.isArray(this.fileNames) && this.fileNames.length > 0) {
-            for (let i = 0; i < this.fileNames.length; i++) {
-                const fileName = this.fileNames[i]
-                names.push(this._getNewName(fileName, this.namesForRename, i))
-            }
-        }
-
-        return names
-    }
-
-    _getTxtFileExtension(fileName) {
-        let ext = fileName.split(/\.(?=[^\.]+$)/)
-        fileName = fileName.toString().split('.'+ext[ext.length - 1]).join("")
-        return fileName+'.txt'
-    }
-
-    _getNewName(fileName, newName, index) {
-        let rename = ''
-
-        let ext = fileName.split(/\.(?=[^\.]+$)/)
-        ext = ext[ext.length - 1].toLowerCase()
-
-        if (newName === undefined || newName === '' || newName === ' ' || newName === null) {
-            rename = fileName
         } else {
-            newName = newName.split(',')
-            rename = newName[index]
-            if (rename == undefined) {
-                rename = fileName
+            console.warn('No files provided for upload.');
+        }
+    }
+
+    _getTxtFileName(fileName) {
+        const base = path.basename(fileName, path.extname(fileName));
+        return `${base}.txt`;
+    }
+
+    _getNewName(fileName, renameList, index) {
+        const ext = path.extname(fileName).toLowerCase();
+
+        if (!renameList || typeof renameList !== 'string') {
+            return fileName;
+        }
+
+        const names = renameList.split(',');
+        let newName = names[index];
+
+        if (!newName || newName.trim() === '') {
+            return fileName;
+        }
+
+        newName = newName.trim().replace(/\s+/g, '_');
+        return `${newName}${ext}`;
+    }
+
+    _readAndConvert(txtFileName, outputFileName) {
+        const txtPath = path.join(this.filePath, txtFileName);
+
+        if (!fs.existsSync(txtPath)) {
+            console.warn(`File not found: ${txtPath}`);
+            return;
+        }
+
+        const readStream = fs.createReadStream(txtPath);
+        let data = '';
+
+        readStream.on('data', chunk => {
+            data += chunk;
+        });
+
+        readStream.on('error', err => {
+            console.error('Error reading file:', err);
+        });
+
+        readStream.on('end', () => {
+            this._writeDecodedFile(data, outputFileName, txtPath);
+        });
+    }
+
+    _writeDecodedFile(encodedData, outputFileName, txtPath) {
+        try {
+            const outputPath = path.join(this.filePath, outputFileName);
+            fs.writeFileSync(outputPath, encodedData, 'base64');
+            console.log(`${outputFileName} has been written.`);
+
+            if (fs.existsSync(txtPath)) {
+                fs.unlinkSync(txtPath);
+                console.log(`${txtPath} has been deleted.`);
             } else {
-                rename = rename.toString().split(' ').join("_") + '.' + ext
+                console.warn(`Could not delete. File not found: ${txtPath}`);
             }
-        }
-
-        return rename
-    }
-
-    _readData(txtFileName, fileName) {
-        if (fs.existsSync(this.filePath+txtFileName)) {
-            const thisClass = this
-
-            const readTxtFileData = fs.createReadStream(this.filePath+txtFileName)
-    
-            let txtData = ''
-    
-            readTxtFileData.on('data', (chunk) => {
-                txtData += chunk
-            })
-    
-            readTxtFileData.on('error', (err) => {
-                console.log('Error reading file: ', err)
-            })
-    
-            readTxtFileData.on('end', async () => {
-                thisClass._createFile(txtData, fileName, txtFileName)
-            })
+        } catch (err) {
+            console.error('Error writing or deleting file:', err);
         }
     }
 
-    _createFile(fileData, fileName, txtFileName) {
-        fs.writeFileSync(this.filePath+fileName, fileData, 'base64')
-        console.log(fileName, ' is written.')
-        fs.unlinkSync(this.filePath+txtFileName)
+    getRenamedFiles() {
+        if (!Array.isArray(this.fileNames)) return [];
+        return this.fileNames.map((file, i) => this._getNewName(file, this.namesForRename, i));
     }
 }
 
-module.exports = UploadFile
+module.exports = UploadFile;

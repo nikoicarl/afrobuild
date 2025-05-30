@@ -19,7 +19,6 @@ module.exports = (socket, Database) => {
             melody2,
             DocumentsForUpdate = []
         } = browserblob;
-        console.log(browserblob);
 
         const session = getSessionIDs(melody1);
         const userid = session.userid;
@@ -66,7 +65,7 @@ module.exports = (socket, Database) => {
                 }
 
                 const UploadFileHandler = new UploadFile(DocumentsForUpdate, name);
-                const documentNames = UploadFileHandler._getFileNames().toString();
+                const documentNames = UploadFileHandler.getRenamedFiles().toString();
                 let result;
 
                 if (isNew) {
@@ -111,7 +110,7 @@ module.exports = (socket, Database) => {
 
                 if (result && result.affectedRows !== undefined) {
                     if (DocumentsForUpdate.length > 0) {
-                        UploadFileHandler._uploadFiles();
+                        UploadFileHandler.upload();
                     }
 
                     const SessionActivityModel = new SessionActivity(Database);
