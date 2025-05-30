@@ -12,12 +12,14 @@ module.exports = (socket, Database) => {
         const {
             name,
             price,
+            category,
             description,
             product_hiddenid,
             melody1,
             melody2,
             DocumentsForUpdate = []
         } = browserblob;
+        console.log(browserblob);
 
         const session = getSessionIDs(melody1);
         const userid = session.userid;
@@ -74,6 +76,7 @@ module.exports = (socket, Database) => {
                         name,
                         description,
                         price,
+                        category,
                         documentNames,
                         gf.getDateTime(),
                         'active'
@@ -85,6 +88,7 @@ module.exports = (socket, Database) => {
                     const updateColumns = [
                         name,
                         description,
+                        category,
                         price,
                         ...(DocumentsForUpdate.length > 0 ? [documentNames] : []),
                         product_hiddenid,
@@ -94,6 +98,7 @@ module.exports = (socket, Database) => {
                     const updateSql = `
                         name = ?, 
                         description = ?,
+                        categoryid = ?,
                         price = ?${DocumentsForUpdate.length > 0 ? ', documents = ?' : ''} 
                         WHERE productid = ? AND status = ?
                     `.replace(/\s+/g, ' ').trim();
