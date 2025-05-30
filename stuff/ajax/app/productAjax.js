@@ -28,7 +28,7 @@ $(document).ready(function () {
 
         // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
-         // Initialize DropZone if switching to form view
+        // Initialize DropZone if switching to form view
         if (!isTableView) pageDropZone();
         if (!isTableView) categoryDropdown();
 
@@ -90,8 +90,10 @@ $(document).ready(function () {
 
 
     function resetProductForm() {
-        $('#productForm')[0].reset();  // Reset the form fields
+        $('#productForm')[0].reset();
+        $('.product_category').val('').change();  // Reset the form fields
         $('#product_hiddenid').val('');  // Clear the hidden ID field
+        FileNamesHolder = [];  // Clear the file names holder
         $('.afrobuild_manage_product_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
     }
 
@@ -216,7 +218,7 @@ $(document).ready(function () {
 
                     pageDropZone();
                     categoryDropdown();
-                    
+
                     $('#afrobuild_manage_product_table_btn').html('View All Products');
                     $('#afrobuild_manage_product_table_btn').data('open', "table");
                     $('.product_submit_btn').html('Update');
@@ -308,7 +310,7 @@ $(document).ready(function () {
         }, 200)
     }
 
-    
+
 
     let holdProductCategory;
     //ProductCategory dropdown
