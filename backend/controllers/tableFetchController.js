@@ -1,3 +1,4 @@
+// Models
 const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
@@ -6,11 +7,15 @@ const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
+const ViewModel = require('../models/ViewModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
+
+// Helpers
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
 const gf = new GeneralFunction();
 
+// Table configuration
 const tableConfigs = {
     user_table: {
         model: User,
@@ -53,6 +58,13 @@ const tableConfigs = {
         permissions: ['add_category', 'update_category', 'deactivate_category'],
         sql: 'status != ? ORDER BY name ASC',
         columns: ['inactive']
+    },
+    transaction_table: {
+        model: ViewModel,
+        method: 'getTransactionTableData',
+        permissions: ['view_transaction'],
+        sql: '',
+        columns: []
     }
 };
 
@@ -74,36 +86,44 @@ module.exports = (socket, Database) => {
 
             const userid = session.userid;
             const PrivilegeModel = new Privilege(Database, userid);
-            const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
-            const afrobuildPerms = privilegeData.afrobuild || {};
+            const privileges = await PrivilegeModel.getPrivileges();
+            const afrobuildPerms = privileges?.privilegeData?.afrobuild || {};
 
             const hasPermission = config.permissions.some(
-                perm => afrobuildPerms[perm] === 'yes'
+                permission => afrobuildPerms[permission] === 'yes'
             );
 
             if (!hasPermission) {
                 return socket.emit(`${melody1}_${param}`, []);
             }
 
-            const Model = new config.model(Database);
-            const data = await Model.preparedFetch({
-                sql: config.sql,
-                columns: config.columns
-            });
+            let data;
+
+            if (config.method && typeof config.model[config.method] === 'function') {
+                // Static method (e.g., getTransactionTableData)
+                data = await config.model[config.method](Database);
+            } else {
+                // Instance method (e.g., preparedFetch)
+                const modelInstance = new config.model(Database);
+                data = await modelInstance.preparedFetch({
+                    sql: config.sql,
+                    columns: config.columns
+                });
+            }
 
             if (!Array.isArray(data)) {
                 return socket.emit(`${melody1}_${param}`, {
                     type: 'error',
-                    message: `Database error while fetching ${param.replace('_table', '')}.`
+                    message: `Database error while fetching data for ${param}.`
                 });
             }
 
-            return socket.emit(`${melody1}_${param}`, data);
+            socket.emit(`${melody1}_${param}`, data);
 
         } catch (err) {
             socket.emit(`${melody1}_${param}`, {
                 type: 'error',
-                message: err.message || 'An error occurred while fetching data.'
+                message: err.message || 'An error occurred while processing the request.'
             });
         }
     });

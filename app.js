@@ -7,6 +7,9 @@ const path = require('path');
 const DatabaseModel = require('./backend/models/DatabaseModel');
 const homeRouter = require('./backend/routers/homeRouter');
 const dashboardRouter = require('./backend/routers/dashboardRouter');
+
+// Controller Imports
+const DashboardController = require('./backend/controllers/dashboardController');
 const setupController = require('./backend/controllers/setupController');
 const loginController = require('./backend/controllers/loginController');
 const logoutController = require('./backend/controllers/logoutController');
@@ -69,6 +72,7 @@ async function startServer() {
                 categoryController(socket, Database);
                 PrivilegeController(socket, Database);
                 DropdownController(socket, Database);
+                DashboardController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }

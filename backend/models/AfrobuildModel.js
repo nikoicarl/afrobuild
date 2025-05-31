@@ -37,6 +37,7 @@ const PrivilegeAfrobuild = {
         'add_product', 'update_product', 'deactivate_product',
         'add_role', 'update_role', 'deactivate_role',
         'add_category', 'update_category', 'deactivate_category',
+        'view_transaction',
         'func_admin', 
         'afrobuild'
     ],
@@ -70,6 +71,7 @@ const PrivilegeAfrobuild = {
         add_category VARCHAR(5),
         update_category VARCHAR(5),
         deactivate_category VARCHAR(5),
+        view_transaction VARCHAR(5),
         func_admin VARCHAR(5),
         afrobuild VARCHAR(5)
     `),
