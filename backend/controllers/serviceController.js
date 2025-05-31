@@ -12,6 +12,7 @@ module.exports = (socket, Database) => {
         const {
             name,
             price,
+            category,
             description,
             service_hiddenid,
             melody1,
@@ -64,7 +65,7 @@ module.exports = (socket, Database) => {
                 }
 
                 const UploadFileHandler = new UploadFile(DocumentsForUpdate, name);
-                const documentNames = UploadFileHandler._getFileNames().toString();
+                const documentNames = UploadFileHandler.getRenamedFiles().toString();
                 let result;
 
                 if (isNew) {
@@ -74,6 +75,7 @@ module.exports = (socket, Database) => {
                         name,
                         description,
                         price,
+                        category,
                         documentNames,
                         gf.getDateTime(),
                         'active'
@@ -85,6 +87,7 @@ module.exports = (socket, Database) => {
                     const updateColumns = [
                         name,
                         description,
+                        category,
                         price,
                         ...(DocumentsForUpdate.length > 0 ? [documentNames] : []),
                         service_hiddenid,
@@ -94,6 +97,7 @@ module.exports = (socket, Database) => {
                     const updateSql = `
                         name = ?, 
                         description = ?,
+                        categoryid = ?,
                         price = ?${DocumentsForUpdate.length > 0 ? ', documents = ?' : ''} 
                         WHERE serviceid = ? AND status = ?
                     `.replace(/\s+/g, ' ').trim();
@@ -106,7 +110,7 @@ module.exports = (socket, Database) => {
 
                 if (result && result.affectedRows !== undefined) {
                     if (DocumentsForUpdate.length > 0) {
-                        UploadFileHandler._uploadFiles();
+                        UploadFileHandler.upload();
                     }
 
                     const SessionActivityModel = new SessionActivity(Database);
@@ -120,7 +124,7 @@ module.exports = (socket, Database) => {
                         userid,
                         activityMsg,
                         gf.getDateTime(),
-                        null 
+                        null
                     ]);
 
                     return socket.emit(`${melody1}_create_service`, {

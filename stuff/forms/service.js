@@ -29,10 +29,15 @@ function renderServiceForm() {
                     <form id="serviceForm" enctype="multipart/form-data" novalidate>
                         <input type="hidden" id="afrobuild_manage_service_hiddenid">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <input type="text" class="form-control" id="service_name" placeholder="Service Name" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <select class="form-control form-control-md basic service_category" id="service_category" required>
+                                        <option value="" selected>Select Category</option>
+                                    </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <input type="number" class="form-control" id="service_price" placeholder="Price (e.g. 99.99)" step="0.01" required>
                             </div>
                         </div>

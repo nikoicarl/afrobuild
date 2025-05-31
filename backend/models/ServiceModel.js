@@ -8,7 +8,7 @@ class Service {
         this.tableName = 'service';
         this.columnsList = [
             'serviceid', 'name', 'description', 
-            'price', 'documents', 'datetime', 'status'
+            'price', 'categoryid', 'documents', 'datetime', 'status'
         ];
 
         // Ensure table exists on instantiation
@@ -24,6 +24,7 @@ class Service {
                 name VARCHAR(255),
                 description VARCHAR(255),
                 price DOUBLE(10,2),
+                categoryid BIGINT(100),
                 documents LONGTEXT,
                 datetime DATETIME,
                 status VARCHAR(50)

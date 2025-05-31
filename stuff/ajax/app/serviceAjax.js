@@ -28,8 +28,9 @@ $(document).ready(function () {
 
         // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
-         // Initialize DropZone if switching to form view
+        // Initialize DropZone if switching to form view
         if (!isTableView) pageDropZone();
+        if (!isTableView) categoryDropdown();
 
         // Fetch the service table if we are in table view
         if (isTableView) serviceTableFetch();
@@ -42,6 +43,7 @@ $(document).ready(function () {
         const serviceData = {
             name: $('#service_name').val().trim(),
             price: $('#service_price').val().trim(),
+            category: $('#service_category').val().trim(),
             description: $('#service_description').val().trim(),
             service_hiddenid: $('#afrobuild_manage_service_hiddenid').val().trim(),
             DocumentsForUpdate: FilterFileNames(FileNamesHolder),
@@ -75,7 +77,7 @@ $(document).ready(function () {
                 if (res.success) {
                     resetServiceForm();
                     serviceTableFetch();
-                    pageDropZone() // Refresh the service table
+                    pageDropZone();
                 }
             });
 
@@ -88,8 +90,10 @@ $(document).ready(function () {
 
 
     function resetServiceForm() {
-        $('#serviceForm')[0].reset();  // Reset the form fields
+        $('#serviceForm')[0].reset();
+        $('.service_category').val('').change();  // Reset the form fields
         $('#service_hiddenid').val('');  // Clear the hidden ID field
+        FileNamesHolder = [];  // Clear the file names holder
         $('.afrobuild_manage_service_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
     }
 
@@ -211,6 +215,10 @@ $(document).ready(function () {
                 if (res.serviceResult) {
                     const html = ejs.render(renderServiceForm(), {});
                     document.getElementById('afrobuild_service_page_form_display').innerHTML = html;
+
+                    pageDropZone();
+                    categoryDropdown();
+
                     $('#afrobuild_manage_service_table_btn').html('View All Services');
                     $('#afrobuild_manage_service_table_btn').data('open', "table");
                     $('.service_submit_btn').html('Update');
@@ -222,7 +230,6 @@ $(document).ready(function () {
                             FileNamesHolder.push(list[i] + '*^*^any_div')
                         }
                     }
-                    pageDropZone();
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching service details', 'error');
                 }
@@ -277,6 +284,8 @@ $(document).ready(function () {
     // Function to populate the service form with data
     function populateServiceForm(service) {
         $('#afrobuild_manage_service_hiddenid').val(service.serviceid);
+        holdServiceCategory = service.categoryid;
+        $('#service_category').val(service.categoryid).change();
         $('#service_name').val(service.name);
         $('#service_price').val(service.price);
         $('#service_description').val(service.description);
@@ -299,6 +308,36 @@ $(document).ready(function () {
             // $('.afrobuild_manage_service_drop_zone_label').css('height', '150px');
             $('.afrobuild_manage_service_drop_zone_inner').addClass('mt-4');
         }, 200)
+    }
+
+
+
+    let holdServiceCategory;
+    //ServiceCategory dropdown
+    categoryDropdown();
+    function categoryDropdown() {
+        socket.off('dropdown');
+        socket.off(melody.melody1 + '_category');
+
+        socket.emit('dropdown', {
+            melody1: melody.melody1,
+            melody2: melody.melody2,
+            param: 'category'
+        });
+
+        //Get dropdown data
+        socket.on(melody.melody1 + '_category', function (data) {
+            //Get json content from login code
+            if (data.type == "error") {
+                console.log(data.message);
+            } else {
+                $('.service_category').html(`<option value="" ${holdServiceCategory !== undefined ? '' : 'selected'}> Select Category </option>`);
+                data.forEach(function (item, index) {
+                    $('.service_category').append(`<option value="${item.categoryid}" ${item.categoryid == holdServiceCategory ? 'selected' : ''}> ${item.name.toUcwords()} </option>`);
+                });
+            }
+            makeAllSelectLiveSearch('service_category', 'Select Category')
+        });
     }
 });
 
