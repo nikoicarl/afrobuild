@@ -65,9 +65,30 @@ function renderTransactionTable() {
     `;
 }
 
+function Activities() {
+    return `
+        <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+                <div class="widget widget-activity-three">
+                    <div class="widget-heading">
+                        <h5 class="">Activities</h5>
+                    </div>
+                    <div class="widget-content">
+                        <div class="mt-container mx-auto">
+                            <div class="timeline-line">
+                                <div class="afrobuild_dashboard_session_activity"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Combines stats and transaction table into one layout
 function renderStatsAndTransactionTable(data) {
-    return renderStats(data) + renderTransactionTable();
+    return renderStats(data) + renderTransactionTable() + Activities();
 }
 
 // Immediately Invoked Function Expression (IIFE) to render the dashboard
@@ -76,19 +97,6 @@ function renderStatsAndTransactionTable(data) {
     const dashboardHTML = renderDashboardContainer();
     $('#afrobuild_main_content_display').html(dashboardHTML);
 
-    // Wait for dashboard data via socket
-    socket.emit('fetchDashboardData');
-
-    socket.on('dashboardData', function (data) {
-        if (!data || typeof data !== 'object') {
-            console.error('[Dashboard Stats]: Invalid data received', data);
-            return;
-        }
-
-        const statsAndTableHTML = renderStatsAndTransactionTable(data);
-        $('#afrobuild_dashboard_page_form_display').html(statsAndTableHTML);
-
-        // Load any dashboard-specific scripts
-        addPageScript('app/dashboardAjax');
-    });
+    // Load any dashboard-specific scripts
+    addPageScript('app/dashboardAjax');
 })();

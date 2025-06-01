@@ -6,6 +6,7 @@ const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
+const Session = require('../models/SessionModel');
 const ViewModel = require('../models/ViewModel');
 
 const getSessionIDs = require('./getSessionIDs');
@@ -58,12 +59,18 @@ const tableConfigs = {
     },
     transaction_table: {
         model: ViewModel,
-        method: 'getGeneral',  // Use instance method
+        method: 'getGeneral',
         permissions: ['view_transaction'],
         sql: '1 ORDER BY datetime DESC',
-        columns: [], // Not used here
+        columns: [],
         isViewModel: true
-    }
+    },
+    activity_table: {
+        model: Session,
+        permissions: [],
+        sql: '1',
+        columns: []
+    },
 };
 
 module.exports = (socket, Database) => {
@@ -82,21 +89,24 @@ module.exports = (socket, Database) => {
             }
 
             const userid = session.userid;
-            const PrivilegeModel = new Privilege(Database, userid);
-            const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
-            const afrobuildPerms = privilegeData.afrobuild || {};
 
-            const hasPermission = config.permissions.some(
-                perm => afrobuildPerms[perm] === 'yes'
-            );
+            // Skip privilege check for activity_table
+            if (param !== 'activity_table') {
+                const PrivilegeModel = new Privilege(Database, userid);
+                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
+                const afrobuildPerms = privilegeData.afrobuild || {};
 
-            if (!hasPermission) {
-                return socket.emit(`${melody1}_${param}`, []);
+                const hasPermission = config.permissions.some(
+                    perm => afrobuildPerms[perm] === 'yes'
+                );
+
+                if (!hasPermission) {
+                    return socket.emit(`${melody1}_${param}`, []);
+                }
             }
 
             let data;
             if (config.isViewModel) {
-                // Handle special view model instance method
                 const View = new config.model(Database);
                 data = await View[config.method]({
                     table: 'transaction_view',
@@ -104,7 +114,6 @@ module.exports = (socket, Database) => {
                     columns: config.columns
                 });
             } else {
-                // Handle regular fetch from models
                 const Model = new config.model(Database);
                 data = await Model.preparedFetch({
                     sql: config.sql,

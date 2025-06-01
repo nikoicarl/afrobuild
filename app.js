@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+
 
 // Model & Route Imports
 const DatabaseModel = require('./backend/models/DatabaseModel');
@@ -9,7 +11,6 @@ const homeRouter = require('./backend/routers/homeRouter');
 const dashboardRouter = require('./backend/routers/dashboardRouter');
 
 // Controller Imports
-const DashboardController = require('./backend/controllers/dashboardController');
 const setupController = require('./backend/controllers/setupController');
 const loginController = require('./backend/controllers/loginController');
 const logoutController = require('./backend/controllers/logoutController');
@@ -73,7 +74,6 @@ async function startServer() {
                 categoryController(socket, Database);
                 PrivilegeController(socket, Database);
                 DropdownController(socket, Database);
-                DashboardController(socket, Database);
                 dashboardFetchController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
@@ -85,7 +85,9 @@ async function startServer() {
         });
 
         // Start server
-        const PORT = 6080;
+        const PORT = process.env.PORT || 6080;
+        const ENV = process.env.NODE_ENV || 'development';
+
         server.listen(PORT, () => {
             console.log(`Server is listening on port ${PORT}`);
         });
