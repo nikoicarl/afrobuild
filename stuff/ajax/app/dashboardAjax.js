@@ -179,7 +179,6 @@ $(document).ready(function () {
                     title: 'Action',
                     template:  row => {
                             const status = row.transaction_status?.toLowerCase?.();
-                            console.log(status);
                             const transactionId = row.transactionid;
                             const itemName = row.item_name?.toUcwords?.() || '';
 
