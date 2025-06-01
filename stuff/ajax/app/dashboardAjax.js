@@ -177,36 +177,61 @@ $(document).ready(function () {
                 {
                     field: 'action',
                     title: 'Action',
-                    template: row => {
-                        const isDeactivated = row.status === 'deactivated';
-                        const itemName = row.item_name?.toUcwords?.() || '';
+                    template:  row => {
+                            const status = row.transaction_status?.toLowerCase?.();
+                            console.log(status);
+                            const transactionId = row.transactionid;
+                            const itemName = row.item_name?.toUcwords?.() || '';
 
-                        const statusBtn = `
-                            <a href="#" class="dropdown-item afrobuild_transaction_table_edit_btn"
-                                data-getid="${row.transactionid}"
-                                data-getname="deactivate_dashboard"
-                                data-getdata="${itemName}"
-                                data-activate="${isDeactivated ? 'activate' : 'deactivate'}">
-                                    <i class="${isDeactivated ? 'icon-checkmark3' : 'icon-blocked'}"></i>
-                                    ${isDeactivated ? 'Reactivate' : 'Deactivate'}
-                            </a>`;
+                            const actions = [];
 
-                        return `
-                            <div class="dropdown">
-                                <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
-                                    <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
+                            // Action: Mark as Completed
+                            if (status === 'pending' || status === 'cancelled') {
+                                actions.push(`
                                     <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                         href="#"
-                                        data-getid="${row.transactionid}"
-                                        data-getname="specific_dashboard">
-                                            <i class="icon-pencil"></i> Edit Details
+                                        data-getid="${transactionId}"
+                                        data-getname="mark_completed"
+                                        data-getdata="${itemName}">
+                                            <i class="icon-checkmark"></i> Mark as Completed
+                                    </a>`);
+                            }
+
+                            // Action: Cancel Transaction
+                            if (status === 'pending') {
+                                actions.push(`
+                                    <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                        href="#"
+                                        data-getid="${transactionId}"
+                                        data-getname="mark_cancelled"
+                                        data-getdata="${itemName}">
+                                            <i class="icon-cross2"></i> Cancel Transaction
+                                    </a>`);
+                            }
+
+                            // Action: Reactivate (if completed or cancelled)
+                            if (status === 'completed' || status === 'cancelled') {
+                                actions.push(`
+                                    <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                        href="#"
+                                        data-getid="${transactionId}"
+                                        data-getname="reactivate_transaction"
+                                        data-getdata="${itemName}">
+                                            <i class="icon-redo2"></i> Reactivate
+                                    </a>`);
+                            }
+
+                            return `
+                                <div class="dropdown">
+                                    <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
+                                        <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
                                     </a>
-                                    ${statusBtn}
-                                </div>
-                            </div>`;
-                    }
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        ${actions.join('')}
+                                    </div>
+                                </div>`;
+                            } 
+                    
                 }
             ]
         });
