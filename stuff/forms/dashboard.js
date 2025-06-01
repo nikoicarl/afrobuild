@@ -26,7 +26,7 @@ function renderStats(data) {
                     <div class="col-md-4">
                         <div class="stat-card card-transactions">
                             <div class="stat-title">Total no. of Transactions</div>
-                            <div class="stat-value">${data.totalTransactionAmount}</div>
+                            <div class="stat-value">${data.transactionCount}</div>
                             <div class="stat-subtitle">From All regions in Ghana</div>
                         </div>
                     </div>

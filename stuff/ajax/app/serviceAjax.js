@@ -60,10 +60,12 @@ $(document).ready(function () {
             const action = serviceData.service_hiddenid ? 'update_service' : 'create_service';
 
             // Emit the respective socket event
-            socket.emit('create_service', serviceData);
+            socket.emit(action, serviceData);
+
 
             // Handle response based on action
-            socket.once(`${serviceData.melody1}_${'create_service'}`, (res) => {
+            const responseEvent = `${serviceData.melody1}_${action}`;
+            socket.off(responseEvent).once(responseEvent, (res) => {
                 Swal.fire({
                     title: res.success ? 'Success' : 'Error',
                     text: res.message || (res.success ? `Service ${action === 'create_service' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_service' ? 'create' : 'update'} service.`),
@@ -73,13 +75,13 @@ $(document).ready(function () {
                 });
                 $submitBtn.html('Submit').removeAttr('disabled');
 
-                // If successful, reset the form and clean up
                 if (res.success) {
                     resetServiceForm();
                     serviceTableFetch();
                     pageDropZone();
                 }
             });
+
 
             socket.on('error', (err) => {
                 $submitBtn.html('Submit').removeAttr('disabled');
@@ -136,12 +138,12 @@ $(document).ready(function () {
                 {
                     field: 'price',
                     title: "Price ",
-                    template: row => 
+                    template: row =>
                         `
                             ${Number(row.price).toLocaleString('en-GH', {
-                                style: 'currency',
-                                currency: 'GHS'
-                            })}
+                            style: 'currency',
+                            currency: 'GHS'
+                        })}
                         `
                 },
 

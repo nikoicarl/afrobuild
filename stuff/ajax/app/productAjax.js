@@ -60,10 +60,12 @@ $(document).ready(function () {
             const action = productData.product_hiddenid ? 'update_product' : 'create_product';
 
             // Emit the respective socket event
-            socket.emit('create_product', productData);
+            socket.emit(action, productData);
+
 
             // Handle response based on action
-            socket.once(`${productData.melody1}_${'create_product'}`, (res) => {
+            const responseEvent = `${productData.melody1}_${action}`;
+            socket.off(responseEvent).once(responseEvent, (res) => {
                 Swal.fire({
                     title: res.success ? 'Success' : 'Error',
                     text: res.message || (res.success ? `Product ${action === 'create_product' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_product' ? 'create' : 'update'} product.`),
@@ -73,13 +75,13 @@ $(document).ready(function () {
                 });
                 $submitBtn.html('Submit').removeAttr('disabled');
 
-                // If successful, reset the form and clean up
                 if (res.success) {
                     resetProductForm();
                     productTableFetch();
                     pageDropZone();
                 }
             });
+
 
             socket.on('error', (err) => {
                 $submitBtn.html('Submit').removeAttr('disabled');
@@ -136,12 +138,12 @@ $(document).ready(function () {
                 {
                     field: 'price',
                     title: "Price ",
-                    template: row => 
+                    template: row =>
                         `
                             ${Number(row.price).toLocaleString('en-GH', {
-                                style: 'currency',
-                                currency: 'GHS'
-                            })}
+                            style: 'currency',
+                            currency: 'GHS'
+                        })}
                         `
                 },
 

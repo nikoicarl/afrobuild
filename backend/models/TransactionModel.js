@@ -118,6 +118,17 @@ class Transaction {
             return [];
         }
     }
+
+    async count() {
+        try {
+            const sql = `SELECT COUNT(*) AS count FROM ${this.tableName}`;
+            const [result] = await this.Database.setupConnection({ sql, columns: [] }, 'object');
+            return result?.count || 0;
+        } catch (error) {
+            console.error('[Count Product Error]:', error);
+            return 0;
+        }
+    }
 }
 
 module.exports = Transaction;

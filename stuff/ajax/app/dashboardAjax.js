@@ -95,7 +95,7 @@ $(document).ready(function () {
                 {
                     field: 'amount',
                     title: 'Amount',
-                    template: row => 
+                    template: row =>
                         `${Number(row.amount).toLocaleString('en-GH', {
                             style: 'currency',
                             currency: 'GHS'
@@ -104,10 +104,21 @@ $(document).ready(function () {
                 {
                     field: 'transaction_status',
                     title: 'Status',
-                    template: row => row.transaction_status === 'active'
-                        ? `<span class="badge text-bg-success">Active</span>`
-                        : `<span class="badge text-bg-danger">${row.status?.toUcwords?.() || ''}</span>`
-                },
+                    template: row => {
+                        const status = (row.transaction_status || '').toLowerCase();
+                        const label = status.charAt(0).toUpperCase() + status.slice(1);
+
+                        let badgeClass = 'secondary';
+                        if (status === 'active') badgeClass = 'success';
+                        else if (status === 'pending') badgeClass = 'warning';
+                        else if (status === 'failed') badgeClass = 'danger';
+                        else if (status === 'completed') badgeClass = 'success';
+                        else if (status === 'cancelled') badgeClass = 'danger';
+
+                        return `<span class="badge text-bg-${badgeClass}">${label}</span>`;
+                    }
+                }
+                ,
                 {
                     field: 'action',
                     title: 'Action',
