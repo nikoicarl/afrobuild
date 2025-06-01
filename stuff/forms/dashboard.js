@@ -33,7 +33,7 @@ function renderStats(data) {
                     <div class="col-md-4">
                         <div class="stat-card card-transactions">
                             <div class="stat-title">Total Value of Transactions</div>
-                            <div class="stat-value">GH₵${formatNumber(data.totalTransactionAmount)}</div>
+                            <div class="stat-value">GHS ${formatNumber(data.totalTransactionAmount)}</div>
                             <div class="stat-subtitle">From Aug 2023 to Mar 2025</div>
                         </div>
                     </div>
