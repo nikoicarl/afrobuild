@@ -1,6 +1,6 @@
 // Renders the dashboard main layout container
 function renderDashboardContainer() {
-    $('.afrobuild_main_page_breadcrumb_navigation').html(``);
+    $('.afrobuild_main_page_breadcrumb_navigation').html('');
     return `
         <div class="layout-px-spacing mb-5">
             <div class="row layout-top-spacing">
@@ -10,8 +10,8 @@ function renderDashboardContainer() {
     `;
 }
 
-// Renders stats cards and recent transactions table
-function renderStatsAndTransactionTable() {
+// Renders stats cards 
+function renderStats(data) {
     return `
         <div class="row">
             <div class="col-12 layout-spacing">
@@ -19,65 +19,55 @@ function renderStatsAndTransactionTable() {
                     <div class="col-md-4">
                         <div class="stat-card card-products">
                             <div class="stat-title">Total no. of Products/Services</div>
-                            <div class="stat-value">1200</div>
-                            <div class="stat-subtitle">in 12 categories</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="stat-card card-merchants">
-                            <div class="stat-title">Total no. of Merchants</div>
-                            <div class="stat-value">150</div>
-                            <div class="stat-subtitle">From 8 regions in Ghana</div>
+                            <div class="stat-value">${data.productCount}</div>
+                            <div class="stat-subtitle">in ${data.categoryCount} categories</div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="stat-card card-transactions">
                             <div class="stat-title">Total no. of Transactions</div>
-                            <div class="stat-value">₵150,000,000.00</div>
-                            <div class="stat-subtitle">From Aug 2023 to Mar 2025</div>
+                            <div class="stat-value">${data.totalTransactionAmount}</div>
+                            <div class="stat-subtitle">From All regions in Ghana</div>
                         </div>
                     </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-title">Recent Transactions</div>
-                    <div class="table-responsive">
-                        <table class="custom-table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Transaction ID</th>
-                                    <th>Product/Service</th>
-                                    <th>Category</th>
-                                    <th>Customer Name</th>
-                                    <th>Date</th>
-                                    <th>Merchant Name</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${[...Array(9)].map((_, i) => {
-                                    const statusClass = i === 5 || i === 6 ? 'status-failed' : (i === 2 ? 'status-pending' : 'status-done');
-                                    return `
-                                        <tr>
-                                            <td>AF1032993</td>
-                                            <td>Cement</td>
-                                            <td>Building</td>
-                                            <td>Kofi Owusu</td>
-                                            <td>12/03/23</td>
-                                            <td>Jane Doe</td>
-                                            <td>₵ 300.00</td>
-                                            <td class="${statusClass}">${statusClass.split('-')[1]}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
+                    <div class="col-md-4">
+                        <div class="stat-card card-transactions">
+                            <div class="stat-title">Total Value of Transactions</div>
+                            <div class="stat-value">₵${Number(data.totalTransactionAmount).toLocaleString()}</div>
+                            <div class="stat-subtitle">${data.transactionRange}</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     `;
+}
+
+// Renders the transaction table section
+function renderTransactionTable() {
+    return `
+        <!-- BEGIN TRANSACTION TABLE -->
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <div class="stat-card afrobuild_transaction_data_table_div">
+                    <div class="search-wrapper">
+                        <input type="text" id="afrobuild_transaction_general_search" class="search-input" placeholder="Search table...">
+                        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <table class="afrobuild_transaction_data_table" style="text-align:left"></table>
+                </div>
+            </div>
+        </div>
+        <!-- END TRANSACTION TABLE -->
+    `;
+}
+
+// Combines stats and transaction table into one layout
+function renderStatsAndTransactionTable(data) {
+    return renderStats(data) + renderTransactionTable();
 }
 
 // Immediately Invoked Function Expression (IIFE) to render the dashboard
@@ -86,10 +76,19 @@ function renderStatsAndTransactionTable() {
     const dashboardHTML = renderDashboardContainer();
     $('#afrobuild_main_content_display').html(dashboardHTML);
 
-    // Inject stats and transactions into the dashboard section
-    const statsAndTableHTML = renderStatsAndTransactionTable();
-    $('#afrobuild_dashboard_page_form_display').html(statsAndTableHTML);
+    // Wait for dashboard data via socket
+    socket.emit('fetchDashboardData');
 
-    // Load any dashboard-specific scripts
-    addPageScript('app/dashboardAjax');
+    socket.on('dashboardData', function (data) {
+        if (!data || typeof data !== 'object') {
+            console.error('[Dashboard Stats]: Invalid data received', data);
+            return;
+        }
+
+        const statsAndTableHTML = renderStatsAndTransactionTable(data);
+        $('#afrobuild_dashboard_page_form_display').html(statsAndTableHTML);
+
+        // Load any dashboard-specific scripts
+        addPageScript('app/dashboardAjax');
+    });
 })();

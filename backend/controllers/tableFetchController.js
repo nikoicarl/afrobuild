@@ -1,4 +1,3 @@
-// Models
 const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
@@ -8,14 +7,12 @@ const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
 const ViewModel = require('../models/ViewModel');
-const GeneralFunction = require('../models/GeneralFunctionModel');
 
-// Helpers
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
+const GeneralFunction = require('../models/GeneralFunctionModel');
 const gf = new GeneralFunction();
 
-// Table configuration
 const tableConfigs = {
     user_table: {
         model: User,
@@ -61,17 +58,17 @@ const tableConfigs = {
     },
     transaction_table: {
         model: ViewModel,
-        method: 'getTransactionTableData',
+        method: 'getGeneral',  // Use instance method
         permissions: ['view_transaction'],
-        sql: '',
-        columns: []
+        sql: '1 ORDER BY datetime DESC',
+        columns: [], // Not used here
+        isViewModel: true
     }
 };
 
 module.exports = (socket, Database) => {
     socket.on('table', async (browserblob) => {
         const { param, melody1 = '' } = browserblob;
-
         const config = tableConfigs[param];
         if (!config) return;
 
@@ -86,11 +83,11 @@ module.exports = (socket, Database) => {
 
             const userid = session.userid;
             const PrivilegeModel = new Privilege(Database, userid);
-            const privileges = await PrivilegeModel.getPrivileges();
-            const afrobuildPerms = privileges?.privilegeData?.afrobuild || {};
+            const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
+            const afrobuildPerms = privilegeData.afrobuild || {};
 
             const hasPermission = config.permissions.some(
-                permission => afrobuildPerms[permission] === 'yes'
+                perm => afrobuildPerms[perm] === 'yes'
             );
 
             if (!hasPermission) {
@@ -98,14 +95,18 @@ module.exports = (socket, Database) => {
             }
 
             let data;
-
-            if (config.method && typeof config.model[config.method] === 'function') {
-                // Static method (e.g., getTransactionTableData)
-                data = await config.model[config.method](Database);
+            if (config.isViewModel) {
+                // Handle special view model instance method
+                const View = new config.model(Database);
+                data = await View[config.method]({
+                    table: 'transaction_view',
+                    sql: config.sql,
+                    columns: config.columns
+                });
             } else {
-                // Instance method (e.g., preparedFetch)
-                const modelInstance = new config.model(Database);
-                data = await modelInstance.preparedFetch({
+                // Handle regular fetch from models
+                const Model = new config.model(Database);
+                data = await Model.preparedFetch({
                     sql: config.sql,
                     columns: config.columns
                 });
@@ -114,16 +115,17 @@ module.exports = (socket, Database) => {
             if (!Array.isArray(data)) {
                 return socket.emit(`${melody1}_${param}`, {
                     type: 'error',
-                    message: `Database error while fetching data for ${param}.`
+                    message: `Database error while fetching ${param.replace('_table', '')}.`
                 });
             }
 
-            socket.emit(`${melody1}_${param}`, data);
+            return socket.emit(`${melody1}_${param}`, data);
 
         } catch (err) {
-            socket.emit(`${melody1}_${param}`, {
+            console.error(err);
+            return socket.emit(`${melody1}_${param}`, {
                 type: 'error',
-                message: err.message || 'An error occurred while processing the request.'
+                message: err.message || 'An error occurred while fetching data.'
             });
         }
     });

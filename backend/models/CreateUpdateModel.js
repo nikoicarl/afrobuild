@@ -57,22 +57,30 @@ class CreateUpdateModel {
     }
 
     async createView() {
-        if (!this.checkIfValue(this.tableName) || !this.checkIfValue(this.createTableStatement)) return false;
-
-        try {
-            const exists = await this.checkIfTableExist(this.tableName, 'VIEW');
-            if (exists) {
-                return this.alterViewTable();
-            } else {
-                const sql = `CREATE VIEW ${this.tableName} AS ${this.createTableStatement};`;
-                const result = await this.Database.setupConnection(sql, 'sql');
-                return result?.affectedRows !== undefined;
-            }
-        } catch (error) {
-            console.error(`${this.tableName} Create View Error => `, error);
-            return false;
-        }
+    if (!this.checkIfValue(this.tableName) || !this.checkIfValue(this.createTableStatement)) {
+        console.error('Missing table name or createTableStatement for view creation.');
+        return false;
     }
+
+    try {
+        const exists = await this.checkIfTableExist(this.tableName, 'VIEW');
+
+        if (exists) {
+            const dropSql = `DROP VIEW IF EXISTS \`${this.tableName}\``;
+            await this.Database.setupConnection({ sql: dropSql, columns: [] }, 'sql');
+        }
+
+        const createSql = `CREATE VIEW \`${this.tableName}\` AS ${this.createTableStatement}`;
+
+        const result = await this.Database.setupConnection({ sql: createSql, columns: [] }, 'sql');
+
+        return result?.affectedRows !== undefined || result === true;
+    } catch (error) {
+        console.error(`${this.tableName} Create View Error =>`, error);
+        return false;
+    }
+}
+
 
     async checkIfTableExist(tableName, tableType) {
         try {

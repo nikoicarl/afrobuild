@@ -136,7 +136,13 @@ $(document).ready(function () {
                 {
                     field: 'price',
                     title: "Price ",
-                    template: row => row.price
+                    template: row => 
+                        `
+                            ${Number(row.price).toLocaleString('en-GH', {
+                                style: 'currency',
+                                currency: 'GHS'
+                            })}
+                        `
                 },
 
                 {
