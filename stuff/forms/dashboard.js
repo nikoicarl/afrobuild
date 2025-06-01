@@ -65,10 +65,10 @@ function renderTransactionTable() {
     `;
 }
 
-function Activities() {
+function renderActivities() {
     return `
         <div class="row">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+            <div class="col-md-12 mt-4">
                 <div class="widget widget-activity-three">
                     <div class="widget-heading">
                         <h5 class="">Activities</h5>
@@ -86,10 +86,6 @@ function Activities() {
     `;
 }
 
-// Combines stats and transaction table into one layout
-function renderStatsAndTransactionTable(data) {
-    return renderStats(data) + renderTransactionTable() + Activities();
-}
 
 // Immediately Invoked Function Expression (IIFE) to render the dashboard
 (() => {
