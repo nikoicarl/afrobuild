@@ -100,9 +100,10 @@ module.exports = (socket, Database) => {
                 columns: [status, dataId]
             });
 
+            const actionVerb = checker === 'deactivate' ? 'deactivated' : 'activated';
             const actionMessage = result?.affectedRows
-                ? `${name} with ID ${dataId} ${status}.`
-                : `Attempt to update ${name.toLowerCase()} with ID ${dataId} failed.`;
+                ? `${name} with ID ${dataId} was ${actionVerb}.`
+                : `Attempt to ${actionVerb} ${name.toLowerCase()} with ID ${dataId} failed.`;
 
             // Insert session activity
             const SessionActivityModel = new SessionActivity(Database);
