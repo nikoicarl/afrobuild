@@ -1,6 +1,5 @@
 $(document).ready(function () {
     const privilege = JSON.parse($('.hidden_privilege_data').val());
-    const isAdmin = $('.hidden_delete_for_admin').val() === 'admin';
     const dashboardDisplay = $('#afrobuild_dashboard_page_form_display');
 
     dashboardDisplay.empty();
@@ -184,21 +183,13 @@ $(document).ready(function () {
 
                         const statusBtn = `
                             <a href="#" class="dropdown-item afrobuild_transaction_table_edit_btn"
-                               data-getid="${row.transactionid}"
-                               data-getname="deactivate_dashboard"
-                               data-getdata="${itemName}"
-                               data-activate="${isDeactivated ? 'activate' : 'deactivate'}">
-                                <i class="${isDeactivated ? 'icon-checkmark3' : 'icon-blocked'}"></i>
-                                ${isDeactivated ? 'Reactivate' : 'Deactivate'}
+                                data-getid="${row.transactionid}"
+                                data-getname="deactivate_dashboard"
+                                data-getdata="${itemName}"
+                                data-activate="${isDeactivated ? 'activate' : 'deactivate'}">
+                                    <i class="${isDeactivated ? 'icon-checkmark3' : 'icon-blocked'}"></i>
+                                    ${isDeactivated ? 'Reactivate' : 'Deactivate'}
                             </a>`;
-
-                        const deleteBtn = isAdmin ? `
-                            <a href="#" class="dropdown-item afrobuild_transaction_table_edit_btn"
-                               data-getid="${row.transactionid}"
-                               data-getname="delete_dashboard"
-                               data-getdata="${itemName}">
-                                <i class="icon-close2"></i> Delete
-                            </a>` : '';
 
                         return `
                             <div class="dropdown">
@@ -207,13 +198,12 @@ $(document).ready(function () {
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
                                     <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                       href="#"
-                                       data-getid="${row.transactionid}"
-                                       data-getname="specific_dashboard">
-                                        <i class="icon-pencil"></i> Edit Details
+                                        href="#"
+                                        data-getid="${row.transactionid}"
+                                        data-getname="specific_dashboard">
+                                            <i class="icon-pencil"></i> Edit Details
                                     </a>
                                     ${statusBtn}
-                                    ${deleteBtn}
                                 </div>
                             </div>`;
                     }
