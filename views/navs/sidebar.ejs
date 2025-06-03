@@ -74,6 +74,15 @@
             </li>
         <% } %>
 
+        <% if (privilege.afrobuild?.view_merchant_report === "yes") { %>
+            <li class="menu nav-item">
+                <a href="/merchant" data-appname="afrobuild" class="nav-link afrobuild_main_navigation_btn" data-navparent="afrobuildnavbar" data-scripts="single::app/merchantAjax">
+                    <img src="/assets/img/merchant.png" alt="">
+                    &nbsp;&nbsp;View Merchant Reports
+                </a>
+            </li>
+        <% } %>
+
 
         <% if (privilege.afrobuild?.add_privilege === "yes" ) { %>
             <li class="menu nav-item">
@@ -83,7 +92,6 @@
                 </a>
             </li>
         <% } %>
-
 
 
     </ul>

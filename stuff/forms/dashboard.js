@@ -67,7 +67,7 @@ function renderTransactionTable() {
 
 function renderActivities() {
     return `
-        <div class="row">
+        <div class="row " style="display : none;">
             <div class="col-md-12 mt-4">
                 <div class="widget widget-activity-three">
                     <div class="widget-heading">

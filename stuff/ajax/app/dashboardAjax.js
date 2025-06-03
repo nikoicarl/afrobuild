@@ -177,61 +177,73 @@ $(document).ready(function () {
                 {
                     field: 'action',
                     title: 'Action',
-                    template:  row => {
-                            const status = row.transaction_status?.toLowerCase?.();
-                            const transactionId = row.transactionid;
-                            const itemName = row.item_name?.toUcwords?.() || '';
+                    template: row => {
+                        const status = row.transaction_status?.toLowerCase?.();
+                        const transactionId = row.transactionid;
+                        const itemName = row.item_name?.toUcwords?.() || '';
 
-                            const actions = [];
+                        const actions = [];
 
-                            // Action: Mark as Completed
-                            if (status === 'pending' || status === 'cancelled') {
-                                actions.push(`
-                                    <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                        href="#"
-                                        data-getid="${transactionId}"
-                                        data-getname="mark_completed"
-                                        data-getdata="${itemName}">
-                                            <i class="icon-checkmark"></i> Mark as Completed
-                                    </a>`);
-                            }
+                        // Action: Mark as Completed
+                        if (status === 'pending') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="mark_completed"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-checkmark"></i> Mark as Completed
+                                </a>`);
+                        }
 
-                            // Action: Cancel Transaction
-                            if (status === 'pending') {
-                                actions.push(`
-                                    <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                        href="#"
-                                        data-getid="${transactionId}"
-                                        data-getname="mark_cancelled"
-                                        data-getdata="${itemName}">
-                                            <i class="icon-cross2"></i> Cancel Transaction
-                                    </a>`);
-                            }
+                        // Action: Cancel Transaction
+                        if (status === 'pending') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="mark_cancelled"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-cross2"></i> Cancel Transaction
+                                </a>`);
+                        }
 
-                            // Action: Reactivate (if completed or cancelled)
-                            if (status === 'completed' || status === 'cancelled') {
-                                actions.push(`
-                                    <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                        href="#"
-                                        data-getid="${transactionId}"
-                                        data-getname="reactivate_transaction"
-                                        data-getdata="${itemName}">
-                                            <i class="icon-redo2"></i> Reactivate
-                                    </a>`);
-                            }
+                        // Action: Reactivate (if cancelled)
+                        if (status === 'cancelled') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="reactivate_transaction"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-redo2"></i> Reactivate
+                                </a>`);
+                        }
 
-                            return `
-                                <div class="dropdown">
-                                    <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
-                                        <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        ${actions.join('')}
-                                    </div>
-                                </div>`;
-                            } 
-                    
+                        // Action: Flag Transaction (if cancelled or pending)
+                        if (status === 'cancelled' || status === 'pending') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="flag_transaction"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-flag7"></i> Flag Transaction
+                                </a>`);
+                        }
+
+                        return `
+                            <div class="dropdown">
+                                <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
+                                    <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    ${actions.join('')}
+                                </div>
+                            </div>`;
+                    }
                 }
+
             ]
         });
     }
