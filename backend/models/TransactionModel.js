@@ -7,7 +7,7 @@ class Transaction {
         this.tableName = 'transaction';
         this.columnsList = [
             'transactionid', 'product_service', 'itemtype', 'category', 'userid',
-            'merchant', 'amount', 'datetime', 'status'
+            'merchant', 'amount', 'message', 'datetime', 'status'
         ];
 
         this.createTable();
@@ -24,11 +24,12 @@ class Transaction {
                 userid BIGINT(100),
                 merchant BIGINT(100),
                 amount DECIMAL(10, 2),
+                message TEXT,
                 datetime DATETIME,
                 status VARCHAR(50)
             `,
             foreignKeyStatement: '',
-            alterTableStatement: []
+            alterTableStatement: ['message TEXT'],
         });
 
         return await CreateUpdateTable.checkTableExistence();
