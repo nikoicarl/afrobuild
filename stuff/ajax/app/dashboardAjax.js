@@ -263,7 +263,7 @@ $(document).ready(function () {
                         const actions = [];
 
                         // Action: Mark as Completed
-                        if (status === 'pending') {
+                        if (status === 'pending' || status === 'active') {
                             actions.push(`
                                 <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                     href="#"
@@ -275,7 +275,7 @@ $(document).ready(function () {
                         }
 
                         // Action: Cancel Transaction
-                        if (status === 'pending') {
+                        if (status === 'pending' || status === 'active') {
                             actions.push(`
                                 <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                     href="#"
@@ -298,8 +298,8 @@ $(document).ready(function () {
                                 </a>`);
                         }
 
-                        // Action: Flag Transaction (if cancelled or pending)
-                        if (status === 'cancelled' || status === 'pending') {
+                        // Action: Flag Transaction (if cancelled, pending, or active)
+                        if (status === 'cancelled' || status === 'pending' || status === 'active') {
                             actions.push(`
                                 <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                     href="#"
@@ -307,6 +307,30 @@ $(document).ready(function () {
                                     data-getname="flag_transaction"
                                     data-getdata="${itemName}">
                                         <i class="icon-flag7"></i> Flag Transaction
+                                </a>`);
+                        }
+
+                        // Action: Mark as Pending (if active)
+                        if (status === 'active') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="mark_pending"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-hour-glass"></i> Mark as Pending
+                                </a>`);
+                        }
+
+                        // Action: View (if flagged or completed)
+                        if (status === 'flagged' || status === 'completed') {
+                            actions.push(`
+                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                                    href="#"
+                                    data-getid="${transactionId}"
+                                    data-getname="view_transaction"
+                                    data-getdata="${itemName}">
+                                        <i class="icon-file-eye"></i> View
                                 </a>`);
                         }
 
@@ -321,6 +345,7 @@ $(document).ready(function () {
                             </div>`;
                     }
                 }
+
 
             ]
         });
