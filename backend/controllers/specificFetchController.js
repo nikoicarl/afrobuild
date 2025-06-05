@@ -9,11 +9,14 @@ const Category = require('../models/CategoryModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
+const Transaction = require('../models/TransactionModel');
 const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
     socket.on('specific', async (browserBlob) => {
-        const { param, melody1, dataId } = browserBlob;
+        console.log(browserBlob);
+
+        const { param, melody1, dataId, action, message } = browserBlob;
 
         // Ensure melody1 is defined
         const session = getSessionIDs(melody1 || '');
@@ -180,7 +183,7 @@ module.exports = (socket, Database) => {
                 } else {
                     socket.emit(`${melody1}_${param}`, {
                         type: 'error',
-                        message: `Oops, something went wrong: Error fetching user data => ${userResult.sqlMessage || 'Unknown error'}`
+                        message: `Oops, something went wrong: Error fetching user data => ${categoryResult.sqlMessage || 'Unknown error'}`
                     });
                 }
             } else if (param === "specific_privilege") {
@@ -189,7 +192,24 @@ module.exports = (socket, Database) => {
                 const PrivilegeModel = new Privilege(Database, dataId);
                 result = (await PrivilegeModel.getPrivileges()).privilegeColumns;
                 socket.emit(melody1 + '_' + param, result);
-            } 
+            } else if (param === 'specific_transaction') {
+                // Initialize the category model
+                const TransactionModel = new Transaction(Database);
+                const PrivilegeModel = new Privilege(Database, userid);
+                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData;
+
+                if(action == 'mark_completed') {
+                    // Update existing transaction
+                    const result = await TransactionModel.updateTable({
+                        sql: 'message=? WHERE transactionid = ?',
+                        columns: [message, 'completed',  dataId],
+                    });
+
+                    console.log(result);
+                }
+                
+                
+            }
 
         } catch (error) {
             console.error('Error handling specific user request:', error);

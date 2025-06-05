@@ -4,6 +4,50 @@ $(document).ready(function () {
 
     dashboardDisplay.empty();
 
+    // Handle form submission for creating or updating role
+    $(document).on('click', '.afrobuild_action_submit_btn', function (e) {
+        e.preventDefault();
+
+        const actionData = {
+            message: $('.afrobuild_transaction_action_msg').val().trim(),
+            hiddenId: $('.afrobuild_transaction_hiddenid').val().trim(),
+            action: $('.afrobuild_transaction_hidden_action').val().trim(),
+            param: 'specific_transaction',
+            melody1: melody.melody1,
+            melody2: melody.melody2
+        };
+        console.log(actionData);
+
+        const $submitBtn = $('.afrobuild_action_submit_btn')
+            .html('<div class="spinner-border loader-sm" role="status"></div>')
+            .attr('disabled', true);
+
+        setTimeout(() => {
+
+            socket.emit('specific', actionData);
+
+            socket.once(`${actionData.melody1}_specific_transaction`, (res) => {
+                Swal.fire({
+                    title: res.success ? 'Success' : 'Error',
+                    text: res.message || (res.success ? `Role ${action === 'specific_transaction' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'specific_transaction' ? 'create' : 'update'} role.`),
+                    icon: res.success ? 'success' : 'error',
+                    showConfirmButton: !res.success,
+                    timer: res.success ? 2000 : undefined
+                });
+                $submitBtn.html('Submit').removeAttr('disabled');
+
+                if (res.success) {
+                    
+                }
+            });
+
+            socket.on('error', (err) => {
+                $submitBtn.html('Submit').removeAttr('disabled');
+                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
+            });
+        }, 300);
+    });
+
     setTimeout(() => {
         fetchActivityTable();
         const html = ejs.render(renderActivities(), {});
@@ -41,6 +85,30 @@ $(document).ready(function () {
             }
         });
     }
+
+    // Action Modal
+    $(document).on('click', '.afrobuild_transaction_table_edit_btn', function (e) {
+        const action = $(this).data('getname');
+        const transactionId = $(this).data('getid');
+        const name = $(this).data('getdata');
+
+        if (action) {
+            let modal_title = $('.modal-header').find('.modal-title');
+            modal_title.text(`${action.replace('_', ' ').toUcwords()}`);
+            // add transactionId to the modal title if needed
+            if (transactionId) {
+                modal_title.append(` - ${transactionId}`);
+            }
+            $('.afrobuild_transaction_hidden_action').val(action);
+            $('.afrobuild_transaction_product').val(name);
+            $('.afrobuild_transaction_hiddenid').val(transactionId);
+        } else {
+            $('.afrobuild_transaction_hidden_action').val('');
+            $('.afrobuild_transaction_hiddenid').val('');
+        }
+        $('.afrobuild_transaction_action_modal').trigger('click');
+        
+    });
 
     function fetchActivityTable() {
         socket.off('table');

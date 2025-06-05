@@ -86,12 +86,56 @@ function renderActivities() {
     `;
 }
 
+function ActionModal() {
+    return `
+        <button type="button" class="afrobuild_transaction_action_modal hide" data-toggle="modal" data-target="#actionModal"></button>
+        <div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #009345;">
+                        <h5 class="modal-title text-white" id="actionModalLabel"></h5>
+                    </div>
+                    <div class="modal-body">
+                        <form class="afrobuild_transaction_action_form">
+                            <input type="hidden" class="afrobuild_transaction_hiddenid">
+                            <input type="hidden" class="afrobuild_transaction_hidden_action">
+                            <div class="row">
+                                <div class="col-md-12 mt-2 mb-3">
+                                    <label class="form-label"> Product / Service </label>
+                                    <input type="text" class="form-control afrobuild_transaction_product" placeholder="Product Name" disabled>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 mt-2 mb-3">
+                                    <textarea id="message" class="form-control afrobuild_transaction_action_msg" rows="3" placeholder="Reason"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn afrobuild_btn afrobuild_action_submit_btn action_submit_btn" role="button">
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 
 // Immediately Invoked Function Expression (IIFE) to render the dashboard
 (() => {
     // Render the dashboard container
     const dashboardHTML = renderDashboardContainer();
     $('#afrobuild_main_content_display').html(dashboardHTML);
+
+
+    html = ejs.render(ActionModal(), {});
+    $('#afrobuild_main_content_display').append(html);
 
     // Load any dashboard-specific scripts
     addPageScript('app/dashboardAjax');
