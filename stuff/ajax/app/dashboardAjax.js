@@ -4,40 +4,49 @@ $(document).ready(function () {
 
     dashboardDisplay.empty();
 
-    // Handle form submission for creating or updating role
+    // Handle form submission for transaction actions
     $(document).on('click', '.afrobuild_action_submit_btn', function (e) {
         e.preventDefault();
 
         const actionData = {
             message: $('.afrobuild_transaction_action_msg').val().trim(),
-            hiddenId: $('.afrobuild_transaction_hiddenid').val().trim(),
+            dataId: $('.afrobuild_transaction_hiddenid').val().trim(),
             action: $('.afrobuild_transaction_hidden_action').val().trim(),
             param: 'specific_transaction',
             melody1: melody.melody1,
             melody2: melody.melody2
         };
-        console.log(actionData);
 
-        const $submitBtn = $('.afrobuild_action_submit_btn')
+        const $submitBtn = $(this)
             .html('<div class="spinner-border loader-sm" role="status"></div>')
             .attr('disabled', true);
 
         setTimeout(() => {
-
             socket.emit('specific', actionData);
 
             socket.once(`${actionData.melody1}_specific_transaction`, (res) => {
-                Swal.fire({
-                    title: res.success ? 'Success' : 'Error',
-                    text: res.message || (res.success ? `Role ${action === 'specific_transaction' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'specific_transaction' ? 'create' : 'update'} role.`),
-                    icon: res.success ? 'success' : 'error',
-                    showConfirmButton: !res.success,
-                    timer: res.success ? 2000 : undefined
-                });
                 $submitBtn.html('Submit').removeAttr('disabled');
 
-                if (res.success) {
-                    
+                if (res && typeof res.success !== 'undefined') {
+                    Swal.fire({
+                        title: res.success ? 'Success' : 'Error',
+                        text: res.message || (res.success
+                            ? `Transaction ${actionData.action.replace(/_/g, ' ')} successfully.`
+                            : `Failed to ${actionData.action.replace(/_/g, ' ')} transaction.`),
+                        icon: res.success ? 'success' : 'error',
+                        showConfirmButton: !res.success,
+                        timer: res.success ? 2000 : undefined
+                    });
+
+                    if (res.success) {
+                        socket.emit('table', {
+                            melody1: melody.melody1,
+                            melody2: melody.melody2,
+                            param: 'transaction_table'
+                        });
+                    }
+                } else {
+                    Swal.fire('Error', 'Invalid response received from the server.', 'error');
                 }
             });
 
@@ -47,6 +56,7 @@ $(document).ready(function () {
             });
         }, 300);
     });
+
 
     setTimeout(() => {
         fetchActivityTable();
@@ -107,7 +117,7 @@ $(document).ready(function () {
             $('.afrobuild_transaction_hiddenid').val('');
         }
         $('.afrobuild_transaction_action_modal').trigger('click');
-        
+
     });
 
     function fetchActivityTable() {

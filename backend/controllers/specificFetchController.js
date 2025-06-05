@@ -2,6 +2,7 @@ const User = require('../models/UserModel');
 const Role = require('../models/RoleModel');
 const Product = require('../models/ProductModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
+const Session = require('../models/SessionModel');
 const Service = require('../models/ServiceModel');
 const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
@@ -14,7 +15,6 @@ const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
     socket.on('specific', async (browserBlob) => {
-        console.log(browserBlob);
 
         const { param, melody1, dataId, action, message } = browserBlob;
 
@@ -193,23 +193,107 @@ module.exports = (socket, Database) => {
                 result = (await PrivilegeModel.getPrivileges()).privilegeColumns;
                 socket.emit(melody1 + '_' + param, result);
             } else if (param === 'specific_transaction') {
-                // Initialize the category model
                 const TransactionModel = new Transaction(Database);
                 const PrivilegeModel = new Privilege(Database, userid);
-                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData;
+                const SessionModel = new Session(Database);
 
-                if(action == 'mark_completed') {
-                    // Update existing transaction
-                    const result = await TransactionModel.updateTable({
-                        sql: 'message=? WHERE transactionid = ?',
-                        columns: [message, 'completed',  dataId],
+                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
+                const afrobuildPerms = privilegeData.afrobuild || {};
+
+                let result;
+                let newStatus = '';
+                let activityMessage = '';
+
+                // Action: Mark Completed
+                if (action === 'mark_completed') {
+                    if (afrobuildPerms.mark_completed_transaction !== 'yes') {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'You do not have permission to mark this transaction as completed.'
+                        });
+                    }
+
+                    newStatus = 'completed';
+                    activityMessage = `Marked transaction ${dataId} as completed`;
+                }
+
+                // Action: Cancel Transaction
+                else if (action === 'cancel_transaction' || action === 'mark_cancelled') {
+                    if (afrobuildPerms.cancel_transaction !== 'yes') {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'You do not have permission to cancel this transaction.'
+                        });
+                    }
+
+                    newStatus = 'cancelled';
+                    activityMessage = `Cancelled transaction ${dataId}`;
+                }
+
+                // Action: Reactivate
+                else if (action === 'reactivate_transaction') {
+                    if (afrobuildPerms.reactivate !== 'yes') {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'You do not have permission to reactivate this transaction.'
+                        });
+                    }
+
+                    newStatus = 'pending';
+                    activityMessage = `Reactivated transaction ${dataId}`;
+                }
+
+                // Action: Flag Transaction
+                else if (action === 'flag_transaction') {
+                    if (afrobuildPerms.flag_transaction !== 'yes') {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'You do not have permission to flag this transaction.'
+                        });
+                    }
+
+                    newStatus = 'flagged';
+                    activityMessage = `Flagged transaction ${dataId}`;
+                }
+
+                // If a supported action was matched
+                if (newStatus) {
+                    result = await TransactionModel.updateTable({
+                        sql: 'message = ?, status = ? WHERE transactionid = ?',
+                        columns: [message, newStatus, dataId],
                     });
 
-                    console.log(result);
+                    if (result?.affectedRows > 0) {
+                        // Log session activity
+                        const activityId = gf.getTimeStamp();
+
+                        await SessionModel.insertTable([
+                            activityId,
+                            userid,
+                            activityMessage,
+                            gf.getDateTime(),
+                            null
+                        ]);
+
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: true,
+                            message: activityMessage
+                        });
+                    } else {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'No changes were made to the transaction.'
+                        });
+                    }
+                } else {
+                    return socket.emit(`${melody1}_${param}`, {
+                        success: false,
+                        message: 'Unsupported or missing action.'
+                    });
                 }
-                
-                
             }
+
+
 
         } catch (error) {
             console.error('Error handling specific user request:', error);
