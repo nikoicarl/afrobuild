@@ -89,34 +89,33 @@ function renderActivities() {
 function ActionModal() {
     return `
         <button type="button" class="afrobuild_transaction_action_modal hide" data-toggle="modal" data-target="#actionModal"></button>
-        <div class="modal fade afrobuild_transaction_action_modal" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true" >
-            <div class="modal-dialog modal-dialog-centered modal-md " role="document" >
-                <div class="modal-content">
+        <div class="modal fade afrobuild_transaction_action_modal" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                <div class="modal-content shadow-sm border-0 rounded-3">
                     <div class="modal-header" style="background-color: #009345;">
-                        <h5 class="modal-title text-white" id="actionModalLabel"></h5>
+                        <h5 class="modal-title text-white fw-semibold" id="actionModalLabel"></h5>
+                        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body px-4 py-3">
                         <form class="afrobuild_transaction_action_form">
                             <input type="hidden" class="afrobuild_transaction_hiddenid">
                             <input type="hidden" class="afrobuild_transaction_hidden_action">
-                            <div class="row">
-                                <div class="col-md-12 mt-2 mb-3">
-                                    <label class="form-label"> Product / Service </label>
-                                    <input type="text" class="form-control afrobuild_transaction_product" placeholder="Product Name" disabled>
-                                </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Product / Service</label>
+                                <input type="text" class="form-control afrobuild_transaction_product" placeholder="Product Name" disabled>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-12 mt-2 mb-3">
-                                    <textarea id="message" class="form-control afrobuild_transaction_action_msg" rows="3" placeholder="Reason"></textarea>
-                                </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Message</label>
+                                <textarea id="message" class="form-control afrobuild_transaction_action_msg" rows="4" placeholder="Enter a message..."></textarea>
                             </div>
-                            <div class="row">
-                                <div class="col-12 text-end">
-                                    <button type="submit" class="btn afrobuild_btn afrobuild_action_submit_btn action_submit_btn" role="button">
-                                        Submit
-                                    </button>
-                                </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success afrobuild_action_submit_btn action_submit_btn">
+                                    Submit
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -125,6 +124,7 @@ function ActionModal() {
         </div>
     `;
 }
+
 
 function ViewModal() {
     return `
@@ -178,7 +178,7 @@ function ViewModal() {
 
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Reason:</label>
+                                <label class="form-label fw-bold">Message:</label>
                                 <p class="form-control-plaintext afrobuild_view_reason"></p>
                             </div>
                         </div>
