@@ -89,8 +89,8 @@ function renderActivities() {
 function ActionModal() {
     return `
         <button type="button" class="afrobuild_transaction_action_modal hide" data-toggle="modal" data-target="#actionModal"></button>
-        <div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal fade afrobuild_transaction_action_modal" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true" >
+            <div class="modal-dialog modal-dialog-centered modal-md " role="document" >
                 <div class="modal-content">
                     <div class="modal-header" style="background-color: #009345;">
                         <h5 class="modal-title text-white" id="actionModalLabel"></h5>

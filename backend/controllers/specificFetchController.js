@@ -232,7 +232,7 @@ module.exports = (socket, Database) => {
 
                 // Action: Reactivate
                 else if (action === 'reactivate_transaction') {
-                    if (afrobuildPerms.reactivate !== 'yes') {
+                    if (afrobuildPerms.reactivate_transaction !== 'yes') {
                         return socket.emit(`${melody1}_${param}`, {
                             success: false,
                             message: 'You do not have permission to reactivate this transaction.'
@@ -254,6 +254,20 @@ module.exports = (socket, Database) => {
 
                     newStatus = 'flagged';
                     activityMessage = `Flagged transaction ${dataId}`;
+                }
+
+
+                // Action: Flag Transaction
+                else if (action === 'mark_pending') {
+                    if (afrobuildPerms.mark_completed_transaction !== 'yes') {
+                        return socket.emit(`${melody1}_${param}`, {
+                            success: false,
+                            message: 'You do not have permission to mark this transaction as pending.'
+                        });
+                    }
+
+                    newStatus = 'pending';
+                    activityMessage = `Pending transaction ${dataId}`;
                 }
 
                 // If a supported action was matched

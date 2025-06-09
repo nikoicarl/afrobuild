@@ -39,11 +39,13 @@ $(document).ready(function () {
                     });
 
                     if (res.success) {
+                        // Refresh the table
                         socket.emit('table', {
                             melody1: melody.melody1,
                             melody2: melody.melody2,
                             param: 'transaction_table'
                         });
+
                     }
                 } else {
                     Swal.fire('Error', 'Invalid response received from the server.', 'error');
@@ -56,6 +58,7 @@ $(document).ready(function () {
             });
         }, 300);
     });
+
 
 
     setTimeout(() => {
@@ -102,21 +105,28 @@ $(document).ready(function () {
         const transactionId = $(this).data('getid');
         const name = $(this).data('getdata');
 
-        if (action) {
-            let modal_title = $('.modal-header').find('.modal-title');
-            modal_title.text(`${action.replace('_', ' ').toUcwords()}`);
-            // add transactionId to the modal title if needed
+        if (action && action !== 'view_transaction') {
+            const modalTitleElement = $('.modal-header').find('.modal-title');
+
+            // Format action text with capitalized words
+            const formattedAction = action.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+            modalTitleElement.text(formattedAction);
+
             if (transactionId) {
-                modal_title.append(` - ${transactionId}`);
+                modalTitleElement.append(` - ${transactionId}`);
             }
+
             $('.afrobuild_transaction_hidden_action').val(action);
             $('.afrobuild_transaction_product').val(name);
             $('.afrobuild_transaction_hiddenid').val(transactionId);
+
+            // Open modal only if action is valid and not 'view_transaction'
+            $('.afrobuild_transaction_action_modal').trigger('click');
         } else {
             $('.afrobuild_transaction_hidden_action').val('');
             $('.afrobuild_transaction_hiddenid').val('');
         }
-        $('.afrobuild_transaction_action_modal').trigger('click');
+
 
     });
 

@@ -91,6 +91,7 @@ class ViewModel {
                 t1.merchant,
                 t1.amount,
                 t1.datetime,
+                t1.message,
                 t1.status AS transaction_status,
 
                 u.username,

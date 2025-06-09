@@ -41,7 +41,7 @@ const PrivilegeAfrobuild = {
         'view_vendor_report', 'view_product_report',
         'view_category_report',
         'view_transaction','cancel_transaction',
-        'mark_completed_transaction','flag_transaction','deactivate_transaction',
+        'mark_completed_transaction','flag_transaction','reactivate_transaction',
         'func_admin', 
         'afrobuild'
     ],
@@ -84,7 +84,7 @@ const PrivilegeAfrobuild = {
         mark_completed_transaction VARCHAR(5),
         cancel_transaction VARCHAR(5),
         flag_transaction VARCHAR(5),
-        deactivate_transaction VARCHAR(5),
+        reactivate_transaction VARCHAR(5),
         func_admin VARCHAR(5),
         afrobuild VARCHAR(5)
     `),
