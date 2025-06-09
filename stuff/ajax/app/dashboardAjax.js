@@ -125,9 +125,44 @@ $(document).ready(function () {
             viewModal.find('.afrobuild_transaction_view_id').val(transactionId);
             viewModal.find('.afrobuild_transaction_view_product').val(name);
 
-            viewModal.find('.afrobuild_view_product').text(name);
-            viewModal.find('.afrobuild_view_reason').text(viewData?.reason || 'N/A');
-            viewModal.find('.afrobuild_view_status').text(viewData?.transaction_status || 'Unknown');
+            // Text fields
+            viewModal.find('.afrobuild_view_product').text(name).toUcwords?.();
+            viewModal.find('.afrobuild_view_reason').text(viewData?.message.toUcwords?.() || 'N/A');
+
+            // Category
+            viewModal.find('.afrobuild_view_category').text(viewData?.category_name?.toUcwords?.() || 'N/A');
+
+            // Customer
+            viewModal.find('.afrobuild_view_customer').text(viewData?.full_name?.toUcwords?.() || 'N/A');
+
+            // Date
+            viewModal.find('.afrobuild_view_date').text(viewData?.datetime?.fullDate?.() || 'N/A');
+
+            // Merchant
+            viewModal.find('.afrobuild_view_merchant').text(viewData?.merchant_name?.toUcwords?.() || 'N/A');
+
+            // Amount
+            viewModal.find('.afrobuild_view_amount').text(
+                Number(viewData?.amount || 0).toLocaleString('en-GH', {
+                    style: 'currency',
+                    currency: 'GHS'
+                })
+            );
+
+            // Status badge
+            const status = (viewData?.transaction_status || 'unknown').toLowerCase();
+            const label = status.charAt(0).toUpperCase() + status.slice(1);
+            const badgeMap = {
+                active: 'success',
+                pending: 'warning',
+                failed: 'danger',
+                completed: 'success',
+                cancelled: 'danger',
+                flagged: 'secondary'
+            };
+            const badgeClass = badgeMap[status] || 'secondary';
+            const statusBadge = `<span class="badge text-bg-${badgeClass}">${label}</span>`;
+            viewModal.find('.afrobuild_view_status').html(statusBadge);
 
             viewModal.trigger('click');
         } else {

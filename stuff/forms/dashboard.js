@@ -133,7 +133,7 @@ function ViewModal() {
 
         <!-- View Modal -->
         <div class="modal fade afrobuild_transaction_view_modal" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
 
                     <!-- Modal Header -->
@@ -144,9 +144,35 @@ function ViewModal() {
                     <!-- Modal Body -->
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Product / Service:</label>
                                 <p class="form-control-plaintext afrobuild_view_product"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Category:</label>
+                                <p class="form-control-plaintext afrobuild_view_category"></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Customer Name:</label>
+                                <p class="form-control-plaintext afrobuild_view_customer"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Merchant:</label>
+                                <p class="form-control-plaintext afrobuild_view_merchant"></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Date:</label>
+                                <p class="form-control-plaintext afrobuild_view_date"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Amount:</label>
+                                <p class="form-control-plaintext afrobuild_view_amount"></p>
                             </div>
                         </div>
 
@@ -158,14 +184,14 @@ function ViewModal() {
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-12 mb-2">
                                 <label class="form-label fw-bold">Status:</label>
                                 <p class="form-control-plaintext afrobuild_view_status"></p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Optional Footer -->
+                    <!-- Modal Footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             Close
@@ -177,6 +203,7 @@ function ViewModal() {
         </div>
     `;
 }
+
 
 
 
