@@ -94,7 +94,7 @@
                     aria-expanded="false"
                     aria-controls="afrobuildnavbar">
                     <span>
-                        <img src="/assets/img/privilege.png" alt="">
+                        <img src="/assets/img/report.png" alt="">
                         &nbsp;&nbsp;Reports
                     </span>
                     <svg class="feather feather-chevron-right" width="24" height="24">
@@ -106,7 +106,7 @@
                     
                     <% if (privilege.afrobuild?.view_transaction_report === "yes") { %>
                         <li>
-                            <a href="/afrobuild_transaction_report" class="nav-link afrobuild_main_navigation_btn"
+                            <a href="/transaction_report" class="nav-link afrobuild_main_navigation_btn"
                                 data-appname="afrobuild" data-scripts="single::afrobuild/transactionReportAjax">
                                 Transaction Report
                             </a>
@@ -115,7 +115,7 @@
 
                     <% if (privilege.afrobuild?.view_product_report === "yes") { %>
                         <li>
-                            <a href="/afrobuild_product_report" class="nav-link afrobuild_main_navigation_btn"
+                            <a href="/product_report" class="nav-link afrobuild_main_navigation_btn"
                                 data-appname="afrobuild" data-scripts="single::afrobuild/productReportAjax">
                                 Product Report
                             </a>
@@ -124,7 +124,7 @@
 
                     <% if (privilege.afrobuild?.view_category_report === "yes") { %>
                         <li>
-                            <a href="/afrobuild_category_report" class="nav-link afrobuild_main_navigation_btn"
+                            <a href="/category_report" class="nav-link afrobuild_main_navigation_btn"
                                 data-appname="afrobuild" data-scripts="single::afrobuild/categoryReportAjax">
                                 Category Report
                             </a>
@@ -133,7 +133,7 @@
 
                     <% if (privilege.afrobuild?.view_merchant_report === "yes") { %>
                         <li>
-                            <a href="/afrobuild_merchant_report" class="nav-link afrobuild_main_navigation_btn"
+                            <a href="/merchant_report" class="nav-link afrobuild_main_navigation_btn"
                                 data-appname="afrobuild" data-scripts="single::afrobuild/merchantReportAjax">
                                 Merchant Report
                             </a>
@@ -142,7 +142,7 @@
 
                     <% if (privilege.afrobuild?.view_vendor_report === "yes") { %>
                         <li>
-                            <a href="/afrobuild_vendor_report" class="nav-link afrobuild_main_navigation_btn"
+                            <a href="/vendor_report" class="nav-link afrobuild_main_navigation_btn"
                                 data-appname="afrobuild" data-scripts="single::afrobuild/vendorReportAjax">
                                 Vendor Report
                             </a>
