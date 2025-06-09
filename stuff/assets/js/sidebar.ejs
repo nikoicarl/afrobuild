@@ -1,0 +1,51 @@
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.querySelector("#navbar_overall_parent");
+    const privilege = JSON.parse(localStorage.getItem("user_privilege")) || {};
+
+    const addItem = (cond, href, icon, label, script, parent = "afrobuildnavbar") => {
+        if (!cond) return '';
+        return `
+        <li class="menu nav-item">
+            <a href="${href}" data-appname="afrobuild" class="nav-link afrobuild_main_navigation_btn"
+                data-navparent="${parent}" data-scripts="single::${script}">
+                <img src="/assets/img/${icon}" alt="">
+                &nbsp;&nbsp;${label}
+            </a>
+        </li>`;
+    };
+
+    let html = '';
+    html += addItem(true, '/dashboard', 'Dashboard.svg', 'Dashboard', 'app/dashboardAjax', 'dashboard');
+    html += addItem(privilege.afrobuild?.add_user === "yes", '/user', 'Manage accounts.svg', 'Manage Users', 'app/userAjax');
+    html += addItem(privilege.afrobuild?.add_product === "yes", '/product', 'Folder managed.svg', 'Manage Products', 'app/productAjax');
+    html += addItem(privilege.afrobuild?.add_privilege === "yes", '/privilege', 'privilege.png', 'Manage Privileges', 'app/privilegeAjax');
+
+    // Reports Dropdown
+    if (privilege.afrobuild?.func_admin === "yes") {
+        html += `
+        <li class="menu">
+            <a class="nav-link d-flex justify-content-between align-items-center"
+                data-bs-toggle="collapse"
+                href="#afrobuildnavbar"
+                role="button"
+                aria-expanded="false"
+                aria-controls="afrobuildnavbar">
+                <span>
+                    <img src="/assets/img/privilege.png" alt="">
+                    &nbsp;&nbsp;Reports
+                </span>
+                <svg class="feather feather-chevron-right" width="24" height="24">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </a>
+            <ul class="collapse list-unstyled ps-3" id="afrobuildnavbar" data-bs-parent="#navbar_overall_parent">
+                ${addItem(privilege.afrobuild?.view_transaction === "yes", '/afrobuild_transactions', '', 'Transactions', 'afrobuild/transactionsAjax')}
+                ${addItem(privilege.afrobuild?.view_vendor_report === "yes", '/afrobuild_vendor_report', '', 'Vendor Report', 'afrobuild/vendorReportAjax')}
+            </ul>
+        </li>`;
+    }
+
+    sidebar.innerHTML = html;
+});
+</script>

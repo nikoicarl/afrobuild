@@ -103,15 +103,7 @@
                 </a>
 
                 <ul class="collapse list-unstyled ps-3" id="afrobuildnavbar" data-bs-parent="#navbar_overall_parent">
-                    <% if (privilege.afrobuild?.view_transaction === "yes") { %>
-                        <li>
-                            <a href="/afrobuild_transactions" class="nav-link afrobuild_main_navigation_btn"
-                                data-appname="afrobuild" data-scripts="single::afrobuild/transactionsAjax">
-                                Transactions
-                            </a>
-                        </li>
-                    <% } %>
-
+                    
                     <% if (privilege.afrobuild?.view_transaction_report === "yes") { %>
                         <li>
                             <a href="/afrobuild_transaction_report" class="nav-link afrobuild_main_navigation_btn"
