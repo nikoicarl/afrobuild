@@ -126,6 +126,59 @@ function ActionModal() {
     `;
 }
 
+function ViewModal() {
+    return `
+        <!-- Trigger Button (Hidden) -->
+        <button type="button" class="afrobuild_transaction_view_modal hide" data-toggle="modal" data-target="#viewModal"></button>
+
+        <!-- View Modal -->
+        <div class="modal fade afrobuild_transaction_view_modal" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header" style="background-color: #009345;">
+                        <h5 class="modal-title text-white" id="viewModalLabel">Transaction Details</h5>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Product / Service:</label>
+                                <p class="form-control-plaintext afrobuild_view_product"></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Reason:</label>
+                                <p class="form-control-plaintext afrobuild_view_reason"></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Status:</label>
+                                <p class="form-control-plaintext afrobuild_view_status"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Optional Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
 
 // Immediately Invoked Function Expression (IIFE) to render the dashboard
 (() => {
@@ -135,6 +188,9 @@ function ActionModal() {
 
 
     html = ejs.render(ActionModal(), {});
+    $('#afrobuild_main_content_display').append(html);
+
+    html = ejs.render(ViewModal(), {});
     $('#afrobuild_main_content_display').append(html);
 
     // Load any dashboard-specific scripts

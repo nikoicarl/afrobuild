@@ -101,95 +101,42 @@ $(document).ready(function () {
 
     // Action Modal
     $(document).on('click', '.afrobuild_transaction_table_edit_btn', function (e) {
+        e.preventDefault();
+
         const action = $(this).data('getname');
         const transactionId = $(this).data('getid');
         const name = $(this).data('getdata');
+        const rawData = $(this).data('viewdata') || '';
+        const viewData = rawData ? JSON.parse(decodeURIComponent(rawData)) : null;
 
         if (action && action !== 'view_transaction') {
-            const modalTitleElement = $('.modal-header').find('.modal-title');
-
-            // Format action text with capitalized words
+            const modalTitle = $('.modal-header .modal-title');
             const formattedAction = action.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-            modalTitleElement.text(formattedAction);
-
-            if (transactionId) {
-                modalTitleElement.append(` - ${transactionId}`);
-            }
+            modalTitle.text(`${formattedAction}${transactionId ? ` - ${transactionId}` : ''}`);
 
             $('.afrobuild_transaction_hidden_action').val(action);
             $('.afrobuild_transaction_product').val(name);
             $('.afrobuild_transaction_hiddenid').val(transactionId);
 
-            // Open modal only if action is valid and not 'view_transaction'
             $('.afrobuild_transaction_action_modal').trigger('click');
+        } else if (action === 'view_transaction') {
+            const viewModal = $('.afrobuild_transaction_view_modal');
+            viewModal.find('.modal-header .modal-title').text(`Transaction Details - ${transactionId}`);
+            viewModal.find('.afrobuild_transaction_view_id').val(transactionId);
+            viewModal.find('.afrobuild_transaction_view_product').val(name);
+
+            viewModal.find('.afrobuild_view_product').text(name);
+            viewModal.find('.afrobuild_view_reason').text(viewData?.reason || 'N/A');
+            viewModal.find('.afrobuild_view_status').text(viewData?.transaction_status || 'Unknown');
+
+            viewModal.trigger('click');
         } else {
             $('.afrobuild_transaction_hidden_action').val('');
             $('.afrobuild_transaction_hiddenid').val('');
         }
-
-
     });
 
-    function fetchActivityTable() {
-        socket.off('table');
-        socket.off(`${melody?.melody1}_activity_table`);
-
-        socket.emit('table', {
-            melody1: melody?.melody1,
-            melody2: melody?.melody2,
-            param: 'activity_table'
-        });
-
-        socket.on(`${melody?.melody1}_activity_table`, (data) => {
-            const activityContainer = $('.afrobuild_dashboard_session_activity');
-            activityContainer.empty();
-
-            if (data?.type === 'error') {
-                console.log(data.message);
-                return;
-            }
-
-            if (Array.isArray(data) && data.length) {
-                data.forEach(entry => {
-                    const act = entry.activity?.toLowerCase?.() || '';
-                    let color = 't-success', icon = 'icon-check2';
-
-                    if (act.includes('deactivated')) {
-                        color = 't-warning';
-                        icon = 'icon-blocked';
-                    } else if (act.includes('logged out')) {
-                        color = 't-danger';
-                        icon = 'icon-exit3';
-                    } else if (act.includes('logged in')) {
-                        color = 't-info';
-                        icon = 'icon-check2';
-                    } else if (act.includes('sent')) {
-                        color = 't-success';
-                        icon = 'icon-mail5';
-                    }
-
-                    activityContainer.append(`
-                        <div class="item-timeline timeline-new">
-                            <div class="t-dot">
-                                <div class="${color}">
-                                    <i class="${icon} text-white mt-2" style="font-size:19px;"></i>
-                                </div>
-                            </div>
-                            <div class="t-content">
-                                <div class="t-uppercontent">
-                                    <h5 class="mt-2">${entry.activity?.toUcwords?.()}</h5>
-                                    <span>${entry.datetime?.fullDateTime?.() || ''}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                });
-            } else {
-                activityContainer.html(`<h5 class="text-muted">No Session Activities</h5>`);
-            }
-        });
-    }
-
+    // Render DataTable
     function renderTransactionDataTable(data) {
         reCreateMdataTable('afrobuild_transaction_data_table', 'afrobuild_transaction_data_table_div');
 
@@ -248,17 +195,15 @@ $(document).ready(function () {
                     template: row => {
                         const status = (row.transaction_status || '').toLowerCase();
                         const label = status.charAt(0).toUpperCase() + status.slice(1);
-
                         const badgeMap = {
                             active: 'success',
                             pending: 'warning',
                             failed: 'danger',
                             completed: 'success',
-                            cancelled: 'danger'
+                            cancelled: 'danger',
+                            flagged: 'secondary'
                         };
-
                         const badgeClass = badgeMap[status] || 'secondary';
-
                         return `<span class="badge text-bg-${badgeClass}">${label}</span>`;
                     }
                 },
@@ -266,98 +211,149 @@ $(document).ready(function () {
                     field: 'action',
                     title: 'Action',
                     template: row => {
+                        const dataEncoded = encodeURIComponent(JSON.stringify(row));
                         const status = row.transaction_status?.toLowerCase?.();
                         const transactionId = row.transactionid;
                         const itemName = row.item_name?.toUcwords?.() || '';
-
                         const actions = [];
 
-                        // Action: Mark as Completed
                         if (status === 'pending' || status === 'active') {
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="mark_completed"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-checkmark"></i> Mark as Completed
-                                </a>`);
-                        }
-
-                        // Action: Cancel Transaction
-                        if (status === 'pending' || status === 'active') {
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="mark_completed"
+                               data-getdata="${itemName}">
+                                <i class="icon-checkmark"></i> Mark as Completed
+                            </a>`);
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="mark_cancelled"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-cross2"></i> Cancel Transaction
-                                </a>`);
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="mark_cancelled"
+                               data-getdata="${itemName}">
+                                <i class="icon-cross2"></i> Cancel Transaction
+                            </a>`);
                         }
 
-                        // Action: Reactivate (if cancelled)
                         if (status === 'cancelled') {
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="reactivate_transaction"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-redo2"></i> Reactivate
-                                </a>`);
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="reactivate_transaction"
+                               data-getdata="${itemName}">
+                                <i class="icon-redo2"></i> Reactivate
+                            </a>`);
                         }
 
-                        // Action: Flag Transaction (if cancelled, pending, or active)
-                        if (status === 'cancelled' || status === 'pending' || status === 'active') {
+                        if (['cancelled', 'pending', 'active'].includes(status)) {
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="flag_transaction"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-flag7"></i> Flag Transaction
-                                </a>`);
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="flag_transaction"
+                               data-getdata="${itemName}">
+                                <i class="icon-flag7"></i> Flag Transaction
+                            </a>`);
                         }
 
-                        // Action: Mark as Pending (if active)
                         if (status === 'active') {
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="mark_pending"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-hour-glass"></i> Mark as Pending
-                                </a>`);
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="mark_pending"
+                               data-getdata="${itemName}">
+                                <i class="icon-hour-glass"></i> Mark as Pending
+                            </a>`);
                         }
 
-                        // Action: View (if flagged or completed)
                         if (status === 'flagged' || status === 'completed') {
                             actions.push(`
-                                <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                                    href="#"
-                                    data-getid="${transactionId}"
-                                    data-getname="view_transaction"
-                                    data-getdata="${itemName}">
-                                        <i class="icon-file-eye"></i> View
-                                </a>`);
+                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                               href="#"
+                               data-getid="${transactionId}"
+                               data-getname="view_transaction"
+                               data-getdata="${itemName}"
+                               data-viewdata="${dataEncoded}">
+                                <i class="icon-file-eye"></i> View
+                            </a>`);
                         }
 
                         return `
-                            <div class="dropdown">
-                                <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
-                                    <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    ${actions.join('')}
-                                </div>
-                            </div>`;
+                        <div class="dropdown">
+                            <a href="#" class="m-btn--icon-only" data-toggle="dropdown">
+                                <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                ${actions.join('')}
+                            </div>
+                        </div>`;
                     }
                 }
-
-
             ]
+        });
+    }
+
+
+    function fetchActivityTable() {
+        socket.off('table');
+        socket.off(`${melody?.melody1}_activity_table`);
+
+        socket.emit('table', {
+            melody1: melody?.melody1,
+            melody2: melody?.melody2,
+            param: 'activity_table'
+        });
+
+        socket.on(`${melody?.melody1}_activity_table`, (data) => {
+            const activityContainer = $('.afrobuild_dashboard_session_activity');
+            activityContainer.empty();
+
+            if (data?.type === 'error') {
+                console.log(data.message);
+                return;
+            }
+
+            if (Array.isArray(data) && data.length) {
+                data.forEach(entry => {
+                    const act = entry.activity?.toLowerCase?.() || '';
+                    let color = 't-success', icon = 'icon-check2';
+
+                    if (act.includes('deactivated')) {
+                        color = 't-warning';
+                        icon = 'icon-blocked';
+                    } else if (act.includes('logged out')) {
+                        color = 't-danger';
+                        icon = 'icon-exit3';
+                    } else if (act.includes('logged in')) {
+                        color = 't-info';
+                        icon = 'icon-check2';
+                    } else if (act.includes('sent')) {
+                        color = 't-success';
+                        icon = 'icon-mail5';
+                    }
+
+                    activityContainer.append(`
+                        <div class="item-timeline timeline-new">
+                            <div class="t-dot">
+                                <div class="${color}">
+                                    <i class="${icon} text-white mt-2" style="font-size:19px;"></i>
+                                </div>
+                            </div>
+                            <div class="t-content">
+                                <div class="t-uppercontent">
+                                    <h5 class="mt-2">${entry.activity?.toUcwords?.()}</h5>
+                                    <span>${entry.datetime?.fullDateTime?.() || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            } else {
+                activityContainer.html(`<h5 class="text-muted">No Session Activities</h5>`);
+            }
         });
     }
 });
