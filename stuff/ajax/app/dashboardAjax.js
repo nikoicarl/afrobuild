@@ -46,7 +46,16 @@ $(document).ready(function () {
                             param: 'transaction_table'
                         });
 
+                        // Reset the form fields
+                        $('.afrobuild_transaction_product').val('');
+                        $('.afrobuild_transaction_action_msg').val('');
+                        $('.afrobuild_transaction_hiddenid').val('');
+                        $('.afrobuild_transaction_hidden_action').val('');
+
+                        // Optionally close the modal (if desired)
+                        $('#afrobuild_transaction_action_modal').modal('hide');
                     }
+
                 } else {
                     Swal.fire('Error', 'Invalid response received from the server.', 'error');
                 }
