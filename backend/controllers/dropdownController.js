@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const Category = require('../models/CategoryModel');
+const Transaction = require('../models/TransactionModel');
 
 module.exports = (socket, Database) => {
     socket.on('dropdown', async (browserblob) => {
@@ -31,6 +32,9 @@ module.exports = (socket, Database) => {
                     break;
                 case 'category':
                     await fetchData(Category, 'status = ? ORDER BY name ASC', ['active']);
+                    break;
+                case 'transaction':
+                    await fetchData(Transaction, 'status = ? ORDER BY datetime ASC', ['active']);
                     break;
                 default:
                     emitError(`Invalid parameter: ${param}`);
