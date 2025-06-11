@@ -10,7 +10,7 @@ let Toast = Swal.mixin({
     position: 'top-end',
     showConfirmButton: false,
     timer: 3000,
-    heightAuto:true
+    heightAuto: true
 });
 
 if (melody && melody.melody2.length > 6) { } else {
@@ -18,19 +18,20 @@ if (melody && melody.melody2.length > 6) { } else {
 }
 
 
+
 //Capitalize each word in a given string
-String.prototype.toUcwords = function() {
+String.prototype.toUcwords = function () {
     let value = this.toString();
     if (value === "" || value === null || value === undefined) {
         return '';
     } else {
-        return value.replace(/\w+/g, function(a){
+        return value.replace(/\w+/g, function (a) {
             return a.charAt(0).toUpperCase() + a.slice(1).toLowerCase();
         });
     }
 }
 
-String.prototype.shuffle = function() {
+String.prototype.shuffle = function () {
     let a = this.split(""), n = a.length;
     for (let i = n - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -41,13 +42,13 @@ String.prototype.shuffle = function() {
     return a.join("");
 }
 
-Array.prototype.sumArray = function() {
-    return this.reduce(function(a,b){
+Array.prototype.sumArray = function () {
+    return this.reduce(function (a, b) {
         return a + b;
     }, 0);
 }
 
-String.prototype.fullDate = function() {
+String.prototype.fullDate = function () {
     let inputDate = this;
     if (inputDate == "" || inputDate == null || inputDate == undefined) {
         return '';
@@ -58,7 +59,7 @@ String.prototype.fullDate = function() {
 }
 
 
-String.prototype.fullDateTime = function() {
+String.prototype.fullDateTime = function () {
     let inputDate = this;
     if (inputDate === "" || inputDate === null || inputDate === undefined) {
         return '';
@@ -67,7 +68,7 @@ String.prototype.fullDateTime = function() {
         let hh = date.getHours();
         let min = date.getMinutes();
         let sec = date.getSeconds();
-        return date.toDateString()+' '+hh+':'+(min < 10 ? '0'+min : min)+':'+(sec < 10 ? '0'+sec : sec);
+        return date.toDateString() + ' ' + hh + ':' + (min < 10 ? '0' + min : min) + ':' + (sec < 10 ? '0' + sec : sec);
     }
 }
 
@@ -75,7 +76,7 @@ String.prototype.getValue = () => {
     return 0.062;
 }
 
-String.prototype.fullTime = function() {
+String.prototype.fullTime = function () {
     let inputDate = this;
     if (inputDate === "" || inputDate === null || inputDate === undefined) {
         return '';
@@ -86,33 +87,33 @@ String.prototype.fullTime = function() {
 }
 
 
-String.prototype.dbDateFormat = function() {
+String.prototype.dbDateFormat = function () {
     let inputDate = this;
     if (inputDate === "" || inputDate === null || inputDate === undefined) {
         return '';
     } else {
         let date = new Date(inputDate);
         let dd = date.getDate();
-        let mm = date.getMonth()+1; 
+        let mm = date.getMonth() + 1;
         let yyyy = date.getFullYear();
         let hh = date.getHours();
         let min = date.getMinutes();
         let sec = date.getSeconds();
-        return yyyy+'-'+mm+'-'+dd+' '+hh+':'+min+':'+sec;
+        return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + sec;
     }
 }
 
-Date.prototype.getCurrentWeekRange = function() {
-    let curr = new Date 
+Date.prototype.getCurrentWeekRange = function () {
+    let curr = new Date
     let week = []
-    
+
     for (let i = 1; i <= 7; i++) {
-        let first = curr.getDate() - curr.getDay() + i 
+        let first = curr.getDate() - curr.getDay() + i
         let day = new Date(curr.setDate(first)).toISOString().slice(0, 10)
         week.push(day)
     }
     return [week[0], week[6]];
-} 
+}
 
 
 //Currency function
@@ -161,7 +162,7 @@ function currencyToCoins(currency) {
     }
 }
 
-function printContent(printDivIdName, footerMessage){
+function printContent(printDivIdName, footerMessage) {
     let docHead = document.head.innerHTML;
     let printArea = document.getElementById(printDivIdName).innerHTML;
     let newWindow = window.open('', '', 'height=768, width=1024');
@@ -205,9 +206,9 @@ function formatNumber(num) {
 }
 
 function numberToWords(num) {
-    let a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
-    let b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
-    
+    let a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+    let b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
     if ((num = num.toString()).length > 9) return 'overflow';
     n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
     if (!n) return; let str = '';
@@ -220,15 +221,15 @@ function numberToWords(num) {
 }
 
 
-function findPosition(obj) { 
-    let currenttop = 0; 
-    if (obj.offsetParent) { 
-        do { 
-            currenttop += (obj.offsetTop - 100); 
+function findPosition(obj) {
+    let currenttop = 0;
+    if (obj.offsetParent) {
+        do {
+            currenttop += (obj.offsetTop - 100);
         } while ((obj = obj.offsetParent));
-        return [currenttop]; 
-    } 
-} 
+        return [currenttop];
+    }
+}
 
 
 
@@ -261,7 +262,7 @@ function customDropzone(dropzoneIdName, dropzoneInputIdName, dropzonePreviewIdNa
                 } else {
                     $('.dropzone_preview_sub_div').append('<div class="col-md-3 mb-2"> <div class="icon-file-zip icon-5x text-danger-400 d-block w-100 h-70"></div> <span class="text-dark d-block mb-1" style="cursor:text; font-size:12px;"> ' + mainFiles[i].name + ' </span> </div');
                 }
-                
+
                 // <span class="text-danger d-block drozone_remove_image mt-1" data-remove="'+mainFiles[i].name+'" style="cursor:move;" id="drozone_remove_image"> Remove </span> 
             }
             //Put the files in the global variable to be accessed everywhere 
@@ -285,7 +286,7 @@ function customDropzone(dropzoneIdName, dropzoneInputIdName, dropzonePreviewIdNa
     };
 
 
-    let readAsBlobForSocket = function(files) {
+    let readAsBlobForSocket = function (files) {
         let mainFiles = files;
         for (i = 0; i < mainFiles.length; i++) {
             readBlobAndDisplay(mainFiles[i], mainFiles[i].name, mainFiles[i].type, mainFiles[i].size);
@@ -298,10 +299,10 @@ function customDropzone(dropzoneIdName, dropzoneInputIdName, dropzonePreviewIdNa
         reader.readAsArrayBuffer(slice);
         reader.onload = function () {
             globalFilesSocket.push({
-                name: name, 
-                type: type, 
-                size: size, 
-                data: reader.result 
+                name: name,
+                type: type,
+                size: size,
+                data: reader.result
             });
         };
     };
@@ -367,7 +368,7 @@ function streamFilesToServer(file, emitEvent, uploadUnique) {
     while (chunk <= chunks) {
         let offset = chunk * chunkSize;
         const reader = new FileReader();
-        reader.onloadend = function(e) {
+        reader.onloadend = function (e) {
             if (e.target.readyState == FileReader.DONE) {
                 socket.emit(emitEvent, {
                     uploadUnique: uploadUnique,
@@ -391,27 +392,27 @@ function convertImageForUpload(file) {
     let reader = new FileReader();
     let slice = file.slice(0, file.size);
     reader.readAsArrayBuffer(slice);
-    reader.onload = function() {
+    reader.onload = function () {
         globalImageHolder.push({
-            name: file.name, 
-            type: file.type, 
-            size: file.size, 
-            data: reader.result 
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            data: reader.result
         });
     }
 }
 
 //Image uploads without buffer
 async function readFileToUpload(file) {
-    let result = new Promise((resolve, reject)=>{
+    let result = new Promise((resolve, reject) => {
         let reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = function() {
+        reader.onload = function () {
             resolve({
-                name: file.name, 
-                type: file.type, 
-                size: file.size, 
-                data: reader.result 
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                data: reader.result
             });
         }
     });
@@ -441,7 +442,7 @@ function mainPagination(pageFileName, pageScripts, navparent) {
 
     //Render ejs page 
     openPage(pageFileName);
-    previous_scripts.push(pageFileName+'*forms/');
+    previous_scripts.push(pageFileName + '*forms/');
 
     //Iterate active links
     // $('ul.nav-menu li.menu a.dropdown-toggle').removeAttr('data-active');
@@ -459,13 +460,13 @@ function mainPagination(pageFileName, pageScripts, navparent) {
         pageScripts = pageScripts.split("::")[1].split(",");
         for (let i = 0; i < pageScripts.length; i++) {
             // addPageScript(pageScripts[i]);
-            previous_scripts.push(pageScripts[i]+'*ajax');
+            previous_scripts.push(pageScripts[i] + '*ajax');
         }
     } else {
-        if (pageScripts.split("::")[1] == "" || pageScripts.split("::")[1] == undefined) {} else {
+        if (pageScripts.split("::")[1] == "" || pageScripts.split("::")[1] == undefined) { } else {
             pageScripts = pageScripts.split("::")[1];
             // addPageScript(pageScripts);
-            previous_scripts.push(pageScripts+'*ajax');
+            previous_scripts.push(pageScripts + '*ajax');
         }
     }
 
@@ -486,16 +487,16 @@ function mainPagination(pageFileName, pageScripts, navparent) {
 }
 
 //A method to open page
-function openPage(pageFileName){
+function openPage(pageFileName) {
     // $('#afrobuild_main_content_display').remove();
 
     let pageScript = document.createElement("script");
 
     //Add script src to script tag
-    pageScript.setAttribute("src", "forms/"+pageFileName+".js");
-    pageScript.setAttribute("id", pageFileName+"_script");
+    pageScript.setAttribute("src", "forms/" + pageFileName + ".js");
+    pageScript.setAttribute("id", pageFileName + "_script");
 
-    
+
     //Add created script to last part of body
     $('#content div.row').append(`
         <div class="col-md-12" id="afrobuild_main_content_display"></div>
@@ -504,12 +505,12 @@ function openPage(pageFileName){
 }
 
 //A method to add page script(s) to document body
-function addPageScript(pageScriptFileName){
+function addPageScript(pageScriptFileName) {
     let pageScript = document.createElement("script");
-        
+
     //Add script src to script tag
-    pageScript.setAttribute("src", "ajax/"+pageScriptFileName+".js");
-    pageScript.setAttribute("id", pageScriptFileName+"_script");
+    pageScript.setAttribute("src", "ajax/" + pageScriptFileName + ".js");
+    pageScript.setAttribute("id", pageScriptFileName + "_script");
 
     //Add created script to last part of body
     document.body.appendChild(pageScript);
@@ -517,21 +518,21 @@ function addPageScript(pageScriptFileName){
 
 //A method to remove script(s) to document body
 function removePageScript(scriptName) {
-    const scriptList = document.querySelectorAll("script[src='"+scriptName+".js']");
+    const scriptList = document.querySelectorAll("script[src='" + scriptName + ".js']");
     const convertedNodeList = Array.from(scriptList);
-    const testScript = convertedNodeList.find(script => script.id === scriptName+"_script");
+    const testScript = convertedNodeList.find(script => script.id === scriptName + "_script");
     if (testScript !== undefined) {
         testScript.parentNode.removeChild(testScript);
     }
 }
 
 //A method to add external script(s) to document body
-function addExternalScript(pageScriptFileName){
+function addExternalScript(pageScriptFileName) {
     let pageScript = document.createElement("script");
-        
+
     //Add script src to script tag
     pageScript.setAttribute("src", pageScriptFileName);
-    pageScript.setAttribute("id", pageScriptFileName+"_script");
+    pageScript.setAttribute("id", pageScriptFileName + "_script");
 
     //Add created script to last part of body
     document.body.appendChild(pageScript);
@@ -555,22 +556,22 @@ function clearNavigationLoader() {
 }
 
 //Check for empty
-function ifEmpty (columns) {
+function ifEmpty(columns) {
     let checker = [];
     if (columns.length > 0) {
         columns.forEach(item => {
-            if (item === '' || item === ' ' || item === undefined || item === null  || item.length <= 0) {
+            if (item === '' || item === ' ' || item === undefined || item === null || item.length <= 0) {
                 checker.push('empty');
             }
         });
-    } 
+    }
 
     return checker;
 }
 
 function makeAllSelectLiveSearch(className, placeholder) {
     if (className) {
-        $('.'+className).select2({
+        $('.' + className).select2({
             placeholder: placeholder,
             allowClear: true
         });
@@ -578,7 +579,7 @@ function makeAllSelectLiveSearch(className, placeholder) {
 }
 
 function makeAllSelectLiveSearchModal(className, placeholder) {
-    $('.modal select.'+className).select2({
+    $('.modal select.' + className).select2({
         dropdownParent: $('.modal'),
         placeholder: placeholder,
         allowClear: true
@@ -593,12 +594,50 @@ function setBreadcrumb(pageName, iconHTML) {
 }
 
 
+function exportHTMLTableToCSV(tableId, filename = 'export.csv') {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const rows = table.querySelectorAll('tr');
+    const csv = [];
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('th, td');
+        const rowData = Array.from(cols).map(col =>
+            `"${col.textContent.trim().replace(/"/g, '""')}"`
+        );
+        csv.push(rowData.join(','));
+    });
+
+    const csvBlob = new Blob([csv.join('\n')], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(csvBlob);
+    downloadLink.download = filename;
+    downloadLink.click();
+}
+
+function exportHTMLTableToExcel(tableId, filename = 'export.xlsx') {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    // Convert the HTML table to a worksheet
+    const worksheet = XLSX.utils.table_to_sheet(table);
+
+    // Create a new workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // Write the workbook to a file
+    XLSX.writeFile(workbook, filename);
+}
+
+
 
 //Recreate table tag for mDataTable
 function reCreateMdataTable(tableClassName, parentClassName) {
-    $('.'+tableClassName).remove();
+    $('.' + tableClassName).remove();
     $('.m-datatable').remove();
-    $('.'+parentClassName).append('<table class="'+tableClassName+'" style="text-align:left"></table>');
+    $('.' + parentClassName).append('<table class="' + tableClassName + '" style="text-align:left"></table>');
 }
 
 
@@ -626,29 +665,29 @@ function displayFileIcon(fileName) {
 }
 
 // Load the Google Maps Places API script dynamically
-    function loadMaps() {
+function loadMaps() {
 
-        function loadGoogleMapsAPI() {
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB8sEX-yL1gcEnnCLM5jS4NQGS5c4n3nYI&libraries=places';
-            script.async = true;
-            script.defer = true;
-            script.onload = initAutocomplete;
-            document.head.appendChild(script);
-        }
-    
-        // Initialize the autocomplete function
-        function initAutocomplete() {
-            const input = document.getElementById('autocomplete');
-            if (input) {
-                const autocomplete = new google.maps.places.Autocomplete(input);
-                autocomplete.setFields(['address_component']);
-            }
-        }
-    
-        // Attach the loadGoogleMapsAPI function to the window load event
-        window.addEventListener('load', loadGoogleMapsAPI);
+    function loadGoogleMapsAPI() {
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB8sEX-yL1gcEnnCLM5jS4NQGS5c4n3nYI&libraries=places';
+        script.async = true;
+        script.defer = true;
+        script.onload = initAutocomplete;
+        document.head.appendChild(script);
     }
+
+    // Initialize the autocomplete function
+    function initAutocomplete() {
+        const input = document.getElementById('autocomplete');
+        if (input) {
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.setFields(['address_component']);
+        }
+    }
+
+    // Attach the loadGoogleMapsAPI function to the window load event
+    window.addEventListener('load', loadGoogleMapsAPI);
+}
 
 
 socket.on('_no_remaining_sms_alert', (data) => {

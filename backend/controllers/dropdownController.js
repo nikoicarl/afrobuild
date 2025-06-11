@@ -34,7 +34,7 @@ module.exports = (socket, Database) => {
                     await fetchData(Category, 'status = ? ORDER BY name ASC', ['active']);
                     break;
                 case 'transaction':
-                    await fetchData(Transaction, 'status = ? ORDER BY datetime ASC', ['active']);
+                    await fetchData(Transaction, 'status != ? ORDER BY datetime ASC', ['inactive']);
                     break;
                 default:
                     emitError(`Invalid parameter: ${param}`);

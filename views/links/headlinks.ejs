@@ -6,11 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= setupData.name %> ||  Portal </title>
 
-    <% if (setupData && setupData.logo == "" || setupData.logo == undefined) { %>
-        <link rel="icon" type="image/x-icon" href="assets/img/afrobuild.png" />
-    <% } else { %>
-        <link rel="icon" type="image/x-icon" href="uploads/<%= setupData.logo %>" />
-    <% } %>
+    <link rel="icon" href="assets/img/logo.svg" type="image/x-icon" sizes="64x64"/>
 
     <style>
         .hide {
