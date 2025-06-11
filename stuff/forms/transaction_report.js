@@ -54,88 +54,103 @@ function renderTransactionForm() {
 }
 
 function TransactionReportPage(data) {
-    let logo;
-    logo = `<img src="assets/img/default.png" style="max-width: 100%; height: auto;"/>`;
-    console.log(data);
+    const logo = `<img src="assets/img/logo-cropped.svg" class="img-fluid" alt="Logo" style="max-width: 220px; display: block; margin: 0; padding: 0;">`;
 
+    let htmlTable = '';
 
-    let htmlTable = ``;
-
-    // if (data.data.length > 0) {
-    //     for (let i = 0; i < data.data.length; i++) {
-    //         const item = data.data[i];
-            
-    //         htmlTable += `
-    //             <tr>
-    //                 <td>${item.name}</td>
-    //                 <td>${item.phone}</td>
-    //                 <td>${item.email}</td>
-    //                 <td>${item.address}</td>
-    //             </tr>
-    //         `;
-    //     }
-    // } else {
-    //     htmlTable += `<tr> <td colspan="8"> No data found. </td></tr>`;
-    // }
+    if (data.data.length > 0) {
+        data.data.forEach(item => {
+            htmlTable += `
+                <tr>
+                    <td>${item.transactionid}</td>
+                    <td>${item.item_name}</td>
+                    <td>${Number(item.item_price).toLocaleString('en-GH', {
+                        style: 'currency',
+                            currency: 'GHS'
+                        })}
+                    </td>
+                    <td>${item.merchant_name}</td>
+                    <td>${item.category_name}</td>
+                    <td>${item.full_name}</td>
+                    <td>${item.datetime.fullDate()}</td>
+                </tr>
+            `;
+        });
+    } else {
+        htmlTable = `<tr><td colspan="6" class="text-center text-muted py-4">No transactions found.</td></tr>`;
+    }
 
     return `
-        <div class="card">
-            <div class="card-body" id="ovasyte_report_print_div">
-                <div class="row ">
-                    <div class="col-sm-12 col-md-6"><h4 style="font-size: 32px; font-weight: 700; color: #0e1726;">SUPPLIER REPORT</h4></div>
-                    <div class="col-sm-12 col-md-6 align-self-right text-right text-sm-right">
-                        <div class="company-info float-right">
-                            <div class="" style="width: 200px;">
-                                ${logo}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
+        <div class="stat-card shadow-sm border rounded-lg p-4 mb-5 bg-white">
+            <div id="afrobuild_report_print_div">
+
+                <!-- Header -->
+                <div class="row mb-4">
                     <div class="col-md-6">
-                        <p class="d-block ovasyte-primary" style="font-size: 14px;font-weight: 600;">REPORT DETAILS</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>From:</b> ${data.dateRange[0].fullDate()}</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>To:</b> ${data.dateRange[1].fullDate()}</p>
+                        <h4 class="text-dark font-weight-bold mb-1">Transaction Report</h4>
+                        <p class="text-muted" style="font-size: 14px;">Detailed transaction summary</p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mt-3 text-right">
-                            <p class="d-block ovasyte-primary" style="font-size: 14px;font-weight: 600;"> ${data.setupData.name.toUpperCase()} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.address} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.email_one} ${data.setupData.email_two == null || data.setupData.email_two == '' ? '' : ' | ' + data.setupData.email_two} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.phone_one} ${data.setupData.phone_two == null || data.setupData.phone_two == '' ? '' : ' | ' + data.setupData.phone_two} </p>
+                    <div class="col-md-6 text-md-end">
+                    <div class="d-inline-block text-end">
+                        <div class="mb-3 mt-2 ml-3">
+                            ${logo}
+                        </div>
+                        <div class="text-muted" style="font-size: 13px; line-height: 1.6;">
+                            ${data.setupData.address}<br>
+                            ${data.setupData.email}<br>
+                            ${data.setupData.phone}
                         </div>
                     </div>
                 </div>
-                <div class="row  mt-4">
-                    <div class="col-md-12 table-responsive">
-                        <table class="table table-striped" width="100%">
-                            <thead>
-                                <tr class="ovasyte-bg-primary">
-                                    <th style="font-size:12px;" class="text-white">Supplier</th>
-                                    <th style="font-size:12px;" class="text-white">Phone</th>
-                                    <th style="font-size:12px;" class="text-white">Email</th>
-                                    <th style="font-size:12px;" class="text-white">Address</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${htmlTable}
-                            </tbody>
-                        </table>
-                    </div>
+
                 </div>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button type="button" class="btn ovasyte-bg-primary-opacity ovasyte-primary mr-2 ovasyte_report_close_btn"><i class="icon-close2"></i> Close </button>
-                            <button type="button" class="btn ovasyte-bg-primary mr-2" onclick="printContent('ovasyte_report_print_div', '');"><i class="icon-printer"></i> Print</button>
+
+                <!-- Report Period -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="bg-light border rounded p-3">
+                            <p class="mb-1 text-success font-weight-bold" style="font-size: 14px;">Report Period</p>
+                            <p class="text-muted mb-0" style="font-size: 13px;">
+                                <strong>From:</strong> ${data.dateRange[0].fullDate()} &nbsp;&nbsp;
+                                <strong>To:</strong> ${data.dateRange[1].fullDate()}
+                            </p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover" style="font-size: 13px;">
+                        <thead style="background-color: #28a745;" class="text-white">
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Item</th>
+                                <th>Amount</th>
+                                <th>Merchant</th>
+                                <th>Category</th>
+                                <th>Customer</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${htmlTable}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="button" class="btn btn-outline-secondary afrobuild_report_close_btn">
+                        <i class="icon-close2"></i> Close
+                    </button>
+                    <button type="button" class="btn btn-success  mr-2" onclick="printContent('afrobuild_report_print_div', '');">
+                        <i class="icon-printer"></i> Print
+                    </button>
                 </div>
             </div>
         </div>
     `;
 }
-
 
 // Immediately Invoked Function Expression (IIFE) to render the full transaction page
 (() => {

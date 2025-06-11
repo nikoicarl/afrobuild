@@ -14,7 +14,7 @@ class ViewModel {
         this._ServiceModel = new Service(Database);
         this._SessionModel = new Session(Database);
         this._TransactionModel = new Transaction(Database);
-        this._Database = Database;
+        this.Database = Database;
     }
 
     /**
@@ -29,7 +29,7 @@ class ViewModel {
             let result = await this.viewChecker(object.table);
             if (result) {
                 let sql = 'SELECT * FROM ' + object.table + ' WHERE ' + object.sql;
-                let result = await this._Database.setupConnection({ sql: sql, columns: object.columns }, 'object');
+                let result = await this.Database.setupConnection({ sql: sql, columns: object.columns }, 'object');
                 (!Array.isArray(result)) ? console.log(result) : '';
                 return Array.isArray(result) ? result : [];
             } else {
@@ -55,7 +55,7 @@ class ViewModel {
             if (!isValidView) return [];
 
             const sql = `SELECT ${object.select} FROM ${object.table} WHERE ${object.sql}`;
-            const rows = await this._Database.setupConnection({ sql, columns: object.columns }, 'object');
+            const rows = await this.Database.setupConnection({ sql, columns: object.columns }, 'object');
 
             if (!Array.isArray(rows)) console.log(rows);
             return Array.isArray(rows) ? rows : [];
@@ -80,7 +80,7 @@ class ViewModel {
      * Dynamically (re)creates the transaction_view if needed.
      */
     async createTransactionView() {
-        const CreateUpdateTable = new CreateUpdateModel(this._Database, {
+        const CreateUpdateTable = new CreateUpdateModel(this.Database, {
             tableName: 'transaction_view',
             createTableStatement: (`
             SELECT 

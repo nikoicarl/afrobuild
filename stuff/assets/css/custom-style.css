@@ -15,6 +15,10 @@ body {
     --btn-text: #ffffff;
 }
 
+.afrobuild_primary {
+    color: #009345;
+}
+
 .afrobuild_btn {
     --btn-bg: #009345;
     --btn-bg-hover: #315721;

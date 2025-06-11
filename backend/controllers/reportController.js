@@ -15,6 +15,7 @@ module.exports = (socket, Database) => {
 
         try {
             const PrivilegeModel = new Privilege(Database, userid);
+            const ViewModel = new View(Database);
             const { privilegeData } = await PrivilegeModel.getPrivileges();
 
             if (param === "transaction_report") {
@@ -45,9 +46,8 @@ module.exports = (socket, Database) => {
                     columns = [transaction.trim(), start_date, end_date];
                 }
 
-                const ViewModel = new View();
                 const result = await ViewModel.getGeneral({
-                    table: 'transaction_view'.trim(),
+                    table: 'transaction_view',
                     sql,
                     columns
                 });
