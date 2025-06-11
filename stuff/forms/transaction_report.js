@@ -54,7 +54,7 @@ function renderTransactionForm() {
 }
 
 function TransactionReportPage(data) {
-    const logo = `<img src="assets/img/logo-cropped.svg" class="img-fluid" alt="Logo" style="max-width: 220px; display: block; margin: 0; padding: 0;">`;
+    const logo = `<img src="assets/img/logo.svg" class="img-fluid" alt="Logo" style="max-width: 220px; display: block; margin: 0; padding: 0;">`;
 
     let htmlTable = '';
 

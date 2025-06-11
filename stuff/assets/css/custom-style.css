@@ -605,13 +605,13 @@ span.breadcrumb-label {
 .sidebar-logo {
     width: 100%;
     /* Make logo responsive */
-    max-width: 220px;
+    max-width: 120px;
     /* Optional: Adjust to your logo size */
     height: auto;
     /* Maintain aspect ratio */
     display: block;
     /* Removes the bottom space typically found with images */
-    margin: 0 auto;
+    margin: 3em auto 1em;
     /* Center align */
 }
 
