@@ -1,6 +1,7 @@
 $(document).ready(function () {
     // Initialize date range picker
     startDateRangePicker('.afrobuild_transaction_report_date_range', '.afrobuild_transaction_report_date');
+    const setupData = JSON.parse($('.hidden_setup_data').val());
 
     // Load transaction dropdown
     loadTransactionDropdown();
@@ -12,68 +13,61 @@ $(document).ready(function () {
         const $form = $(this);
         const transactionValue = $('.afrobuild_transaction_report_dropdown', $form).val() || '';
         const dateRange = $('.afrobuild_transaction_report_date', $form).val();
-
         const transaction = transactionValue.trim() ? transactionValue.split("**")[0] : '';
 
         // Set loading state on submit button
         const $submitBtn = $('.afrobuild_transaction_report_form_btn');
         $submitBtn.html('<div class="mr-2 spinner-border align-self-center loader-sm"></div>').attr('disabled', true);
 
-        // Clean up any previous socket listeners
-        socket.off('runPosReport');
+        // Remove any existing listeners
+        socket.off('runReport');
         socket.off(`${melody.melody1}_transaction_report`);
 
-        // Emit the report request
+        // Emit report request
         setTimeout(() => {
-            socket.emit('runPosReport', {
+            socket.emit('runReport', {
                 melody1: melody.melody1,
                 melody2: melody.melody2,
                 param: 'transaction_report',
-                transaction,
+                transaction: transaction,
                 date_range: dateRange
             });
         }, 500);
 
-        // Handle the response
+        // Handle socket response
         socket.on(`${melody.melody1}_transaction_report`, function (data) {
             if (data.type === "error" || data.type === "caution") {
-                swal({
+                Swal.fire({
+                    icon: data.type === "error" ? 'error' : 'warning',
                     text: data.message,
-                    type: data.type === "error" ? 'error' : 'warning',
+                    confirmButtonColor: '#3085d6',
                     padding: '1em'
                 });
             } else {
-                const pageHtml = data.reportType === 'transaction'
-                    ? TransactionReportPageTransaction({
-                        data: data.data,
-                        setupData,
-                        dateRange: dateRange.split("**"),
-                        transaction: transactionValue
-                    })
-                    : TransactionReportPage({
-                        data: data.data,
-                        setupData,
-                        dateRange: dateRange.split("**"),
-                        transaction: transactionValue
-                    });
+                const pageHtml = TransactionReportPage({
+                    data: data.data,
+                    setupData,
+                    dateRange: dateRange.split("**"),
+                    transaction: transactionValue
+                });
 
                 $('.afrobuild_transaction_report_display_page').html(pageHtml);
             }
 
-            // Reset button
+            // Reset submit button
             $submitBtn.html('<i class="icon-stats-dots mr-2"></i> Run Report').removeAttr('disabled');
             socket.off(`${melody.melody1}_transaction_report`);
         });
     });
 
-    // Handle report close
+    // Handle report close button
     $(document).on('click', 'button.afrobuild_report_close_btn', function (e) {
         e.preventDefault();
         $('.afrobuild_transaction_report_display_page').empty();
         $('.afrobuild_transaction_report_dropdown').val('').change();
     });
 
-    // Load transaction dropdown
+    // Load dropdown
     function loadTransactionDropdown() {
         socket.emit('dropdown', {
             melody1: melody.melody1,

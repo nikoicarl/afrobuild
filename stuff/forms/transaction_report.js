@@ -12,8 +12,6 @@ function renderTransactionContainer() {
 }
 
 
-
-
 function renderTransactionForm() {
     return `
         <div class="row">
@@ -56,57 +54,35 @@ function renderTransactionForm() {
 }
 
 function TransactionReportPage(data) {
-    let logo, revenueTotal = 0, expenditureTotal = 0;
+    let logo;
     logo = `<img src="assets/img/default.png" style="max-width: 100%; height: auto;"/>`;
+    console.log(data);
 
-    let htmlTable = `
-        <table class="table table-striped" width="100%">
-            <thead>
-                <tr class="afrobuild-bg-primary">
-                    <th style="font-size:12px;" class="text-white"> ${data.type == 'monthly' ? 'Month' : 'Year'} </th>
-                    <th style="font-size:12px;" class="text-white"> Revenue </th>
-                    <th style="font-size:12px;" class="text-white"> Expenditure </th>
-                    <th style="font-size:12px;" class="text-white"> Gross Transaction </th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
 
-    if (data.data.length > 0) {
-        for (let i = 0; i < data.data.length; i++) {
-            const item = data.data[i];
-            revenueTotal += Number(item.revenueTotal);
-            expenditureTotal += Number(item.expenditureTotal);
-            htmlTable += `
-                <tr>
-                    <td class="">${data.type == 'monthly' ? item.month.toUcwords() : item.year}</td>
-                    <td class="">${formatNumber(Number(item.revenueTotal))}</td>
-                    <td class="">${formatNumber(Number(item.expenditureTotal))}</td>
-                    <td class="">${formatNumber(Number(item.revenueTotal) - Number(item.expenditureTotal))}</td>
-                </tr>
-            `;
-        }
-        htmlTable += `
-            <tr> 
-                <td> <b>SUBTOTAL:</b> </td>
-                <td class="text-warning text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal))} </td>
-                <td class="text-danger text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(expenditureTotal))} </td>
-                <td class="text-success text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal) - Number(expenditureTotal))} </td>
-            </tr>
-        `;
-    } else {
-        htmlTable += `<tr> <td colspan="5"> No data found. </td></tr>`;
-    }
-    htmlTable += `
-            </tbody>
-        </table>
-    `;
-    
+    let htmlTable = ``;
+
+    // if (data.data.length > 0) {
+    //     for (let i = 0; i < data.data.length; i++) {
+    //         const item = data.data[i];
+            
+    //         htmlTable += `
+    //             <tr>
+    //                 <td>${item.name}</td>
+    //                 <td>${item.phone}</td>
+    //                 <td>${item.email}</td>
+    //                 <td>${item.address}</td>
+    //             </tr>
+    //         `;
+    //     }
+    // } else {
+    //     htmlTable += `<tr> <td colspan="8"> No data found. </td></tr>`;
+    // }
+
     return `
         <div class="card">
-            <div class="card-body" id="afrobuild_report_print_div">
+            <div class="card-body" id="ovasyte_report_print_div">
                 <div class="row ">
-                    <div class="col-sm-12 col-md-6"><h4 style="font-size: 32px; font-weight: 700; color: #0e1726;">TRANSACTION REPORT</h4></div>
+                    <div class="col-sm-12 col-md-6"><h4 style="font-size: 32px; font-weight: 700; color: #0e1726;">SUPPLIER REPORT</h4></div>
                     <div class="col-sm-12 col-md-6 align-self-right text-right text-sm-right">
                         <div class="company-info float-right">
                             <div class="" style="width: 200px;">
@@ -117,17 +93,13 @@ function TransactionReportPage(data) {
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="d-block afrobuild-primary" style="font-size: 14px;font-weight: 600;">REPORT DETAILS</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>Type:</b> ${data.type == null || data.type == '' || data.type == undefined ? '' : data.type.toUcwords()}</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>From:</b> ${data.start_year}</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>To:</b> ${data.end_year}</p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Total Revenue:</b> <span class="text-warning">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal))}</span></p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Total Expenditure:</b> <span class="text-danger">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(expenditureTotal))}</span></p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Gross Transaction:</b> <span class="text-success">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal) - Number(expenditureTotal))}</span></p>
+                        <p class="d-block ovasyte-primary" style="font-size: 14px;font-weight: 600;">REPORT DETAILS</p>
+                        <p class="d-block text-muted" style="font-size: 13px;"><b>From:</b> ${data.dateRange[0].fullDate()}</p>
+                        <p class="d-block text-muted" style="font-size: 13px;"><b>To:</b> ${data.dateRange[1].fullDate()}</p>
                     </div>
                     <div class="col-md-6">
                         <div class="mt-3 text-right">
-                            <p class="d-block afrobuild-primary" style="font-size: 14px;font-weight: 600;"> ${data.setupData.name.toUpperCase()} </p>
+                            <p class="d-block ovasyte-primary" style="font-size: 14px;font-weight: 600;"> ${data.setupData.name.toUpperCase()} </p>
                             <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.address} </p>
                             <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.email_one} ${data.setupData.email_two == null || data.setupData.email_two == '' ? '' : ' | ' + data.setupData.email_two} </p>
                             <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.phone_one} ${data.setupData.phone_two == null || data.setupData.phone_two == '' ? '' : ' | ' + data.setupData.phone_two} </p>
@@ -136,14 +108,26 @@ function TransactionReportPage(data) {
                 </div>
                 <div class="row  mt-4">
                     <div class="col-md-12 table-responsive">
-                        ${htmlTable}
+                        <table class="table table-striped" width="100%">
+                            <thead>
+                                <tr class="ovasyte-bg-primary">
+                                    <th style="font-size:12px;" class="text-white">Supplier</th>
+                                    <th style="font-size:12px;" class="text-white">Phone</th>
+                                    <th style="font-size:12px;" class="text-white">Email</th>
+                                    <th style="font-size:12px;" class="text-white">Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${htmlTable}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-12 text-right">
-                            <button type="button" class="btn afrobuild-bg-primary-opacity afrobuild-primary mr-2 afrobuild_general_inflows_report_close_btn"><i class="icon-close2"></i> Close </button>
-                            <button type="button" class="btn afrobuild-bg-primary mr-2" onclick="printContent('afrobuild_report_print_div', '');"><i class="icon-printer"></i> Print</button>
+                            <button type="button" class="btn ovasyte-bg-primary-opacity ovasyte-primary mr-2 ovasyte_report_close_btn"><i class="icon-close2"></i> Close </button>
+                            <button type="button" class="btn ovasyte-bg-primary mr-2" onclick="printContent('ovasyte_report_print_div', '');"><i class="icon-printer"></i> Print</button>
                         </div>
                     </div>
                 </div>

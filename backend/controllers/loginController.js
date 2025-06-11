@@ -1,5 +1,6 @@
 const User = require('../models/UserModel');
 const Session = require('../models/SessionModel');
+const Setup = require('../models/SetupModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const gf = new GeneralFunction();
 const md5 = require('md5');
@@ -10,8 +11,8 @@ module.exports = function (socket, Database) {
 
         // Initialize database models
         const SessionModel = new Session(Database);
-
         const UserModel = new User(Database);
+        const SetupModel = new Setup(Database);
 
         // Check if the fields are empty
         const checkEmpty = gf.ifEmpty([username, password]);
@@ -52,8 +53,13 @@ module.exports = function (socket, Database) {
             const sessionId = gf.getTimeStamp();
 
             // Insert session into the database
-            const sessionResult = await SessionModel.insertTable([sessionId, userId, 'logged in successfully', gf.getDateTime(), null]);
-
+            const sessionResult = await SessionModel.insertTable([
+                sessionId,
+                userId,
+                'logged in successfully',
+                gf.getDateTime(),
+                null
+            ]);
 
             if (!sessionResult.affectedRows) {
                 return socket.emit('_system_login', {
@@ -64,15 +70,32 @@ module.exports = function (socket, Database) {
 
             // Generate unique "melody" for the user session
             const sampleData = gf.shuffle("qwertyuiopasdfghjklzxcvbnm");
-            const melody1 = (sampleData.substr(0, 4) + userId + sampleData.substr(5, 2) + '-' + sampleData.substr(7, 2) + sessionId + sampleData.substr(10, 4)).toUpperCase();
+            const melody1 = (
+                sampleData.substr(0, 4) +
+                userId +
+                sampleData.substr(5, 2) +
+                '-' +
+                sampleData.substr(7, 2) +
+                sessionId +
+                sampleData.substr(10, 4)
+            ).toUpperCase();
             const melody2 = md5(userId);
 
-            // Send success response with session data
+            // Fetch setup data
+            const setupData = await SetupModel.preparedFetch({
+                sql: '1', // Adjust if needed to filter setup data
+                columns: []
+            });
+
+            console.log(setupData);
+
+            // Send success response with session and setup data
             socket.emit('_system_login', {
                 type: 'success',
                 message: 'Logged in successfully, redirecting...',
                 melody1,
-                melody2
+                melody2,
+                setupData: setupData[0] || {},
             });
 
         } catch (error) {

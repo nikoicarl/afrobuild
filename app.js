@@ -28,6 +28,7 @@ const FileUploadHandler = require('./backend/controllers/FileUploadHandler');
 const PrivilegeController = require('./backend/controllers/privilegeController');
 const DropdownController = require('./backend/controllers/dropdownController');
 const dashboardFetchController = require('./backend/controllers/dashboardFetchController');
+const reportController = require('./backend/controllers/reportController');
 
 
 // Initialize the server
@@ -75,6 +76,7 @@ async function startServer() {
                 PrivilegeController(socket, Database);
                 DropdownController(socket, Database);
                 dashboardFetchController(socket, Database);
+                reportController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }
