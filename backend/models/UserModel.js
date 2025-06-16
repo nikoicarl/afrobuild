@@ -7,7 +7,7 @@ class User {
 
         this.columnsList = [
             'userid', 'first_name', 'last_name', 'phone', 'email',
-            'address', 'username', 'password', 'status', 'date_time', 'sessionid'
+            'address', 'username', 'password', 'user_role', 'status', 'date_time', 'sessionid'
         ];
 
         this.createTable();
@@ -25,6 +25,7 @@ class User {
                 address VARCHAR(255),
                 username VARCHAR(50),
                 password TEXT,
+                user_role BIGINT(100),
                 status VARCHAR(50),
                 date_time DATETIME,
                 sessionid BIGINT(100)

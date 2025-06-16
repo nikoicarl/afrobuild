@@ -1,6 +1,7 @@
 const Setup = require('../models/SetupModel');
 const User = require('../models/UserModel');
 const Session = require('../models/SessionModel');
+const Role = require('../models/RoleModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const Apps = require('../models/AppsModel');
@@ -15,6 +16,7 @@ module.exports = (socket, Database) => {
         const AppsModel = new Apps(Database);
         const SetupModel = new Setup(Database);
         const UserModel = new User(Database);
+        const RoleModel = new Role(Database);
         const SessionModel = new Session(Database);
 
         try {
@@ -90,9 +92,15 @@ module.exports = (socket, Database) => {
 
                 if (!insertSetupResult.affectedRows) throw new Error('Failed to insert setup');
 
+                const roleID = gf.getTimeStamp();
+
+                const insertRoleResult = await RoleModel.insertTable([roleID, 'admin', 'Administrator', gf.getDateTime(), 'active']);
+
+                if (!insertRoleResult.affectedRows) throw new Error('Failed to insert role');
+
                 const insertUserResult = await UserModel.insertTable([
                     userid, 'system', 'administrator', null, null, null,
-                    'admin', md5('admin123'), 'active', gf.getDateTime(), null,
+                    'admin', md5('admin123'), roleID, 'active', gf.getDateTime(), null,
                 ]);
 
                 if (!insertUserResult.affectedRows) throw new Error('Failed to insert user');
