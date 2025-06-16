@@ -169,7 +169,9 @@
                     &nbsp;
                 <% } %>
             </div>
-            <div class="user-role">Admin</div>
+            <div class="user-role">
+                <%= roleData.name.toUcwords() || 'Unknown Role' %>
+            </div>
         </div>
     </div>
 

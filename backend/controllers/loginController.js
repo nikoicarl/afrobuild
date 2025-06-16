@@ -87,8 +87,6 @@ module.exports = function (socket, Database) {
                 columns: []
             });
 
-            console.log(setupData);
-
             // Send success response with session and setup data
             socket.emit('_system_login', {
                 type: 'success',

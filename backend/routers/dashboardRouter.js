@@ -1,4 +1,5 @@
 const User = require('../models/UserModel');
+const Role = require('../models/RoleModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const Setup = require('../models/SetupModel');
 const md5 = require('md5');
@@ -39,21 +40,46 @@ module.exports = function (start, Database) {
                             });
 
                             if (Array.isArray(userResult) && userResult.length > 0) {
+                                const user = userResult[0];
                                 const PrivilegeModel = new Privilege(Database, userid);
                                 const SetupModel = new Setup(Database);
+                                const RoleModel = new Role(Database);
 
-                                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData;
-                                const setupResult = await SetupModel.preparedFetch({
-                                    sql: '1',
-                                    columns: []
-                                });
+                                try {
+                                    // Get user privileges
+                                    const { privilegeData } = await PrivilegeModel.getPrivileges();
 
-                                return response.render('dashboard', {
-                                    pageNavigate: queryStr,
-                                    userData: userResult[0],
-                                    privilege: privilegeData,
-                                    setupData: setupResult.length > 0 ? setupResult[0] : {}
-                                });
+                                    // Get setup data
+                                    const setupResult = await SetupModel.preparedFetch({
+                                        sql: '1',
+                                        columns: []
+                                    });
+
+                                    // Get role data
+                                    const roleResult = await RoleModel.preparedFetch({
+                                        sql: 'roleid = ?',
+                                        columns: [user.user_role || '']
+                                    });
+
+                                    const roleData = Array.isArray(roleResult) && roleResult.length > 0 ? roleResult[0] : {};
+
+                                    // Render dashboard with role info
+                                    return response.render('dashboard', {
+                                        pageNavigate: queryStr,
+                                        userData: user,
+                                        privilege: privilegeData || [],
+                                        setupData: setupResult.length > 0 ? setupResult[0] : {},
+                                        roleData
+                                    });
+
+                                } catch (err) {
+                                    console.error('Error during session setup:', err);
+                                    return response.render('index', {
+                                        pageNavigate: { error: 'loginError5' },
+                                        setupData: {}
+                                    });
+                                }
+
                             } else {
                                 console.warn('User not found or session invalid');
                                 return response.render('index', {
@@ -61,6 +87,7 @@ module.exports = function (start, Database) {
                                     setupData: {}
                                 });
                             }
+
                         } else {
                             console.warn('Invalid user hash');
                             return response.render('index', {
