@@ -100,6 +100,41 @@ function UserTable() {
     `;
 }
 
+function ActionModal() {
+    return `
+        <button type="button" class="afrobuild_user_action_modal hide" data-toggle="modal" data-target="#actionModal"></button>
+        <div class="modal fade afrobuild_user_action_modal" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                <div class="modal-content shadow-sm border-0 rounded-3">
+                    <div class="modal-header" style="background-color: #009345;">
+                        <h5 class="modal-title text-white fw-semibold" id="actionModalLabel"></h5>
+                        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body px-4 py-3" style = "z-index:100;">
+                        <form class="afrobuild_user_action_form">
+                            <input type="hidden" class="afrobuild_user_hiddenid">
+                            <input type="hidden" class="afrobuild_user_hidden_action">
+                            
+                            <div class="mb-3">
+                                <select class="form-select afrobuild_user_role_select" required>
+                                    <option value="" disabled selected>Select User Role</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success afrobuild_action_submit_btn action_submit_btn">
+                                    Submit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Immediately Invoked Function Expression (IIFE) to render the full user page
 (() => {
     // Render breadcrumb and container layout
@@ -109,6 +144,9 @@ function UserTable() {
     // Inject the form into the dedicated div inside the container
     const formHtml = renderUserForm();
     $('#afrobuild_user_page_form_display').html(formHtml);
+
+    html = ejs.render(ActionModal(), {});
+    $('#afrobuild_main_content_display').append(html);
 
     // Load page-specific logic
     if (typeof addPageScript === 'function') {

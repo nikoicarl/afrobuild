@@ -4,6 +4,9 @@ $(document).ready(function () {
     const $toggleBtn = $('#afrobuild_manage_user_table_btn');
     const $userForm = $('#userForm');
 
+    // Load user role dropdown
+    loadUserRoleDropdown();
+
     // Handle the toggle between table and form
     $(document).on('click.pageopener', 'h3#afrobuild_manage_user_table_btn', function (e) {
         e.preventDefault();
@@ -152,7 +155,8 @@ $(document).ready(function () {
                                     <i class="icon-menu7" style="font-size:20px;color:grey;"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="afrobuild_user_table_edit_btn dropdown-item" href="#" data-getid="${row.userid}" data-getname="specific_user"><i class="icon-pencil"></i>Edit Details</a>
+                                    <a class="afrobuild_user_table_edit_btn dropdown-item" href="#" data-getid="${row.userid}" data-getname="set_user_role" data-getdata="${row.username.toUcwords()}"><i class="icon-user"></i>&nbspSet Role</a>
+                                    <a class="afrobuild_user_table_edit_btn dropdown-item" href="#" data-getid="${row.userid}" data-getname="specific_user"><i class="icon-pencil"></i>&nbspEdit Details</a>
                                     ${statusBtn}
                                     ${deleteBtn}
                                 </div>
@@ -236,6 +240,15 @@ $(document).ready(function () {
             });
 
         }
+
+        if (action === 'set_user_role') {
+            const viewModal = $('.afrobuild_user_action_modal');
+            viewModal.find('.modal-header .modal-title').text(`Set Role for ${username}`);
+            viewModal.find('.afrobuild_user_hiddenid').val(userId);
+
+            viewModal.trigger('click');
+
+        }
     });
 
 
@@ -249,5 +262,32 @@ $(document).ready(function () {
         $('#username').val(user.username);
         $('#user_hiddenid').val(user.userid);
         // If you need more fields, populate them here
+    }
+
+
+    // Load dropdown
+    function loadUserRoleDropdown() {
+        socket.emit('dropdown', {
+            melody1: melody.melody1,
+            melody2: melody.melody2,
+            param: "user_role"
+        });
+
+        socket.on(`${melody.melody1}_user_role`, function (data) {
+            const $select = $('.afrobuild_user_role_select');
+            $select.html(`<option value="" selected>Select Role</option>`);
+
+            if (data.type === "error") {
+                console.warn(data.message);
+                return;
+            }
+
+            data.forEach(item => {
+                const optionValue = `${item.roleid}`;
+                $select.append(`<option value="${optionValue}">${item.name}</option>`);
+            });
+
+            makeAllSelectLiveSearch('afrobuild_user_role_select', 'Select Role');
+        });
     }
 });
