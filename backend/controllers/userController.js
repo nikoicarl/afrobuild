@@ -89,7 +89,7 @@ module.exports = function (socket, Database) {
             const result = isNewUser
                 ? await UserModel.insertTable([
                     newUserId, first_name, last_name, phone, email, address,
-                    username, hashedPassword, 'active', gf.getDateTime(), userid
+                    username, hashedPassword, null, 'active', gf.getDateTime(), userid
                 ])
                 : await UserModel.updateTable({
                     sql: `

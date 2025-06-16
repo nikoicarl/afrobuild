@@ -170,7 +170,11 @@
                 <% } %>
             </div>
             <div class="user-role">
-                <%= roleData.name.toUcwords() || 'Unknown Role' %>
+                <% if (JSON.stringify(roleData) !== '{}') { %>
+                    <%= roleData.name.toUcwords() || 'Unknown Role' %>
+                <% } else { %>
+                    Unknown Role&nbsp;
+                <% } %>
             </div>
         </div>
     </div>
