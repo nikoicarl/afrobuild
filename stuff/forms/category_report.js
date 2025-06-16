@@ -1,47 +1,52 @@
-// Renders the category container section with breadcrumb
-function renderCategoryContainer() {
-    $('.afrobuild_main_page_breadcrumb_navigation').html(``);
-
+// Renders the container section with breadcrumb
+function renderReportContainer(targetId = 'afrobuild_category_report_page_form_display') {
+    $('.afrobuild_main_page_breadcrumb_navigation').html('');
     return `
         <div class="layout-px-spacing mb-5">
             <div class="row layout-top-spacing">
-                <div class="col-md-12" id="afrobuild_category_report_page_form_display"></div>
+                <div class="col-md-12" id="${targetId}"></div>
             </div>
         </div>
     `;
 }
 
-
-
-
-function renderCategoryForm() {
+// Renders the filter form
+function renderReportForm({
+    formClass = 'afrobuild_category_report_form',
+    dropdownClass = 'afrobuild_category_report_dropdown',
+    dateRangeClass = 'afrobuild_category_report_date_range',
+    dateInputClass = 'afrobuild_category_report_date',
+    submitBtnClass = 'afrobuild_category_report_form_btn',
+    displayContainerClass = 'afrobuild_category_report_display_page'
+} = {}) {
     return `
         <div class="row">
             <div class="col-md-12 mt-3">
                 <div class="stat-card p-4">
-                    <form class="card-body afrobuild_category_report_form" method="post">
+                    <form class="card-body ${formClass}" method="post">
                         <div class="row">
                             <div class="col-md-5 col-sm-6">
                                 <div class="form-group">
-                                    <label>Category </label>
-                                    <select class="form-control afrobuild_category_report_category">
-                                        <option value="" selected> Select Category </option>
+                                    <label>Category</label>
+                                    <select class="form-control ${dropdownClass}">
+                                        <option value="" selected>Select Category</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-5 col-sm-6">
                                 <div class="form-group">
-                                    <label>Pick Date in Range </label>
-                                    <div class="form-control afrobuild_category_report_date_range">
-                                        <i class="icon-calendar2"></i>&nbsp;
-                                        <span></span> <i class="icon-caret-down"></i>
-                                        <input class="hide afrobuild_category_report_date" type="text">
+                                    <label>Pick Date in Range</label>
+                                    <div class="form-control ${dateRangeClass}">
+                                        <i class="icon-calendar2"></i>&nbsp;<span></span> <i class="icon-caret-down"></i>
+                                        <input class="hide ${dateInputClass}" type="text">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="mt-4">
-                                    <button type="submit" class="  btn afrobuild_btn afrobuild_category_report_form_btn "><i class="icon-stats-dots mr-2"></i>  Run Report</button>
+                                    <button type="submit" class="btn afrobuild_btn ${submitBtnClass}">
+                                        <i class="icon-stats-dots mr-2"></i> Run Report
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -50,120 +55,112 @@ function renderCategoryForm() {
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12 mt-4 afrobuild_category_report_display_page"></div>
+            <div class="col-md-12 mt-4 ${displayContainerClass}"></div>
         </div>
     `;
 }
 
+// Renders the category report
 function CategoryReportPage(data) {
-    let logo, revenueTotal = 0, expenditureTotal = 0;
-    logo = `<img src="assets/img/default.png" style="max-width: 100%; height: auto;"/>`;
-
-    let htmlTable = `
-        <table class="table table-striped" width="100%">
-            <thead>
-                <tr class="afrobuild-bg-primary">
-                    <th style="font-size:12px;" class="text-white"> ${data.type == 'monthly' ? 'Month' : 'Year'} </th>
-                    <th style="font-size:12px;" class="text-white"> Revenue </th>
-                    <th style="font-size:12px;" class="text-white"> Expenditure </th>
-                    <th style="font-size:12px;" class="text-white"> Gross Category </th>
-                </tr>
-            </thead>
-            <tbody>
+    const logo = `
+        <img src="assets/img/logo.svg" class="img-fluid" alt="Logo" style="max-width: 180px;">
     `;
 
-    if (data.data.length > 0) {
-        for (let i = 0; i < data.data.length; i++) {
-            const item = data.data[i];
-            revenueTotal += Number(item.revenueTotal);
-            expenditureTotal += Number(item.expenditureTotal);
-            htmlTable += `
-                <tr>
-                    <td class="">${data.type == 'monthly' ? item.month.toUcwords() : item.year}</td>
-                    <td class="">${formatNumber(Number(item.revenueTotal))}</td>
-                    <td class="">${formatNumber(Number(item.expenditureTotal))}</td>
-                    <td class="">${formatNumber(Number(item.revenueTotal) - Number(item.expenditureTotal))}</td>
-                </tr>
-            `;
-        }
-        htmlTable += `
-            <tr> 
-                <td> <b>SUBTOTAL:</b> </td>
-                <td class="text-warning text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal))} </td>
-                <td class="text-danger text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(expenditureTotal))} </td>
-                <td class="text-success text-bold"> ${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal) - Number(expenditureTotal))} </td>
+    const htmlTable = data.data.length > 0
+        ? data.data.map(item => `
+            <tr>
+                <td>${item.categoryid}</td>
+                <td>${item.name.toUcwords()}</td>
+                <td>${item.description ? item.description : 'N/A'}</td>
+                <td>${item.datetime.fullDate()}</td>
             </tr>
-        `;
-    } else {
-        htmlTable += `<tr> <td colspan="5"> No data found. </td></tr>`;
-    }
-    htmlTable += `
-            </tbody>
-        </table>
-    `;
-    
+        `).join('')
+        : `<tr><td colspan="5" class="text-center text-muted py-4">No categorys found.</td></tr>`;
+
     return `
-        <div class="card">
-            <div class="card-body" id="afrobuild_report_print_div">
-                <div class="row ">
-                    <div class="col-sm-12 col-md-6"><h4 style="font-size: 32px; font-weight: 700; color: #0e1726;">CATEGORY REPORT</h4></div>
-                    <div class="col-sm-12 col-md-6 align-self-right text-right text-sm-right">
-                        <div class="company-info float-right">
-                            <div class="" style="width: 200px;">
-                                ${logo}
-                            </div>
+        <div class="stat-card shadow-sm border rounded-lg p-4 mb-5 bg-white">
+            <div id="afrobuild_report_print_div">
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap align-items-start mb-4">
+                    <div>
+                        <h4 class="text-dark mb-1">Category Report</h4>
+                        <p class="text-muted" style="font-size: 14px;">Detailed category summary</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="mb-2">${logo}</div>
+                        <div class="text-muted small">
+                            ${data.setupData.address}<br>
+                            ${data.setupData.email}<br>
+                            ${data.setupData.phone}
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="d-block afrobuild-primary" style="font-size: 14px;font-weight: 600;">REPORT DETAILS</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>Type:</b> ${data.type == null || data.type == '' || data.type == undefined ? '' : data.type.toUcwords()}</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>From:</b> ${data.start_year}</p>
-                        <p class="d-block text-muted" style="font-size: 13px;"><b>To:</b> ${data.end_year}</p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Total Revenue:</b> <span class="text-warning">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal))}</span></p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Total Expenditure:</b> <span class="text-danger">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(expenditureTotal))}</span></p>
-                        <p class="d-block text-muted" style="font-size: 15px;"><b>Gross Category:</b> <span class="text-success">${data.setupData.currency.toUpperCase()} ${formatNumber(Number(revenueTotal) - Number(expenditureTotal))}</span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mt-3 text-right">
-                            <p class="d-block afrobuild-primary" style="font-size: 14px;font-weight: 600;"> ${data.setupData.name.toUpperCase()} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.address} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.email_one} ${data.setupData.email_two == null || data.setupData.email_two == '' ? '' : ' | ' + data.setupData.email_two} </p>
-                            <p class="d-block text-muted" style="font-size: 13px;"> ${data.setupData.phone_one} ${data.setupData.phone_two == null || data.setupData.phone_two == '' ? '' : ' | ' + data.setupData.phone_two} </p>
+
+                <!-- Report Period -->
+                <div class="mb-4">
+                    <div class="bg-light border rounded p-3">
+                        <div class="fw-semibold text-success mb-1" style="font-size: 14px;">Report Period</div>
+                        <div class="text-muted" style="font-size: 13px;">
+                            <strong>From:</strong> ${data.dateRange[0].fullDate()} &nbsp;&nbsp;
+                            <strong>To:</strong> ${data.dateRange[1].fullDate()}
                         </div>
                     </div>
                 </div>
-                <div class="row  mt-4">
-                    <div class="col-md-12 table-responsive">
-                        ${htmlTable}
-                    </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table id="category_table" class="table table-bordered table-striped table-hover" style="font-size: 13px;">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th>Category ID</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>${htmlTable}</tbody>
+                    </table>
                 </div>
-                <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button type="button" class="btn afrobuild-bg-primary-opacity afrobuild-primary mr-2 afrobuild_general_inflows_report_close_btn"><i class="icon-close2"></i> Close </button>
-                            <button type="button" class="btn afrobuild-bg-primary mr-2" onclick="printContent('afrobuild_report_print_div', '');"><i class="icon-printer"></i> Print</button>
+
+                <!-- Action Buttons -->
+                <div class="card mt-4 shadow-sm border no-print">
+                    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div class="text-muted small">
+                            <i class="icon-info me-1"></i> Report Actions
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-outline-dark afrobuild_report_close_btn">
+                                <i class="icon-close2 me-1"></i> Close
+                            </button>
+                            <button type="button" class="btn btn-outline-success" onclick="printContent('afrobuild_report_print_div')">
+                                <i class="icon-printer me-1"></i> Print
+                            </button>
+                            <button type="button" class="btn btn-outline-info" onclick="exportHTMLTableToCSV('category_table', 'category_report.csv')">
+                                <i class="icon-file-text me-1"></i> CSV
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="exportHTMLTableToExcel('category_table', 'category_report.xlsx')">
+                                <i class="icon-file-excel me-1"></i> Excel
+                            </button>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     `;
 }
 
 
-// Immediately Invoked Function Expression (IIFE) to render the full category page
-(() => {
-    // Render breadcrumb and container layout
-    const categoryContainerHTML = renderCategoryContainer();
-    $('#afrobuild_main_content_display').html(categoryContainerHTML);
 
-    // Inject the form into the dedicated div inside the container
-    const formHtml = renderCategoryForm();
+// Auto-load page
+(() => {
+    const containerHTML = renderReportContainer();
+    $('#afrobuild_main_content_display').html(containerHTML);
+
+    const formHtml = renderReportForm();
     $('#afrobuild_category_report_page_form_display').html(formHtml);
 
-    // Load page-specific logic
     if (typeof addPageScript === 'function') {
         addPageScript('app/categoryReportAjax');
     } else {
