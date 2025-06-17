@@ -113,17 +113,17 @@ function ActionModal() {
                     <div class="modal-body px-4 py-3" style = "z-index:100;">
                         <form class="afrobuild_user_action_form">
                             <input type="hidden" class="afrobuild_user_hiddenid">
-                            <input type="hidden" class="afrobuild_user_hidden_action">
                             
                             <div class="mb-3">
-                                <select class="form-select afrobuild_user_role_select" required>
+                                <label class="mb-2 ml-1"> Role</label>
+                                <select class="form-select afrobuild_user_role_select form-control" required>
                                     <option value="" disabled selected>Select User Role</option>
                                 </select>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-success afrobuild_action_submit_btn action_submit_btn">
+                                <button type="submit" class="btn btn-success afrobuild_user_action_submit_btn action_submit_btn">
                                     Submit
                                 </button>
                             </div>

@@ -15,8 +15,9 @@ const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
     socket.on('specific', async (browserBlob) => {
+        console.log(browserBlob);
 
-        const { param, melody1, dataId, action, message } = browserBlob;
+        const { param, role, melody1, dataId, action, message } = browserBlob;
 
         // Ensure melody1 is defined
         const session = getSessionIDs(melody1 || '');
@@ -305,6 +306,43 @@ module.exports = (socket, Database) => {
                         message: 'Unsupported or missing action.'
                     });
                 }
+            } else if (param === 'specific_user_role') {
+                // Initialize the user model
+                const userModel = new User(Database);
+                const SessionModel = new Session(Database);
+                const activityMessage = `Updated user role `;
+
+                // Fetch user details by userId
+                const roleResult = await userModel.updateTable({
+                    sql: 'user_role = ? WHERE userid = ?',
+                    columns: [role, dataId],
+                });
+
+                console.log(roleResult);
+
+                if (roleResult?.affectedRows > 0) {
+                    // Log session activity
+                    const activityId = gf.getTimeStamp();
+
+                    await SessionModel.insertTable([
+                        activityId,
+                        userid,
+                        activityMessage,
+                        gf.getDateTime(),
+                        null
+                    ]);
+
+                    return socket.emit(`${melody1}_${param}`, {
+                        success: true,
+                        message: activityMessage
+                    });
+                } else {
+                    return socket.emit(`${melody1}_${param}`, {
+                        success: false,
+                        message: 'No changes were made to the transaction.'
+                    });
+                }
+
             }
 
 

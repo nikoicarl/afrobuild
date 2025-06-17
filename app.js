@@ -76,7 +76,7 @@ async function startServer() {
                 PrivilegeController(socket, Database);
                 DropdownController(socket, Database);
                 dashboardFetchController(socket, Database);
-                reportController(socket, Database);
+                reportController(socket, Database); 
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }

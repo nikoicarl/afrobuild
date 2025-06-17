@@ -7,6 +7,64 @@ $(document).ready(function () {
     // Load user role dropdown
     loadUserRoleDropdown();
 
+
+    // Handle form submission for transaction actions
+    $(document).on('click', '.afrobuild_user_action_submit_btn', function (e) {
+        e.preventDefault();
+
+        const actionData = {
+            dataId: $('.afrobuild_user_hiddenid').val().trim(),
+            role: $('.afrobuild_user_role_select').val().trim(),
+            param: 'specific_user_role',
+            melody1: melody.melody1,
+            melody2: melody.melody2
+        };
+
+        const $submitBtn = $(this)
+            .html('<div class="spinner-border loader-sm" role="status"></div>')
+            .attr('disabled', true);
+
+        setTimeout(() => {
+            socket.emit('specific', actionData);
+
+            socket.once(`${actionData.melody1}_specific_user_role`, (res) => {
+                $submitBtn.html('Submit').removeAttr('disabled');
+
+                if (res && typeof res.success !== 'undefined') {
+                    Swal.fire({
+                        title: res.success ? 'Success' : 'Error',
+                        text: res.message || (res.success
+                            ? `Role ${actionData.action.replace(/_/g, ' ')} successfully.`
+                            : `Failed to ${actionData.action.replace(/_/g, ' ')} Role.`),
+                        icon: res.success ? 'success' : 'error',
+                        showConfirmButton: !res.success,
+                        timer: res.success ? 2000 : undefined
+                    });
+
+                    if (res.success) {
+
+                        // Reset the form fields
+                        $('.afrobuild_user_hiddenid').val('');
+                        $('.afrobuild_user_role_select').change(function () {
+                            $(this).val('');
+                        });
+
+                        // Optionally close the modal (if desired)
+                        $('#afrobuild_user_action_modal').modal('hide');
+                    }
+
+                } else {
+                    Swal.fire('Error', 'Invalid response received from the server.', 'error');
+                }
+            });
+
+            socket.on('error', (err) => {
+                $submitBtn.html('Submit').removeAttr('disabled');
+                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
+            });
+        }, 300);
+    });
+
     // Handle the toggle between table and form
     $(document).on('click.pageopener', 'h3#afrobuild_manage_user_table_btn', function (e) {
         e.preventDefault();
@@ -284,10 +342,10 @@ $(document).ready(function () {
 
             data.forEach(item => {
                 const optionValue = `${item.roleid}`;
-                $select.append(`<option value="${optionValue}">${item.name}</option>`);
+                $select.append(`<option value="${optionValue}">${item.name.toUcwords()}</option>`);
             });
 
-            makeAllSelectLiveSearch('afrobuild_user_role_select', 'Select Role');
+            // makeAllSelectLiveSearch('afrobuild_user_role_select', 'Select Role');
         });
     }
 });
