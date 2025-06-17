@@ -8,7 +8,6 @@ const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
 const Session = require('../models/SessionModel');
 const ViewModel = require('../models/ViewModel');
-
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
 const GeneralFunction = require('../models/GeneralFunctionModel');
@@ -17,8 +16,9 @@ const gf = new GeneralFunction();
 const tableConfigs = {
     user_table: {
         model: User,
+        method: 'joinFetch',
         permissions: ['add_user', 'update_user', 'deactivate_user'],
-        sql: 'status != ? ORDER BY date_time DESC',
+        sql: 't1.status != ? ORDER BY t1.date_time DESC',
         columns: ['inactive']
     },
     role_table: {
@@ -70,7 +70,7 @@ const tableConfigs = {
         permissions: [],
         sql: '1',
         columns: []
-    },
+    }
 };
 
 module.exports = (socket, Database) => {
@@ -93,7 +93,7 @@ module.exports = (socket, Database) => {
             // Skip privilege check for activity_table
             if (param !== 'activity_table') {
                 const PrivilegeModel = new Privilege(Database, userid);
-                const privilegeData = (await PrivilegeModel.getPrivileges()).privilegeData || {};
+                const { privilegeData = {} } = await PrivilegeModel.getPrivileges();
                 const afrobuildPerms = privilegeData.afrobuild || {};
 
                 const hasPermission = config.permissions.some(
@@ -106,19 +106,26 @@ module.exports = (socket, Database) => {
             }
 
             let data;
-            if (config.isViewModel) {
-                const View = new config.model(Database);
-                data = await View[config.method]({
+            const ModelInstance = new config.model(Database);
+
+            if (config.isViewModel && config.method && typeof ModelInstance[config.method] === 'function') {
+                data = await ModelInstance[config.method]({
                     table: 'transaction_view',
                     sql: config.sql,
                     columns: config.columns
                 });
-            } else {
-                const Model = new config.model(Database);
-                data = await Model.preparedFetch({
+            } else if (config.method && typeof ModelInstance[config.method] === 'function') {
+                data = await ModelInstance[config.method]({
                     sql: config.sql,
                     columns: config.columns
                 });
+            } else if (typeof ModelInstance.preparedFetch === 'function') {
+                data = await ModelInstance.preparedFetch({
+                    sql: config.sql,
+                    columns: config.columns
+                });
+            } else {
+                throw new Error(`No valid method found for ${param}`);
             }
 
             if (!Array.isArray(data)) {
@@ -128,13 +135,12 @@ module.exports = (socket, Database) => {
                 });
             }
 
-            return socket.emit(`${melody1}_${param}`, data);
-
+            socket.emit(`${melody1}_${param}`, data);
         } catch (err) {
             console.error(err);
-            return socket.emit(`${melody1}_${param}`, {
+            socket.emit(`${melody1}_${param}`, {
                 type: 'error',
-                message: err.message || 'An error occurred while fetching data.'
+                message: err.message || 'An unexpected error occurred.'
             });
         }
     });

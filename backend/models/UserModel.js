@@ -78,6 +78,36 @@ class User {
         });
     }
 
+    async joinFetch(object) {
+        
+        try {
+            if (!object?.sql || !Array.isArray(object.columns)) {
+                throw new Error('Invalid parameters for joinFetch');
+            }
+
+            const sql = `
+            SELECT
+                t1.*,
+                COALESCE(t2.name, 'No Role Assigned') AS role_name
+            FROM user AS t1
+            LEFT JOIN role AS t2
+                ON t2.roleid = t1.user_role
+            WHERE ${object.sql}
+        `;
+
+            const result = await this.Database.setupConnection({
+                sql,
+                columns: object.columns
+            }, 'object');
+
+            return result;
+        } catch (error) {
+            console.error('joinFetch error:', error);
+            return { error: error.message || 'An unexpected error occurred in joinFetch.' };
+        }
+    }
+
+
     async deactivateUser(userid) {
         return await this.updateTable({
             sql: 'status = ? WHERE userid = ?',

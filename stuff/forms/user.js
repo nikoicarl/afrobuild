@@ -108,7 +108,7 @@ function ActionModal() {
                 <div class="modal-content shadow-sm border-0 rounded-3">
                     <div class="modal-header" style="background-color: #009345;">
                         <h5 class="modal-title text-white fw-semibold" id="actionModalLabel"></h5>
-                        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white afrobuild_user_action_modal_close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body px-4 py-3" style = "z-index:100;">
                         <form class="afrobuild_user_action_form">

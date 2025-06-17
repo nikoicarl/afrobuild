@@ -15,7 +15,6 @@ const gf = new GeneralFunction();
 
 module.exports = (socket, Database) => {
     socket.on('specific', async (browserBlob) => {
-        console.log(browserBlob);
 
         const { param, role, melody1, dataId, action, message } = browserBlob;
 
@@ -318,7 +317,6 @@ module.exports = (socket, Database) => {
                     columns: [role, dataId],
                 });
 
-                console.log(roleResult);
 
                 if (roleResult?.affectedRows > 0) {
                     // Log session activity

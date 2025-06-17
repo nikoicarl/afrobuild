@@ -7,8 +7,7 @@ $(document).ready(function () {
     // Load user role dropdown
     loadUserRoleDropdown();
 
-
-    // Handle form submission for transaction actions
+    // Handle form submission for role actions
     $(document).on('click', '.afrobuild_user_action_submit_btn', function (e) {
         e.preventDefault();
 
@@ -24,45 +23,37 @@ $(document).ready(function () {
             .html('<div class="spinner-border loader-sm" role="status"></div>')
             .attr('disabled', true);
 
-        setTimeout(() => {
-            socket.emit('specific', actionData);
+        // Emit immediately, no timeout needed
+        socket.emit('specific', actionData);
 
-            socket.once(`${actionData.melody1}_specific_user_role`, (res) => {
-                $submitBtn.html('Submit').removeAttr('disabled');
+        socket.off(`${actionData.melody1}_specific_user_role`).on(`${actionData.melody1}_specific_user_role`, (res) => {
+            $submitBtn.html('Submit').removeAttr('disabled');
 
-                if (res && typeof res.success !== 'undefined') {
-                    Swal.fire({
-                        title: res.success ? 'Success' : 'Error',
-                        text: res.message || (res.success
-                            ? `Role ${actionData.action.replace(/_/g, ' ')} successfully.`
-                            : `Failed to ${actionData.action.replace(/_/g, ' ')} Role.`),
-                        icon: res.success ? 'success' : 'error',
-                        showConfirmButton: !res.success,
-                        timer: res.success ? 2000 : undefined
-                    });
+            if (res && typeof res.success !== 'undefined') {
+                Swal.fire({
+                    title: res.success ? 'Success' : 'Error',
+                    text: res.message || (res.success
+                        ? `Role updated successfully.`
+                        : `Failed to update role.`),
+                    icon: res.success ? 'success' : 'error',
+                    showConfirmButton: !res.success,
+                    timer: res.success ? 2000 : undefined
+                });
 
-                    if (res.success) {
+                if (res.success) {
+                    // Reset form fields
+                    $('.afrobuild_user_hiddenid').val('');
+                    $('.afrobuild_user_role_select').val('');
 
-                        // Reset the form fields
-                        $('.afrobuild_user_hiddenid').val('');
-                        $('.afrobuild_user_role_select').change(function () {
-                            $(this).val('');
-                        });
+                    userTableFetch(); // Refresh user table
 
-                        // Optionally close the modal (if desired)
-                        $('#afrobuild_user_action_modal').modal('hide');
-                    }
-
-                } else {
-                    Swal.fire('Error', 'Invalid response received from the server.', 'error');
+                    // Close modal
+                    $('.afrobuild_user_action_modal_close').trigger('click');
                 }
-            });
-
-            socket.on('error', (err) => {
-                $submitBtn.html('Submit').removeAttr('disabled');
-                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
-            });
-        }, 300);
+            } else {
+                Swal.fire('Error', 'Invalid response received from the server.', 'error');
+            }
+        });
     });
 
     // Handle the toggle between table and form
@@ -70,25 +61,23 @@ $(document).ready(function () {
         e.preventDefault();
         const isTableView = $(this).data("open") === 'table';
 
-        // Render the corresponding content based on the current state
+        // Render corresponding content
         const html = isTableView ? ejs.render(UserTable(), {}) : ejs.render(renderUserForm(), {});
         $formDisplay.html(html);
 
-        // Update the button text for toggling between views
+        // Update button text and data attribute
         const btnText = isTableView
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Users';
 
-        // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
 
-        // Fetch the user table if we are in table view
         if (isTableView) userTableFetch();
     });
 
-    // Handle user form submission for creating or updating a user
+    // Handle user form submission (create/update)
     $(document).on('click', '.afrobuild_manage_user_submit_btn', function (e) {
-        e.preventDefault();  // Prevent the default action of the button
+        e.preventDefault();
 
         const userData = {
             first_name: $('#first_name').val().trim(),
@@ -104,50 +93,41 @@ $(document).ready(function () {
             melody2: melody.melody2
         };
 
-        const $submitBtn = $('.afrobuild_manage_user_submit_btn')
+        const $submitBtn = $(this)
             .html('<div class="spinner-border loader-sm" role="status"></div>')
             .attr('disabled', true);
 
-        setTimeout(() => {
-            // Determine if it's create or update action based on user_hiddenid
-            const action = userData.user_hiddenid ? 'update_user' : 'create_user';
+        // Determine create or update action
+        const action = userData.user_hiddenid ? 'update_user' : 'create_user';
 
-            // Emit the respective socket event
-            socket.emit('create_user', userData);
+        // Emit 'create_user' event regardless since backend likely handles create/update by presence of user_hiddenid
+        socket.emit('create_user', userData);
 
-            // Handle response based on action
-            socket.once(`${userData.melody1}_${'create_user'}`, (res) => {
-                Swal.fire({
-                    title: res.success ? 'Success' : 'Error',
-                    text: res.message || (res.success ? `User ${action === 'create_user' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_user' ? 'create' : 'update'} user.`),
-                    icon: res.success ? 'success' : 'error',
-                    showConfirmButton: !res.success,
-                    timer: res.success ? 2000 : undefined
-                });
-                $submitBtn.html('Submit').removeAttr('disabled');
-
-                // If successful, reset the form and clean up
-                if (res.success) {
-                    resetUserForm();
-                    userTableFetch(); // Refresh the user table
-                }
+        socket.off(`${userData.melody1}_create_user`).on(`${userData.melody1}_create_user`, (res) => {
+            Swal.fire({
+                title: res.success ? 'Success' : 'Error',
+                text: res.message || (res.success ? `User ${action === 'create_user' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_user' ? 'create' : 'update'} user.`),
+                icon: res.success ? 'success' : 'error',
+                showConfirmButton: !res.success,
+                timer: res.success ? 2000 : undefined
             });
+            $submitBtn.html('Submit').removeAttr('disabled');
 
-            socket.on('error', (err) => {
-                $submitBtn.html('Submit').removeAttr('disabled');
-                Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
-            });
-        }, 300);
+            if (res.success) {
+                resetUserForm();
+                userTableFetch();
+            }
+        });
     });
 
-
+    // Reset user form function
     function resetUserForm() {
-        $('#userForm')[0].reset();  // Reset the form fields
-        $('#user_hiddenid').val('');  // Clear the hidden ID field
-        $('.afrobuild_manage_user_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
+        $('#userForm')[0].reset();
+        $('#user_hiddenid').val('');
+        $('.afrobuild_manage_user_submit_btn').html('Submit').removeAttr('disabled');
     }
 
-    // Function to fetch and render the user table
+    // Fetch and render user table
     const userTableFetch = () => {
         socket.off('table').off(`${melody.melody1}_user_table`);
 
@@ -166,7 +146,7 @@ $(document).ready(function () {
         });
     };
 
-    // Function to handle user table rendering
+    // Render user data table
     function userDataTable(dataJSONArray) {
         reCreateMdataTable('afrobuild_user_data_table', 'afrobuild_user_data_table_div');
 
@@ -187,6 +167,11 @@ $(document).ready(function () {
                     field: 'username',
                     title: "Username",
                     template: row => row.username.toUcwords()
+                },
+                {
+                    field: 'role_name',
+                    title: "Role",
+                    template: row => row.role_name.toUcwords()
                 },
                 {
                     field: 'status',
@@ -225,43 +210,41 @@ $(document).ready(function () {
         });
     }
 
-    // Update User on Click
+    // Handle user table edit button clicks
     $(document).on('click', '.afrobuild_user_table_edit_btn', function (e) {
+        e.preventDefault();
+
         const action = $(this).data('getname');
         const userId = $(this).data('getid');
         const username = $(this).data('getdata');
-        const isActivate = $(this).data('activate'); // Checks if it's an 'activate' action
+        const isActivate = $(this).data('activate'); // 'activate' or 'deactivate'
 
-        // Specific User Action
         if (action === 'specific_user') {
             socket.emit('specific', {
-                "melody1": melody.melody1,
-                "melody2": melody.melody2,
-                "melody3": melody.melody3,
-                "param": action,
-                "dataId": userId
+                melody1: melody.melody1,
+                melody2: melody.melody2,
+                melody3: melody.melody3,
+                param: action,
+                dataId: userId
             });
 
-            socket.on(`${melody.melody1}_specific_user`, (res) => {
+            socket.off(`${melody.melody1}_specific_user`).on(`${melody.melody1}_specific_user`, (res) => {
                 if (res.userResult) {
                     const html = ejs.render(renderUserForm(), {});
-                    document.getElementById('afrobuild_user_page_form_display').innerHTML = html;
-                    $('#afrobuild_manage_user_table_btn').html('View All Users');
-                    $('#afrobuild_manage_user_table_btn').data('open', "table");
+                    $formDisplay.html(html);
+                    $toggleBtn.html('View All Users').data('open', "table");
                     $('.user_submit_btn').html('Update');
-                    populateUserForm(res.userResult);  // Populate the form with user data
+                    populateUserForm(res.userResult);
                 } else {
                     Swal.fire('Error', res.message || 'Error fetching user details', 'error');
                 }
             });
         }
 
-        // Deactivate or Activate User Action
         if (action === 'deactivate_user' || action === 'activate_user') {
             const isActivating = isActivate === 'activate';
             const actionVerb = isActivating ? 'Reactivate' : 'Deactivate';
-            const pastTenseVerb = isActivate === 'activate' ? 'reactivated' : 'deactivated';
-
+            const pastTenseVerb = isActivating ? 'reactivated' : 'deactivated';
 
             Swal.fire({
                 title: `Are you sure you want to ${actionVerb} this user?`,
@@ -273,8 +256,6 @@ $(document).ready(function () {
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Emit deactivate or activate action
-                    socket.off('deactivate');
                     socket.off(`${melody.melody1}_${action}`);
 
                     socket.emit('deactivate', {
@@ -292,11 +273,10 @@ $(document).ready(function () {
                             icon: res.type ? 'success' : 'error',
                             showConfirmButton: true
                         });
-                        userTableFetch();  // Refresh table after action
+                        userTableFetch();
                     });
                 }
             });
-
         }
 
         if (action === 'set_user_role') {
@@ -305,12 +285,10 @@ $(document).ready(function () {
             viewModal.find('.afrobuild_user_hiddenid').val(userId);
 
             viewModal.trigger('click');
-
         }
     });
 
-
-    // Function to populate the user form with data
+    // Populate user form fields
     function populateUserForm(user) {
         $('#first_name').val(user.first_name);
         $('#last_name').val(user.last_name);
@@ -319,11 +297,9 @@ $(document).ready(function () {
         $('#address').val(user.address);
         $('#username').val(user.username);
         $('#user_hiddenid').val(user.userid);
-        // If you need more fields, populate them here
     }
 
-
-    // Load dropdown
+    // Load user role dropdown
     function loadUserRoleDropdown() {
         socket.emit('dropdown', {
             melody1: melody.melody1,
@@ -331,7 +307,7 @@ $(document).ready(function () {
             param: "user_role"
         });
 
-        socket.on(`${melody.melody1}_user_role`, function (data) {
+        socket.off(`${melody.melody1}_user_role`).on(`${melody.melody1}_user_role`, function (data) {
             const $select = $('.afrobuild_user_role_select');
             $select.html(`<option value="" selected>Select Role</option>`);
 
@@ -344,8 +320,12 @@ $(document).ready(function () {
                 const optionValue = `${item.roleid}`;
                 $select.append(`<option value="${optionValue}">${item.name.toUcwords()}</option>`);
             });
-
-            // makeAllSelectLiveSearch('afrobuild_user_role_select', 'Select Role');
         });
     }
+
+    // Global socket error handler
+    socket.on('error', (err) => {
+        Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
+        $('.afrobuild_user_action_submit_btn, .afrobuild_manage_user_submit_btn').html('Submit').removeAttr('disabled');
+    });
 });
