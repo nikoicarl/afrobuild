@@ -56,24 +56,6 @@
             </li>
         <% } %>
 
-        <% if (privilege.afrobuild?.add_vendor === "yes" || privilege.afrobuild?.update_vendor === "yes" || privilege.afrobuild?.deactivate_vendor === "yes") { %>
-            <li class="menu nav-item">
-                <a href="/vendor" data-appname="afrobuild" class="nav-link afrobuild_main_navigation_btn" data-navparent="afrobuildnavbar" data-scripts="single::app/vendorAjax">
-                    <img src="/assets/img/vendor.png" alt="">
-                    &nbsp;&nbsp;Manage Vendors
-                </a>
-            </li>
-        <% } %>
-
-        <% if (privilege.afrobuild?.add_merchant === "yes" || privilege.afrobuild?.update_merchant === "yes" || privilege.afrobuild?.deactivate_merchant === "yes") { %>
-            <li class="menu nav-item">
-                <a href="/merchant" data-appname="afrobuild" class="nav-link afrobuild_main_navigation_btn" data-navparent="afrobuildnavbar" data-scripts="single::app/merchantAjax">
-                    <img src="/assets/img/merchant.png" alt="">
-                    &nbsp;&nbsp;Manage Merchants
-                </a>
-            </li>
-        <% } %>
-
         <% if (privilege.afrobuild?.add_privilege === "yes" ) { %>
             <li class="menu nav-item">
                 <a href="/privilege" data-appname="afrobuild" class="nav-link afrobuild_main_navigation_btn" data-navparent="afrobuildnavbar" data-scripts="single::app/privilegeAjax">
@@ -131,23 +113,6 @@
                         </li>
                     <% } %>
 
-                    <% if (privilege.afrobuild?.view_merchant_report === "yes") { %>
-                        <li>
-                            <a href="/merchant_report" class="nav-link afrobuild_main_navigation_btn"
-                                data-appname="afrobuild" data-scripts="single::afrobuild/merchantReportAjax">
-                                Merchant Report
-                            </a>
-                        </li>
-                    <% } %>
-
-                    <% if (privilege.afrobuild?.view_vendor_report === "yes") { %>
-                        <li>
-                            <a href="/vendor_report" class="nav-link afrobuild_main_navigation_btn"
-                                data-appname="afrobuild" data-scripts="single::afrobuild/vendorReportAjax">
-                                Vendor Report
-                            </a>
-                        </li>
-                    <% } %>
                 </ul>
             </li>
         <% } %>
