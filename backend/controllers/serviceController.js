@@ -84,6 +84,7 @@ module.exports = (socket, Database) => {
                     description,
                     price,
                     category,
+                    userid,
                     documentNames,
                     gf.getDateTime(),
                     'active'
