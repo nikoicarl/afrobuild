@@ -30,15 +30,16 @@ const tableConfigs = {
     product_table: {
         model: Product,
         permissions: ['add_product', 'update_product', 'deactivate_product'],
-        sql: 'status != ? ORDER BY name ASC',
-        columns: ['inactive']
+        sql: 'userid = ? AND status != ? ORDER BY name ASC',
+        columns: [], // We'll push values dynamically
     },
     service_table: {
         model: Service,
         permissions: ['add_service', 'update_service', 'deactivate_service'],
-        sql: 'status != ? ORDER BY name ASC',
-        columns: ['inactive']
+        sql: 'userid = ? AND status != ? ORDER BY name ASC',
+        columns: [], // We'll push values dynamically
     },
+
     merchant_table: {
         model: Merchant,
         permissions: ['add_merchant', 'update_merchant', 'deactivate_merchant'],
@@ -89,6 +90,12 @@ module.exports = (socket, Database) => {
             }
 
             const userid = session.userid;
+
+            // Inject userid into columns if required
+            if ((param === 'product_table' || param === 'service_table') && Array.isArray(config.columns)) {
+                config.columns = [userid, 'inactive'];
+            }
+
 
             // Skip privilege check for activity_table
             if (param !== 'activity_table') {
