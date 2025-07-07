@@ -42,7 +42,7 @@ class Product {
         await this.createTable();
         try {
             const placeholders = this.columnsList.map(() => '?').join(',');
-            const sql = `INSERT INTO product (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const sql = `INSERT IGNORE INTO product (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             const result = await this.Database.setupConnection({ sql, columns }, 'object');
             return result;
         } catch (error) {

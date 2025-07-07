@@ -43,7 +43,7 @@ class User {
         await this.createTable();
         try {
             const placeholders = this.columnsList.map(() => '?').join(',');
-            const sql = `INSERT INTO ${this.tableName} (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const sql = `INSERT IGNORE INTO ${this.tableName} (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             return await this.Database.setupConnection({ sql, columns }, 'object');
         } catch (error) {
             console.error('[Insert User Error]:', error);

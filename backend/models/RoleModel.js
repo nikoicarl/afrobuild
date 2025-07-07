@@ -19,7 +19,7 @@ class Role {
         await this.createTable();
         try {
             const placeholders = this.columnsList.map(() => '?').join(',');
-            const sql = `INSERT INTO role (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const sql = `INSERT IGNORE INTO role (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             const result = await this.Database.setupConnection({ sql, columns }, 'object');
             return result;
         } catch (error) {

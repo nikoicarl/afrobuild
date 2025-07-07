@@ -19,7 +19,7 @@ class Session {
         await this.createTable();
         try {
             const placeholders = this.columnsList.map(() => '?').join(',');
-            const sql = `INSERT INTO session (${this.columnsList.join(',')}) VALUES (${placeholders})`;
+            const sql = `INSERT IGNORE INTO session (${this.columnsList.join(',')}) VALUES (${placeholders})`;
             const result = await this.Database.setupConnection({ sql, columns }, 'object');
             return result;
         } catch (error) {
