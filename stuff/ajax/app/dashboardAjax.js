@@ -89,24 +89,26 @@ $(document).ready(function () {
             }
 
             const statsHTML = renderStats(data);
-            const tableHTML = renderTransactionTable();
-            dashboardDisplay.html(statsHTML + tableHTML);
-        });
-
-        socket.emit('table', {
-            melody1: melody.melody1,
-            melody2: melody.melody2,
-            param: 'transaction_table'
-        });
-
-        socket.on(`${melody.melody1}_transaction_table`, (data) => {
-            if (data?.type === 'error') {
-                console.error(data.message);
-            } else {
-                renderTransactionDataTable(data);
-            }
+            dashboardDisplay.prepend(statsHTML);
         });
     }
+
+    socket.emit('table', {
+        melody1: melody.melody1,
+        melody2: melody.melody2,
+        param: 'transaction_table'
+    });
+
+    socket.on(`${melody.melody1}_transaction_table`, (data) => {
+        if (data?.type === 'error') {
+            console.error(data.message);
+        } else {
+            const tableHTML = renderTransactionTable(); // this function should return the HTML markup
+            dashboardDisplay.append(tableHTML);
+            renderTransactionDataTable(data);
+
+        }
+    });
 
     // Action Modal
     $(document).on('click', '.afrobuild_transaction_table_edit_btn', function (e) {

@@ -91,14 +91,30 @@ module.exports = (socket, Database) => {
 
             const userid = session.userid;
 
-            // Inject userid into columns if required
+            // Get user + role name
+            const UserModel = new User(Database);
+            const userResult = await UserModel.joinFetch({
+                sql: 't1.userid = ?',
+                columns: [userid]
+            });
+
+            if (!Array.isArray(userResult) || userResult.length === 0) {
+                return socket.emit(`${melody1}_${param}`, {
+                    type: 'error',
+                    message: 'User not found.'
+                });
+            }
+
+            const user = userResult[0];
+            const roleName = (user.role_name || '').toLowerCase();
+
+            // Inject userid into product/service tables
             if ((param === 'product_table' || param === 'service_table') && Array.isArray(config.columns)) {
                 config.columns = [userid, 'inactive'];
             }
 
-
-            // Skip privilege check for activity_table
-            if (param !== 'activity_table') {
+            // Privilege check (except for activity_table and transaction_table)
+            if (param !== 'activity_table' && param !== 'transaction_table') {
                 const PrivilegeModel = new Privilege(Database, userid);
                 const { privilegeData = {} } = await PrivilegeModel.getPrivileges();
                 const afrobuildPerms = privilegeData.afrobuild || {};
@@ -112,24 +128,33 @@ module.exports = (socket, Database) => {
                 }
             }
 
-            let data;
+            // For transaction_table, filter by userid if not admin
+            let sql = config.sql;
+            let columns = config.columns;
+
+            if (param === 'transaction_table' && roleName !== 'admin') {
+                sql = `userid = ? AND ` + sql;
+                columns = [userid, ...columns];
+            }
+
             const ModelInstance = new config.model(Database);
 
+            let data;
             if (config.isViewModel && config.method && typeof ModelInstance[config.method] === 'function') {
                 data = await ModelInstance[config.method]({
                     table: 'transaction_view',
-                    sql: config.sql,
-                    columns: config.columns
+                    sql,
+                    columns
                 });
             } else if (config.method && typeof ModelInstance[config.method] === 'function') {
                 data = await ModelInstance[config.method]({
-                    sql: config.sql,
-                    columns: config.columns
+                    sql,
+                    columns
                 });
             } else if (typeof ModelInstance.preparedFetch === 'function') {
                 data = await ModelInstance.preparedFetch({
-                    sql: config.sql,
-                    columns: config.columns
+                    sql,
+                    columns
                 });
             } else {
                 throw new Error(`No valid method found for ${param}`);
