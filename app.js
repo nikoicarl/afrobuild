@@ -1,16 +1,49 @@
+// ==== Log File Setup (MUST be at the very top) ====
+const fs = require('fs');
+const path = require('path');
+const logFilePath = path.join(__dirname, 'server.log');
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+
+console.log = function (...args) {
+    originalConsoleLog.apply(console, args);
+    logStream.write(`${new Date().toISOString()} LOG: ${args.join(' ')}\n`);
+};
+
+console.error = function (...args) {
+    originalConsoleError.apply(console, args);
+    logStream.write(`${new Date().toISOString()} ERROR: ${args.join(' ')}\n`);
+};
+
+// ==== Global Error Handling for Uncaught Exceptions and Rejections ====
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+// ==== Standard Server Setup ====
+const cors = require('cors');
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const path = require('path');
 
+// Path setup
+const stuffPath = path.join(__dirname, 'stuff');
 
-// Model & Route Imports
+// ==== Model & Route Imports ====
 const DatabaseModel = require('./backend/models/DatabaseModel');
 const homeRouter = require('./backend/routers/homeRouter');
 const dashboardRouter = require('./backend/routers/dashboardRouter');
 
-// Controller Imports
+// ==== Controller Imports ====
 const setupController = require('./backend/controllers/setupController');
 const loginController = require('./backend/controllers/loginController');
 const logoutController = require('./backend/controllers/logoutController');
@@ -30,31 +63,35 @@ const DropdownController = require('./backend/controllers/dropdownController');
 const dashboardFetchController = require('./backend/controllers/dashboardFetchController');
 const reportController = require('./backend/controllers/reportController');
 
-
-// Initialize the server
+// ==== Server Initialization ====
 async function startServer() {
     try {
         const app = express();
-        const server = http.createServer(app); // Use HTTP server for socket.io
+        const server = http.createServer(app);
         const io = socketIo(server);
 
-        // Set EJS as template engine
+        // View engine
         app.set('view engine', 'ejs');
 
         // Middleware
-        app.use(express.static(path.join(__dirname, 'stuff')));
+        app.use(express.static(stuffPath));
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));
+        app.use(cors({
+            origin: '*',
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        }));
 
         // Initialize database
         const Database = new DatabaseModel();
         await Database.createConnection();
+        console.log('Database connected successfully');
 
-        // Register routers with database dependency
+        // Register routers
         homeRouter(app, Database);
         dashboardRouter(app, Database);
 
-        // Socket.IO connection handling
+        // Socket.IO
         io.on('connection', (socket) => {
             console.log('A user connected');
 
@@ -87,9 +124,7 @@ async function startServer() {
         });
 
         // Start server
-        const PORT = process.env.PORT || 6080;
-        const ENV = process.env.NODE_ENV || 'development';
-
+        const PORT = process.env.PORT || 7000;
         server.listen(PORT, () => {
             console.log(`Server is listening on port ${PORT}`);
         });
