@@ -1,0 +1,15 @@
+2025-07-07T18:51:25.119Z LOG: Database connected successfully
+2025-07-07T18:51:25.123Z LOG: Server is listening on port 7000
+2025-07-07T18:51:25.210Z LOG: MYSQL Database is connected successfully
+2025-07-07T18:51:34.610Z LOG: A user connected
+2025-07-07T18:51:40.566Z LOG: A user connected
+2025-07-07T18:52:15.699Z LOG: Database connected successfully
+2025-07-07T18:52:15.716Z LOG: Server is listening on port 6080
+2025-07-07T18:52:15.726Z LOG: MYSQL Database is connected successfully
+2025-07-07T18:52:26.318Z LOG: A user connected
+2025-07-07T18:52:29.340Z LOG: A user disconnected
+2025-07-07T18:52:30.052Z LOG: A user connected
+2025-07-07T19:10:59.502Z LOG: Database connected successfully
+2025-07-07T19:10:59.518Z LOG: Server is listening on port 6080
+2025-07-07T19:10:59.540Z LOG: MYSQL Database is connected successfully
+2025-07-07T19:11:00.188Z LOG: A user connected
