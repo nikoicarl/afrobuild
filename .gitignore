@@ -1,17 +1,48 @@
-node_modules
+# Node modules
+node_modules/
 
-backups
-
-stuff/uploads/*
-
-package-lock.json
-
-.env
-
-.env/*
-
-.env*
-
-*.env
-
+# Logs
+logs/
 *.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# dotenv environment files
+.env
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor settings
+.vscode/
+.idea/
+
+# Coverage directory
+coverage/
+
+# Debug log from npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Socket.IO file store (if using file-based adapters)
+*.sock
+
+# Database files (if any local ones exist)
+*.sqlite
+*.db
+
+# Uploaded files (optional if you're storing uploads locally)
+uploads/
+public/uploads/
