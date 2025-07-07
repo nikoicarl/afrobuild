@@ -84,50 +84,54 @@ class ViewModel {
             tableName: 'transaction_view',
             createTableStatement: (`
             SELECT 
-                t1.transactionid,
-                t1.product_service,
-                t1.itemtype,
-                t1.userid,
-                t1.merchant,
-                t1.amount,
-                t1.datetime,
-                t1.message,
-                t1.status AS transaction_status,
+                t.transactionid,
+                t.userid,
+                t.amount,
+                t.message,
+                t.datetime,
+                t.status AS transaction_status,
+
+                ti.transaction_itemsid,
+                ti.product_service,
+                ti.itemtype,
+                ti.category AS categoryid,
+                ti.name AS item_name,
+                ti.price AS item_price,
+                ti.quantity,
+                ti.subtotal,
 
                 u.username,
                 u.email,
                 u.status AS user_status,
                 CONCAT(u.first_name, ' ', u.last_name) AS full_name,
 
-                m.name AS merchant_name,
+                -- Get merchant from either service.userid or product.userid
+                CONCAT(mu.first_name, ' ', mu.last_name) AS merchant_name,
 
                 CASE 
-                    WHEN t1.itemtype = 'product' THEN p.name
-                    WHEN t1.itemtype = 'service' THEN s.name
-                END AS item_name,
-
-                CASE 
-                    WHEN t1.itemtype = 'product' THEN p.price
-                    WHEN t1.itemtype = 'service' THEN s.price
-                END AS item_price,
-
-                CASE 
-                    WHEN t1.itemtype = 'product' THEN c.name
-                    WHEN t1.itemtype = 'service' THEN cs.name
+                    WHEN ti.itemtype = 'product' THEN c.name
+                    WHEN ti.itemtype = 'service' THEN cs.name
+                    ELSE NULL
                 END AS category_name
 
-            FROM transaction t1
-            LEFT JOIN user u ON u.userid = t1.userid
-            LEFT JOIN merchant m ON m.merchantid = t1.merchant
-            LEFT JOIN product p ON p.productid = t1.product_service AND t1.itemtype = 'product'
+            FROM transaction_items ti
+            LEFT JOIN transaction t ON t.transactionid = ti.transactionid
+            LEFT JOIN user u ON u.userid = t.userid
+
+            LEFT JOIN product p ON p.productid = ti.product_service AND ti.itemtype = 'product'
+            LEFT JOIN service s ON s.serviceid = ti.product_service AND ti.itemtype = 'service'
+
+            -- Join user table to both product and service via COALESCE
+            LEFT JOIN user mu ON mu.userid = COALESCE(p.userid, s.userid)
+
             LEFT JOIN category c ON c.categoryid = p.categoryid
-            LEFT JOIN service s ON s.serviceid = t1.product_service AND t1.itemtype = 'service'
             LEFT JOIN category cs ON cs.categoryid = s.categoryid
         `)
         });
 
         return await CreateUpdateTable.createView();
     }
+
 
 }
 
