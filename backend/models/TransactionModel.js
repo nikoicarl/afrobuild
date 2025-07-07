@@ -6,8 +6,7 @@ class Transaction {
 
         this.tableName = 'transaction';
         this.columnsList = [
-            'transactionid', 'product_service', 'itemtype', 'category', 'userid',
-            'merchant', 'amount', 'message', 'datetime', 'status'
+            'transactionid', 'userid', 'amount', 'message', 'datetime', 'status'
         ];
 
         this.createTable();
@@ -18,11 +17,7 @@ class Transaction {
             tableName: this.tableName,
             createTableStatement: `
                 transactionid BIGINT(100) PRIMARY KEY,
-                product_service BIGINT(100),
-                itemtype VARCHAR(50),
-                category BIGINT(100),
                 userid BIGINT(100),
-                merchant BIGINT(100),
                 amount DECIMAL(10, 2),
                 message TEXT,
                 datetime DATETIME,

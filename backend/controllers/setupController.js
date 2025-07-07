@@ -2,6 +2,8 @@ const Setup = require('../models/SetupModel');
 const User = require('../models/UserModel');
 const Session = require('../models/SessionModel');
 const Role = require('../models/RoleModel');
+const TransactionItem = require('../models/TransactionItemsModel');
+const Transaction = require('../models/TransactionModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
 const GeneralFunction = require('../models/GeneralFunctionModel');
 const Apps = require('../models/AppsModel');
@@ -17,6 +19,8 @@ module.exports = (socket, Database) => {
         const SetupModel = new Setup(Database);
         const UserModel = new User(Database);
         const RoleModel = new Role(Database);
+        const TransactionItemModel = new TransactionItem(Database);
+        const TransactionModel = new Transaction(Database);
         const SessionModel = new Session(Database);
 
         try {
