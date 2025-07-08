@@ -103,7 +103,7 @@ module.exports = (socket, Database) => {
                 if (!insertRoleResult.affectedRows) throw new Error('Failed to insert role');
 
                 const insertUserResult = await UserModel.insertTable([
-                    userid, 'system', 'administrator', null, null, null,
+                    userid, 'system', 'administrator', null, null, null, null, null,
                     'admin', md5('admin123'), roleID, 'active', gf.getDateTime(), null,
                 ]);
 
