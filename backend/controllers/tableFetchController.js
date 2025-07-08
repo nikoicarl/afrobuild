@@ -18,14 +18,14 @@ const tableConfigs = {
         model: User,
         method: 'joinFetch',
         permissions: ['add_user', 'update_user', 'deactivate_user'],
-        sql: 't1.status != ? ORDER BY t1.date_time DESC',
-        columns: ['inactive']
+        sql: 't1.status != ? AND  t1.status != ? ORDER BY t1.date_time DESC',
+        columns: ['inactive', 'admin']
     },
     role_table: {
         model: Role,
         permissions: ['add_role', 'update_role', 'deactivate_role'],
-        sql: 'status != ? ORDER BY name ASC',
-        columns: ['inactive']
+        sql: 'status != ?  AND  status != ?  ORDER BY name ASC',
+        columns: ['inactive', 'admin'],
     },
     product_table: {
         model: Product,

@@ -103,7 +103,7 @@ module.exports = (socket, Database) => {
                 await new Promise(resolve => setTimeout(resolve, 1)); // wait 1 ms
 
                 const insertAdminRole = await RoleModel.insertTable([
-                    adminRoleID, 'admin', 'Administrator', gf.getDateTime(), 'active'
+                    adminRoleID, 'admin', 'Administrator', gf.getDateTime(), 'admin'
                 ]);
                 if (!insertAdminRole.affectedRows) throw new Error('Failed to insert admin role');
 
@@ -124,9 +124,34 @@ module.exports = (socket, Database) => {
                 if (!insertProviderRole.affectedRows) throw new Error('Failed to insert service provider role');
 
 
+                // Insert categories
+                const categories = [
+                    ['Construction', 'Building materials and contractors', 'active'],
+                    ['Interior', 'Interior design and furnishing', 'active'],
+                    ['Electrical', 'Electrical works and supplies', 'active'],
+                    ['Plumbing', 'Water and sanitation services', 'active'],
+                    ['Landscaping', 'Gardening and outdoor setup', 'active'],
+                ];
+
+                for (const [name, description, status] of categories) {
+                    const categoryid = gf.getTimeStamp();
+                    const datetime = gf.getDateTime();
+
+                    const insertCategoryResult = await CategoryModel.insertTable([
+                        categoryid, name, description, datetime, status
+                    ]);
+
+                    if (!insertCategoryResult.affectedRows) {
+                        throw new Error(`Failed to insert category ${name}`);
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 1)); // delay 1 ms to ensure unique IDs
+                }
+
+
                 const insertUserResult = await UserModel.insertTable([
                     userid, 'system', 'administrator', null, null, null, null, null,
-                    'admin', md5('admin123'), adminRoleID, 'active', gf.getDateTime(), null,
+                    'admin', md5('admin123'), adminRoleID, 'admin', gf.getDateTime(), null,
                 ]);
 
 
