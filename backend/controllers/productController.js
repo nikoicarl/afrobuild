@@ -14,6 +14,7 @@ module.exports = (socket, Database) => {
             name,
             price: rawPrice,
             category,
+            shipping_fee: rawShippingFee,
             description,
             product_hiddenid,
             melody1,
@@ -24,7 +25,7 @@ module.exports = (socket, Database) => {
         const session = getSessionIDs(melody1);
         const userid = session.userid;
         const price = isNaN(parseFloat(rawPrice)) ? 0.00 : parseFloat(parseFloat(rawPrice).toFixed(2));
-
+        const shipping_fee = isNaN(parseFloat(rawShippingFee)) ? 0.00 : parseFloat(parseFloat(rawShippingFee).toFixed(2));
 
         const responseEvent = `${melody1}_${isUpdate ? 'update' : 'create'}_product`;
 
@@ -83,6 +84,7 @@ module.exports = (socket, Database) => {
                     name,
                     description,
                     price,
+                    shipping_fee,
                     category,
                     userid,
                     documentNames,
@@ -90,23 +92,29 @@ module.exports = (socket, Database) => {
                     'active'
                 ]);
             } else {
+                let updateSql = `
+                    name = ?, 
+                    description = ?,
+                    categoryid = ?,
+                    price = ?,
+                    shipping_fee = ?
+                `.trim();
+
                 const updateColumns = [
                     name,
                     description,
                     category,
                     price,
-                    ...(DocumentsForUpdate.length > 0 ? [documentNames] : []),
-                    product_hiddenid,
-                    'active'
+                    shipping_fee
                 ];
 
-                const updateSql = `
-                    name = ?, 
-                    description = ?,
-                    categoryid = ?,
-                    price = ?${DocumentsForUpdate.length > 0 ? ', documents = ?' : ''} 
-                    WHERE productid = ? AND status = ?
-                `.replace(/\s+/g, ' ').trim();
+                if (DocumentsForUpdate.length > 0) {
+                    updateSql += ', documents = ?';
+                    updateColumns.push(documentNames);
+                }
+
+                updateSql += ' WHERE productid = ? AND status = ?';
+                updateColumns.push(product_hiddenid, 'active');
 
                 result = await ProductModel.updateTable({
                     sql: updateSql,
@@ -114,7 +122,7 @@ module.exports = (socket, Database) => {
                 });
             }
 
-            if (result && result.affectedRows !== undefined) {
+            if (result && result.affectedRows !== undefined && result.affectedRows > 0) {
                 if (DocumentsForUpdate.length > 0) {
                     UploadFileHandler.upload();
                 }

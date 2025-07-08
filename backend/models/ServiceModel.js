@@ -21,7 +21,7 @@ class Service {
             tableName: this.tableName,
             createTableStatement: `
                 serviceid BIGINT(100) PRIMARY KEY,
-                name VARCHAR(255),
+                name VARCHAR(255) UNIQUE,
                 description VARCHAR(255),
                 price DOUBLE(10,2),
                 categoryid BIGINT(100),

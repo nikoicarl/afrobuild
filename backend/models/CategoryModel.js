@@ -15,7 +15,7 @@ class Category {
             tableName: this.tableName,
             createTableStatement: `
                 categoryid BIGINT(100) PRIMARY KEY,
-                name VARCHAR(255),
+                name VARCHAR(255) UNIQUE,
                 description VARCHAR(255),
                 datetime DATETIME,
                 status VARCHAR(50)

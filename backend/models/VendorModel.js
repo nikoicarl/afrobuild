@@ -19,7 +19,7 @@ class Vendor {
             tableName: 'vendor',
             createTableStatement: `
                 vendorid BIGINT(100) PRIMARY KEY,
-                name VARCHAR(255),
+                name VARCHAR(255) UNIQUE,
                 phone VARCHAR(50),
                 email VARCHAR(100),
                 address VARCHAR(255),

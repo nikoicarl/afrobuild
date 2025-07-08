@@ -1,48 +1,41 @@
 $(document).ready(function () {
-
-    // Dropzone
+    // Dropzone Icons
     let dropZoneIcons = {
         pdf: '<div class="icon-file-pdf icon-5x text-danger-400 d-block w-100 h-70"></div>',
         doc: '<div class="icon-file-word icon-5x text-danger-400 d-block w-100 h-70"></div>',
         spreadsheet: '<div class="icon-file-excel icon-5x text-danger-400 d-block w-100 h-70"></div>',
         other: '<div class="icon-file-zip icon-5x text-danger-400 d-block w-100 h-70"></div> '
-    }
-    const socket = io();
+    };
+
     const $formDisplay = $('#afrobuild_product_page_form_display');
     const $toggleBtn = $('#afrobuild_manage_product_table_btn');
     const $productForm = $('#productForm');
 
-    // Handle the toggle between table and form
+    // Toggle between table and form
     $(document).on('click.pageopener', 'h3#afrobuild_manage_product_table_btn', function (e) {
         e.preventDefault();
         const isTableView = $(this).data("open") === 'table';
-
-        // Render the corresponding content based on the current state
         const html = isTableView ? ejs.render(ProductTable(), {}) : ejs.render(renderProductForm(), {});
         $formDisplay.html(html);
 
-        // Update the button text for toggling between views
         const btnText = isTableView
             ? `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M19 12H5"></path><path d="M12 5l-7 7 7 7"></path></svg> Go Back`
             : 'View All Products';
 
-        // Set the button data-toggle state for next interaction
         $toggleBtn.html(btnText).data('open', isTableView ? 'form' : 'table');
-        // Initialize DropZone if switching to form view
         if (!isTableView) pageDropZone();
         if (!isTableView) categoryDropdown();
-
-        // Fetch the product table if we are in table view
         if (isTableView) productTableFetch();
     });
 
-    // Handle product form submission for creating or updating a product
+    // Handle product form submission
     $(document).on('click', '.afrobuild_manage_product_submit_btn', function (e) {
-        e.preventDefault();  // Prevent the default action of the button
+        e.preventDefault();
 
         const productData = {
             name: $('#product_name').val().trim(),
             price: $('#product_price').val().trim(),
+            shipping_fee: $('#product_shipping_fee').val().trim(),
             category: $('#product_category').val().trim(),
             description: $('#product_description').val().trim(),
             product_hiddenid: $('#afrobuild_manage_product_hiddenid').val().trim(),
@@ -56,16 +49,15 @@ $(document).ready(function () {
             .attr('disabled', true);
 
         setTimeout(() => {
-            // Determine if it's create or update action based on product_hiddenid
             const action = productData.product_hiddenid ? 'update_product' : 'create_product';
-
-            // Emit the respective socket event
-            socket.emit(action, productData);
-
-
-            // Handle response based on action
             const responseEvent = `${productData.melody1}_${action}`;
-            socket.off(responseEvent).once(responseEvent, (res) => {
+
+            // Remove previous listeners for this event
+            socket.off(responseEvent);
+            socket.off('error');
+
+            // Only handle next response
+            socket.once(responseEvent, (res) => {
                 Swal.fire({
                     title: res.success ? 'Success' : 'Error',
                     text: res.message || (res.success ? `Product ${action === 'create_product' ? 'created' : 'updated'} successfully!` : `Failed to ${action === 'create_product' ? 'create' : 'update'} product.`),
@@ -74,7 +66,6 @@ $(document).ready(function () {
                     timer: res.success ? 2000 : undefined
                 });
                 $submitBtn.html('Submit').removeAttr('disabled');
-
                 if (res.success) {
                     resetProductForm();
                     productTableFetch();
@@ -82,26 +73,27 @@ $(document).ready(function () {
                 }
             });
 
-
-            socket.on('error', (err) => {
+            socket.once('error', (err) => {
                 $submitBtn.html('Submit').removeAttr('disabled');
                 Swal.fire('Error', 'An unexpected error occurred. Please try again later.', 'error');
             });
+
+            socket.emit(action, productData);
         }, 300);
     });
 
-
     function resetProductForm() {
         $('#productForm')[0].reset();
-        $('.product_category').val('').change();  // Reset the form fields
-        $('#product_hiddenid').val('');  // Clear the hidden ID field
-        FileNamesHolder = [];  // Clear the file names holder
-        $('.afrobuild_manage_product_submit_btn').html('Submit').removeAttr('disabled');  // Reset submit button text and enable
+        $('.product_category').val('').change();
+        $('#product_hiddenid').val('');
+        FileNamesHolder = [];
+        $('.afrobuild_manage_product_submit_btn').html('Submit').removeAttr('disabled');
     }
 
-    // Function to fetch and render the product table
+    // Fetch and render the product table
     const productTableFetch = () => {
-        socket.off('table').off(`${melody.melody1}_product_table`);
+        socket.off('table');
+        socket.off(`${melody.melody1}_product_table`);
 
         socket.emit('table', {
             melody1: melody.melody1,
@@ -109,7 +101,7 @@ $(document).ready(function () {
             param: 'product_table'
         });
 
-        socket.on(`${melody.melody1}_product_table`, (data) => {
+        socket.once(`${melody.melody1}_product_table`, (data) => {
             if (data.type === 'error') {
                 console.error(data.message);
                 return;
@@ -118,10 +110,9 @@ $(document).ready(function () {
         });
     };
 
-    // Function to handle product table rendering
+    // Render the product table
     function productDataTable(dataJSONArray) {
         reCreateMdataTable('afrobuild_product_data_table', 'afrobuild_product_data_table_div');
-
         $('.afrobuild_product_data_table').mDatatable({
             data: {
                 type: 'local',
@@ -139,14 +130,11 @@ $(document).ready(function () {
                     field: 'price',
                     title: "Price ",
                     template: row =>
-                        `
-                            ${Number(row.price).toLocaleString('en-GH', {
+                        `${Number(row.price).toLocaleString('en-GH', {
                             style: 'currency',
                             currency: 'GHS'
-                        })}
-                        `
+                        })}`
                 },
-
                 {
                     field: 'description',
                     title: "Description ",
@@ -157,13 +145,11 @@ $(document).ready(function () {
                     title: "Image",
                     type: 'text',
                     template: function (row) {
-                        let img = row.documents && row.documents ? (row.documents.split(',') ? row.documents.split(',')[0] : row.documents) : ''
-                        if (img && img != '') {
-                            img = (`
-                                    <img src="uploads/${img}" style="max-width: 40px; max-height: 40px; border-radius: 4px; cursor: pointer;" />
-                                `)
+                        let img = row.documents && row.documents ? (row.documents.split(',') ? row.documents.split(',')[0] : row.documents) : '';
+                        if (img && img !== '') {
+                            img = (`<img src="uploads/${img}" style="max-width: 40px; max-height: 40px; border-radius: 4px; cursor: pointer;" />`);
                         }
-                        return img
+                        return img;
                     }
                 },
                 {
@@ -202,15 +188,15 @@ $(document).ready(function () {
         });
     }
 
-    // Update Product on Click
+    // Handle product table actions (edit, deactivate, activate, delete)
     $(document).on('click', '.afrobuild_product_table_edit_btn', function (e) {
         const action = $(this).data('getname');
         const productId = $(this).data('getid');
         const name = $(this).data('getdata');
-        const isActivate = $(this).data('activate'); // Checks if it's an 'activate' action
+        const isActivate = $(this).data('activate');
 
-        // Specific Product Action
         if (action === 'specific_product') {
+            socket.off(`${melody.melody1}_specific_product`);
             socket.emit('specific', {
                 "melody1": melody.melody1,
                 "melody2": melody.melody2,
@@ -219,23 +205,21 @@ $(document).ready(function () {
                 "dataId": productId
             });
 
-            socket.on(`${melody.melody1}_specific_product`, (res) => {
+            socket.once(`${melody.melody1}_specific_product`, (res) => {
                 if (res.productResult) {
                     const html = ejs.render(renderProductForm(), {});
                     document.getElementById('afrobuild_product_page_form_display').innerHTML = html;
-
                     pageDropZone();
                     categoryDropdown();
-
                     $('#afrobuild_manage_product_table_btn').html('View All Products');
                     $('#afrobuild_manage_product_table_btn').data('open', "table");
                     $('.product_submit_btn').html('Update');
-                    populateProductForm(res.productResult);  // Populate the form with product data
+                    populateProductForm(res.productResult);
                     FileNamesHolder = [];
                     if (res.productResult) {
                         let list = res.productResult.documents.split(',') ? res.productResult.documents.split(',') : [res.productResult.documents];
                         for (let i = 0; i < list.length; i++) {
-                            FileNamesHolder.push(list[i] + '*^*^any_div')
+                            FileNamesHolder.push(list[i] + '*^*^any_div');
                         }
                     }
                 } else {
@@ -250,7 +234,6 @@ $(document).ready(function () {
             const actionVerb = isActivating ? 'Reactivate' : 'Deactivate';
             const pastTenseVerb = isActivate === 'activate' ? 'reactivated' : 'deactivated';
 
-
             Swal.fire({
                 title: `Are you sure you want to ${actionVerb} this product?`,
                 text: `This will change the status of the product ${name}.`,
@@ -261,7 +244,6 @@ $(document).ready(function () {
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Emit deactivate or activate action
                     socket.off('deactivate');
                     socket.off(`${melody.melody1}_${action}`);
 
@@ -280,16 +262,14 @@ $(document).ready(function () {
                             icon: res.type ? 'success' : 'error',
                             showConfirmButton: true
                         });
-                        productTableFetch();  // Refresh table after action
+                        productTableFetch();
                     });
                 }
             });
-
         }
     });
 
-
-    // Function to populate the product form with data
+    // Populate the product form with data
     function populateProductForm(product) {
         $('#afrobuild_manage_product_hiddenid').val(product.productid);
         holdProductCategory = product.categoryid;
@@ -297,31 +277,29 @@ $(document).ready(function () {
         $('#product_name').val(product.name);
         $('#product_price').val(product.price);
         $('#product_description').val(product.description);
-        // If you need more fields, populate them here
+        $('#product_shipping_fee').val(product.shipping_fee);
     }
 
+    // DropZone initialization
     pageDropZone();
     function pageDropZone() {
         const primary_color = '#009345';
         setTimeout(function () {
-            FileNamesHolder = []
-            UploadChecker = 0
+            FileNamesHolder = [];
+            UploadChecker = 0;
             DropZone('afrobuild_manage_product_drop_zone', primary_color.split("**")[0] + '61', dropZoneIcons, {
                 requestType: 'socket',
                 socketObject: socket,
                 socketEvent: 'ovasyte_general_file_upload'
-            }, 'image/*', 2)
+            }, 'image/*', 2);
             $('.afrobuild_manage_product_drop_zone_title').text('Click to upload images here');
             $('.afrobuild_manage_product_drop_zone_subtitle').text(``);
-            // $('.afrobuild_manage_product_drop_zone_label').css('height', '150px');
             $('.afrobuild_manage_product_drop_zone_inner').addClass('mt-4');
-        }, 200)
+        }, 200);
     }
 
-
-
     let holdProductCategory;
-    //ProductCategory dropdown
+    // ProductCategory dropdown
     categoryDropdown();
     function categoryDropdown() {
         socket.off('dropdown');
@@ -333,9 +311,7 @@ $(document).ready(function () {
             param: 'category'
         });
 
-        //Get dropdown data
-        socket.on(melody.melody1 + '_category', function (data) {
-            //Get json content from login code
+        socket.once(melody.melody1 + '_category', function (data) {
             if (data.type == "error") {
                 console.log(data.message);
             } else {
@@ -344,8 +320,7 @@ $(document).ready(function () {
                     $('.product_category').append(`<option value="${item.categoryid}" ${item.categoryid == holdProductCategory ? 'selected' : ''}> ${item.name.toUcwords()} </option>`);
                 });
             }
-            makeAllSelectLiveSearch('product_category', 'Select Category')
+            makeAllSelectLiveSearch('product_category', 'Select Category');
         });
     }
 });
-

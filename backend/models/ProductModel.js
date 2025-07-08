@@ -8,7 +8,7 @@ class Product {
         this.tableName = 'product';
         this.columnsList = [
             'productid', 'name', 'description', 
-            'price', 'categoryid', 'userid', 'documents', 'datetime', 'status'
+            'price', 'shipping_fee', 'categoryid', 'userid', 'documents', 'datetime', 'status'
         ];
 
         // Ensure table exists on instantiation
@@ -21,9 +21,10 @@ class Product {
             tableName: this.tableName,
             createTableStatement: `
                 productid BIGINT(100) PRIMARY KEY,
-                name VARCHAR(255),
+                name VARCHAR(255) UNIQUE,
                 description VARCHAR(255),
                 price DOUBLE(10,2),
+                shipping_fee DOUBLE(10,2),
                 categoryid BIGINT(100),
                 userid BIGINT(100),
                 documents LONGTEXT,

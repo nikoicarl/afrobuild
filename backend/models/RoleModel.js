@@ -57,7 +57,7 @@ class Role {
 
             createTableStatement: (`
                 roleid BIGINT(100) PRIMARY KEY,
-                name varchar(255),
+                name varchar(255) UNIQUE,
                 description varchar(255),
                 datetime datetime,
                 status varchar(50)

@@ -25,7 +25,6 @@ module.exports = (socket, Database) => {
         const userid = session.userid;
         const price = isNaN(parseFloat(rawPrice)) ? 0.00 : parseFloat(parseFloat(rawPrice).toFixed(2));
 
-
         const responseEvent = `${melody1}_${isUpdate ? 'update' : 'create'}_service`;
 
         try {
@@ -90,23 +89,27 @@ module.exports = (socket, Database) => {
                     'active'
                 ]);
             } else {
+                let updateSql = `
+                    name = ?, 
+                    description = ?,
+                    categoryid = ?,
+                    price = ?
+                `.trim();
+
                 const updateColumns = [
                     name,
                     description,
                     category,
-                    price,
-                    ...(DocumentsForUpdate.length > 0 ? [documentNames] : []),
-                    service_hiddenid,
-                    'active'
+                    price
                 ];
 
-                const updateSql = `
-                    name = ?, 
-                    description = ?,
-                    categoryid = ?,
-                    price = ?${DocumentsForUpdate.length > 0 ? ', documents = ?' : ''} 
-                    WHERE serviceid = ? AND status = ?
-                `.replace(/\s+/g, ' ').trim();
+                if (DocumentsForUpdate.length > 0) {
+                    updateSql += ', documents = ?';
+                    updateColumns.push(documentNames);
+                }
+
+                updateSql += ' WHERE serviceid = ? AND status = ?';
+                updateColumns.push(service_hiddenid, 'active');
 
                 result = await ServiceModel.updateTable({
                     sql: updateSql,
@@ -114,7 +117,7 @@ module.exports = (socket, Database) => {
                 });
             }
 
-            if (result && result.affectedRows !== undefined) {
+            if (result && result.affectedRows !== undefined && result.affectedRows > 0) {
                 if (DocumentsForUpdate.length > 0) {
                     UploadFileHandler.upload();
                 }
