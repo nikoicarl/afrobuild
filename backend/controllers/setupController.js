@@ -2,6 +2,7 @@ const Setup = require('../models/SetupModel');
 const User = require('../models/UserModel');
 const Session = require('../models/SessionModel');
 const Role = require('../models/RoleModel');
+const Category = require('../models/CategoryModel');
 const TransactionItem = require('../models/TransactionItemsModel');
 const Transaction = require('../models/TransactionModel');
 const Privilege = require('../models/PrivilegeFeaturesModel');
@@ -19,6 +20,7 @@ module.exports = (socket, Database) => {
         const SetupModel = new Setup(Database);
         const UserModel = new User(Database);
         const RoleModel = new Role(Database);
+        const CategoryModel = new Category(Database);
         const TransactionItemModel = new TransactionItem(Database);
         const TransactionModel = new Transaction(Database);
         const SessionModel = new Session(Database);
@@ -96,16 +98,37 @@ module.exports = (socket, Database) => {
 
                 if (!insertSetupResult.affectedRows) throw new Error('Failed to insert setup');
 
-                const roleID = gf.getTimeStamp();
+                // Insert admin role
+                const adminRoleID = gf.getTimeStamp();
+                await new Promise(resolve => setTimeout(resolve, 1)); // wait 1 ms
 
-                const insertRoleResult = await RoleModel.insertTable([roleID, 'admin', 'Administrator', gf.getDateTime(), 'active']);
+                const insertAdminRole = await RoleModel.insertTable([
+                    adminRoleID, 'admin', 'Administrator', gf.getDateTime(), 'active'
+                ]);
+                if (!insertAdminRole.affectedRows) throw new Error('Failed to insert admin role');
 
-                if (!insertRoleResult.affectedRows) throw new Error('Failed to insert role');
+                // Insert vendor role
+                const vendorRoleID = gf.getTimeStamp();
+                await new Promise(resolve => setTimeout(resolve, 1)); // wait 1 ms
+
+                const insertVendorRole = await RoleModel.insertTable([
+                    vendorRoleID, 'Vendor', 'Vendor', gf.getDateTime(), 'active'
+                ]);
+                if (!insertVendorRole.affectedRows) throw new Error('Failed to insert vendor role');
+
+                // Insert service provider role
+                const providerRoleID = gf.getTimeStamp();
+                const insertProviderRole = await RoleModel.insertTable([
+                    providerRoleID, 'Service Provider', 'Service Provider', gf.getDateTime(), 'active'
+                ]);
+                if (!insertProviderRole.affectedRows) throw new Error('Failed to insert service provider role');
+
 
                 const insertUserResult = await UserModel.insertTable([
                     userid, 'system', 'administrator', null, null, null, null, null,
-                    'admin', md5('admin123'), roleID, 'active', gf.getDateTime(), null,
+                    'admin', md5('admin123'), adminRoleID, 'active', gf.getDateTime(), null,
                 ]);
+
 
                 if (!insertUserResult.affectedRows) throw new Error('Failed to insert user');
 
