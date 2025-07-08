@@ -6,7 +6,7 @@ class User {
         this.tableName = 'user';
 
         this.columnsList = [
-            'userid', 'first_name', 'last_name', 'phone', 'email',
+            'userid', 'first_name', 'last_name', 'phone', 'email', 'reset_token', 'reset_expires',
             'address', 'username', 'password', 'user_role', 'status', 'date_time', 'sessionid'
         ];
 
@@ -22,6 +22,8 @@ class User {
                 last_name VARCHAR(255),
                 phone VARCHAR(50),
                 email VARCHAR(255),
+                reset_token VARCHAR(255),
+                reset_expires VARCHAR(255),
                 address VARCHAR(255),
                 username VARCHAR(50),
                 password TEXT,
