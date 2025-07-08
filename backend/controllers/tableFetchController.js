@@ -62,8 +62,8 @@ const tableConfigs = {
         model: ViewModel,
         method: 'getGeneral',
         permissions: ['view_transaction'],
-        sql: '1 ORDER BY datetime DESC',
-        columns: [],
+        sql: '1=1 ORDER BY datetime DESC', // valid WHERE clause
+        columns: [], // Add column definitions if needed
         isViewModel: true
     },
     activity_table: {

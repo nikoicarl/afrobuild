@@ -105,9 +105,10 @@ class ViewModel {
                 u.status AS user_status,
                 CONCAT(u.first_name, ' ', u.last_name) AS full_name,
 
-                -- Get merchant from either service.userid or product.userid
+                -- Get merchant name from either product or service owner
                 CONCAT(mu.first_name, ' ', mu.last_name) AS merchant_name,
 
+                -- Get category name based on item type
                 CASE 
                     WHEN ti.itemtype = 'product' THEN c.name
                     WHEN ti.itemtype = 'service' THEN cs.name
@@ -121,8 +122,12 @@ class ViewModel {
             LEFT JOIN product p ON p.productid = ti.product_service AND ti.itemtype = 'product'
             LEFT JOIN service s ON s.serviceid = ti.product_service AND ti.itemtype = 'service'
 
-            -- Join user table to both product and service via COALESCE
-            LEFT JOIN user mu ON mu.userid = COALESCE(p.userid, s.userid)
+            LEFT JOIN user mu ON mu.userid = 
+                CASE 
+                    WHEN ti.itemtype = 'product' THEN p.userid
+                    WHEN ti.itemtype = 'service' THEN s.userid
+                    ELSE NULL
+                END
 
             LEFT JOIN category c ON c.categoryid = p.categoryid
             LEFT JOIN category cs ON cs.categoryid = s.categoryid
@@ -131,7 +136,6 @@ class ViewModel {
 
         return await CreateUpdateTable.createView();
     }
-
 
 }
 
