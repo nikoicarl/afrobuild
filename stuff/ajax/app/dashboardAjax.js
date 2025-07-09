@@ -47,7 +47,6 @@ $(document).ready(function () {
                         });
 
                         // Reset the form fields
-                        $('.afrobuild_transaction_product').val('');
                         $('.afrobuild_transaction_action_msg').val('');
                         $('.afrobuild_transaction_hiddenid').val('');
                         $('.afrobuild_transaction_hidden_action').val('');
@@ -67,7 +66,6 @@ $(document).ready(function () {
             });
         }, 300);
     });
-
 
 
     setTimeout(() => {
@@ -126,7 +124,6 @@ $(document).ready(function () {
             modalTitle.text(`${formattedAction}${transactionId ? ` - ${transactionId}` : ''}`);
 
             $('.afrobuild_transaction_hidden_action').val(action);
-            $('.afrobuild_transaction_product').val(name);
             $('.afrobuild_transaction_hiddenid').val(transactionId);
 
             $('.afrobuild_transaction_action_modal').trigger('click');
@@ -139,17 +136,11 @@ $(document).ready(function () {
             // Text fields
             viewModal.find('.afrobuild_view_reason').text(viewData?.message.toUcwords?.() || 'N/A');
 
-            // Category
-            viewModal.find('.afrobuild_view_category').text(viewData?.category_name?.toUcwords?.() || 'N/A');
-
             // Customer
             viewModal.find('.afrobuild_view_customer').text(viewData?.customer_full_name?.toUcwords?.() || 'N/A');
 
             // Date
             viewModal.find('.afrobuild_view_date').text(viewData?.datetime?.fullDate?.() || 'N/A');
-
-            // Merchant
-            viewModal.find('.afrobuild_view_merchant').text(viewData?.merchant_full_name?.toUcwords?.() || 'N/A');
 
             // Amount
             viewModal.find('.afrobuild_view_amount').text(
@@ -182,10 +173,10 @@ $(document).ready(function () {
                 viewData.items.forEach((item, index) => {
                     const row = `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${String(item.item_name ?? '')}</td>
-                    <td>${String(item.product_service ?? '')}</td>
-                    <td>${String(item.category_name ?? '')}</td>
+                    <td>${item.transaction_itemsid}</td>
+                    <td>${String(item.item_name.toUcwords() ?? '')}</td>
+                    <td>${String(item.itemtype.toUcwords() ?? '')}</td>
+                    <td>${String(item.category_name.toUcwords() ?? '')}</td>
                     <td>${item.quantity ?? 0}</td>
                     <td>${Number(item.unit_price ?? 0).toLocaleString('en-GH', {
                         style: 'currency',
@@ -240,11 +231,6 @@ $(document).ready(function () {
                     field: 'datetime',
                     title: 'Date',
                     template: row => row.datetime?.fullDate?.() || ''
-                },
-                {
-                    field: 'merchant_full_name',
-                    title: 'Merchant',
-                    template: row => `${row.merchant_full_name?.toUcwords?.() || ''}`
                 },
                 {
                     field: 'amount',
