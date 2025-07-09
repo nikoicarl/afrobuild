@@ -137,20 +137,19 @@ $(document).ready(function () {
             viewModal.find('.afrobuild_transaction_view_product').val(name);
 
             // Text fields
-            viewModal.find('.afrobuild_view_product').text(name).toUcwords?.();
             viewModal.find('.afrobuild_view_reason').text(viewData?.message.toUcwords?.() || 'N/A');
 
             // Category
             viewModal.find('.afrobuild_view_category').text(viewData?.category_name?.toUcwords?.() || 'N/A');
 
             // Customer
-            viewModal.find('.afrobuild_view_customer').text(viewData?.full_name?.toUcwords?.() || 'N/A');
+            viewModal.find('.afrobuild_view_customer').text(viewData?.customer_full_name?.toUcwords?.() || 'N/A');
 
             // Date
             viewModal.find('.afrobuild_view_date').text(viewData?.datetime?.fullDate?.() || 'N/A');
 
             // Merchant
-            viewModal.find('.afrobuild_view_merchant').text(viewData?.merchant_name?.toUcwords?.() || 'N/A');
+            viewModal.find('.afrobuild_view_merchant').text(viewData?.merchant_full_name?.toUcwords?.() || 'N/A');
 
             // Amount
             viewModal.find('.afrobuild_view_amount').text(
@@ -161,7 +160,7 @@ $(document).ready(function () {
             );
 
             // Status badge
-            const status = (viewData?.transaction_status || 'unknown').toLowerCase();
+            const status = (viewData?.status || 'unknown').toLowerCase();
             const label = status.charAt(0).toUpperCase() + status.slice(1);
             const badgeMap = {
                 active: 'success',
@@ -175,8 +174,38 @@ $(document).ready(function () {
             const statusBadge = `<span class="badge text-bg-${badgeClass}">${label}</span>`;
             viewModal.find('.afrobuild_view_status').html(statusBadge);
 
+            // Render Items Table
+            const itemsTableBody = viewModal.find('.afrobuild_view_items_table_body');
+            itemsTableBody.empty();
+
+            if (Array.isArray(viewData?.items) && viewData.items.length > 0) {
+                viewData.items.forEach((item, index) => {
+                    const row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${String(item.item_name ?? '')}</td>
+                    <td>${String(item.product_service ?? '')}</td>
+                    <td>${String(item.category_name ?? '')}</td>
+                    <td>${item.quantity ?? 0}</td>
+                    <td>${Number(item.unit_price ?? 0).toLocaleString('en-GH', {
+                        style: 'currency',
+                        currency: 'GHS'
+                    })}</td>
+                    <td>${Number(item.subtotal ?? 0).toLocaleString('en-GH', {
+                        style: 'currency',
+                        currency: 'GHS'
+                    })}</td>
+                </tr>
+            `;
+                    itemsTableBody.append(row);
+                });
+            } else {
+                itemsTableBody.append(`<tr><td colspan="7" class="text-center">No items found</td></tr>`);
+            }
+
             viewModal.trigger('click');
-        } else {
+        }
+        else {
             $('.afrobuild_transaction_hidden_action').val('');
             $('.afrobuild_transaction_hiddenid').val('');
         }
@@ -184,6 +213,7 @@ $(document).ready(function () {
 
     // Render DataTable
     function renderTransactionDataTable(data) {
+        console.log(data);
         reCreateMdataTable('afrobuild_transaction_data_table', 'afrobuild_transaction_data_table_div');
 
         $('.afrobuild_transaction_data_table').mDatatable({
@@ -202,44 +232,33 @@ $(document).ready(function () {
                     template: row => `${row.transactionid}`
                 },
                 {
-                    field: 'item_name',
-                    title: 'Product/Service',
-                    template: row => `${row.item_name?.toUcwords?.() || ''}`
-                },
-                {
-                    field: 'category',
-                    title: 'Category',
-                    template: row => `${row.category_name?.toUcwords?.() || ''}`
-                },
-                {
-                    field: 'full_name',
+                    field: 'customer_full_name',
                     title: 'Customer Name',
-                    template: row => `${row.full_name?.toUcwords?.() || ''}`
+                    template: row => `${row.customer_full_name?.toUcwords?.() || ''}`
                 },
                 {
                     field: 'datetime',
                     title: 'Date',
-                    template: row => row.datetime?.fullDate()
+                    template: row => row.datetime?.fullDate?.() || ''
                 },
                 {
-                    field: 'merchant_name',
+                    field: 'merchant_full_name',
                     title: 'Merchant',
-                    template: row => `${row.merchant_name?.toUcwords?.() || ''}`
+                    template: row => `${row.merchant_full_name?.toUcwords?.() || ''}`
                 },
                 {
                     field: 'amount',
                     title: 'Amount',
-                    template: row =>
-                        `${Number(row.amount).toLocaleString('en-GH', {
-                            style: 'currency',
-                            currency: 'GHS'
-                        })}`
+                    template: row => `${Number(row.amount).toLocaleString('en-GH', {
+                        style: 'currency',
+                        currency: 'GHS'
+                    })}`
                 },
                 {
-                    field: 'transaction_status',
+                    field: 'status',
                     title: 'Status',
                     template: row => {
-                        const status = (row.transaction_status || '').toLowerCase();
+                        const status = (row.status || '').toLowerCase();
                         const label = status.charAt(0).toUpperCase() + status.slice(1);
                         const badgeMap = {
                             active: 'success',
@@ -256,11 +275,11 @@ $(document).ready(function () {
                 {
                     field: 'action',
                     title: 'Action',
+                    sortable: false,
                     template: row => {
                         const dataEncoded = encodeURIComponent(JSON.stringify(row));
-                        const status = row.transaction_status?.toLowerCase?.();
+                        const status = row.status?.toLowerCase?.();
                         const transactionId = row.transactionid;
-                        const itemName = row.item_name?.toUcwords?.() || '';
                         const actions = [];
 
                         if (status === 'pending' || status === 'active') {
@@ -268,16 +287,14 @@ $(document).ready(function () {
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
                                data-getid="${transactionId}"
-                               data-getname="mark_completed"
-                               data-getdata="${itemName}">
+                               data-getname="mark_completed">
                                 <i class="icon-checkmark"></i> Mark as Completed
                             </a>`);
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
                                data-getid="${transactionId}"
-                               data-getname="mark_cancelled"
-                               data-getdata="${itemName}">
+                               data-getname="mark_cancelled">
                                 <i class="icon-cross2"></i> Cancel Transaction
                             </a>`);
                         }
@@ -287,8 +304,7 @@ $(document).ready(function () {
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
                                data-getid="${transactionId}"
-                               data-getname="reactivate_transaction"
-                               data-getdata="${itemName}">
+                               data-getname="reactivate_transaction">
                                 <i class="icon-redo2"></i> Reactivate
                             </a>`);
                         }
@@ -298,8 +314,7 @@ $(document).ready(function () {
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
                                data-getid="${transactionId}"
-                               data-getname="flag_transaction"
-                               data-getdata="${itemName}">
+                               data-getname="flag_transaction">
                                 <i class="icon-flag7"></i> Flag Transaction
                             </a>`);
                         }
@@ -309,23 +324,20 @@ $(document).ready(function () {
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
                                data-getid="${transactionId}"
-                               data-getname="mark_pending"
-                               data-getdata="${itemName}">
+                               data-getname="mark_pending">
                                 <i class="icon-hour-glass"></i> Mark as Pending
                             </a>`);
                         }
 
-                        if (status === 'flagged' || status === 'completed') {
-                            actions.push(`
-                            <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                               href="#"
-                               data-getid="${transactionId}"
-                               data-getname="view_transaction"
-                               data-getdata="${itemName}"
-                               data-viewdata="${dataEncoded}">
-                                <i class="icon-file-eye"></i> View
-                            </a>`);
-                        }
+                        // View action to show transaction details/items
+                        actions.push(`
+                        <a class="afrobuild_transaction_table_edit_btn dropdown-item"
+                           href="#"
+                           data-getid="${transactionId}"
+                           data-getname="view_transaction"
+                           data-viewdata="${dataEncoded}">
+                            <i class="icon-file-eye"></i> View
+                        </a>`);
 
                         return `
                         <div class="dropdown">

@@ -7,7 +7,7 @@ const Merchant = require('../models/MerchantModel');
 const Vendor = require('../models/VendorModel');
 const Category = require('../models/CategoryModel');
 const Session = require('../models/SessionModel');
-const ViewModel = require('../models/ViewModel');
+const Transaction = require('../models/TransactionModel');
 const getSessionIDs = require('./getSessionIDs');
 const md5 = require('md5');
 const GeneralFunction = require('../models/GeneralFunctionModel');
@@ -59,12 +59,12 @@ const tableConfigs = {
         columns: ['inactive']
     },
     transaction_table: {
-        model: ViewModel,
-        method: 'getGeneral',
+        model: Transaction,
+        method: 'getAllTransactionsWithItems', // use your custom method here
         permissions: ['view_transaction'],
-        sql: '1=1 ORDER BY datetime DESC', // valid WHERE clause
-        columns: [], // Add column definitions if needed
-        isViewModel: true
+        sql: '',    // no need for SQL filtering inside the view; your method fetches everything
+        columns: [], // no columns needed for this method
+        isViewModel: false // not a simple ViewModel anymore, custom logic
     },
     activity_table: {
         model: Session,
@@ -140,25 +140,22 @@ module.exports = (socket, Database) => {
             const ModelInstance = new config.model(Database);
 
             let data;
-            if (config.isViewModel && config.method && typeof ModelInstance[config.method] === 'function') {
-                data = await ModelInstance[config.method]({
-                    table: 'transaction_view',
-                    sql,
-                    columns
-                });
-            } else if (config.method && typeof ModelInstance[config.method] === 'function') {
-                data = await ModelInstance[config.method]({
-                    sql,
-                    columns
-                });
+            if (config.method && typeof ModelInstance[config.method] === 'function') {
+                // Check if method expects parameters or not
+                const methodFn = ModelInstance[config.method];
+                if (methodFn.length === 0) {
+                    // Method takes no params
+                    data = await methodFn.call(ModelInstance);
+                } else {
+                    // Method expects {sql, columns}
+                    data = await methodFn.call(ModelInstance, { sql, columns });
+                }
             } else if (typeof ModelInstance.preparedFetch === 'function') {
-                data = await ModelInstance.preparedFetch({
-                    sql,
-                    columns
-                });
+                data = await ModelInstance.preparedFetch({ sql, columns });
             } else {
                 throw new Error(`No valid method found for ${param}`);
             }
+
 
             if (!Array.isArray(data)) {
                 return socket.emit(`${melody1}_${param}`, {

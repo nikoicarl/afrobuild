@@ -22,7 +22,7 @@ class TransactionItem {
                 product_service BIGINT,
                 itemtype VARCHAR(50),
                 category BIGINT,
-                name VARCHAR(255) UNIQUE,
+                name VARCHAR(255) ,
                 price DECIMAL(10,2),
                 quantity INT,
                 subtotal DECIMAL(10,2)

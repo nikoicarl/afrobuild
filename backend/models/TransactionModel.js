@@ -125,6 +125,64 @@ class Transaction {
             return 0;
         }
     }
+
+    async getAllTransactionsWithItems() {
+        try {
+            const sql = `
+            SELECT * FROM transaction_view
+            ORDER BY datetime DESC
+        `;
+
+            const rows = await this.Database.setupConnection({ sql, columns: [] }, 'object');
+
+            if (!Array.isArray(rows) || rows.length === 0) return [];
+
+            // Group by transactionid
+            const grouped = {};
+
+            for (const row of rows) {
+                const tid = row.transactionid;
+
+                if (!grouped[tid]) {
+                    grouped[tid] = {
+                        transactionid: row.transactionid,
+                        userid: row.userid,
+                        amount: row.amount,
+                        message: row.message,
+                        datetime: row.datetime,
+                        status: row.status,
+                        customer_full_name: row.customer_first_name && row.customer_last_name
+                            ? `${row.customer_first_name} ${row.customer_last_name}`
+                            : '',
+                        merchant_full_name: row.merchant_first_name && row.merchant_last_name
+                            ? `${row.merchant_first_name} ${row.merchant_last_name}`
+                            : '',
+                        items: [],
+                    };
+                }
+
+                if (row.transaction_itemsid) {
+                    grouped[tid].items.push({
+                        transaction_itemsid: row.transaction_itemsid,
+                        itemtype: row.itemtype,
+                        product_service: row.product_service,
+                        item_name: row.item_name,
+                        category: row.category,
+                        category_name: row.category_name,
+                        quantity: row.quantity,
+                        unit_price: row.unit_price,
+                        subtotal: row.subtotal,
+                    });
+                }
+            }
+
+            return Object.values(grouped);
+        } catch (error) {
+            console.error('[getAllTransactionsWithItems Error]:', error);
+            return [];
+        }
+    }
+
 }
 
 module.exports = Transaction;

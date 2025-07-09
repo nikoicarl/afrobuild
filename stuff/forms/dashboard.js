@@ -145,17 +145,6 @@ function ViewModal() {
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Product / Service:</label>
-                                <p class="form-control-plaintext afrobuild_view_product"></p>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Category:</label>
-                                <p class="form-control-plaintext afrobuild_view_category"></p>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Customer Name:</label>
                                 <p class="form-control-plaintext afrobuild_view_customer"></p>
                             </div>
@@ -177,14 +166,12 @@ function ViewModal() {
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Message:</label>
                                 <p class="form-control-plaintext afrobuild_view_reason"></p>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-12 mb-2">
+                            <div class="col-md-6 mb-2">
                                 <label class="form-label fw-bold">Status:</label>
                                 <p class="form-control-plaintext afrobuild_view_status"></p>
                             </div>

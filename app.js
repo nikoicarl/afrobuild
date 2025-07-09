@@ -86,6 +86,17 @@ async function startServer() {
         const Database = new DatabaseModel();
         await Database.createConnection();
         console.log('Database connected successfully');
+        // Create transaction_view if it doesn't exist
+        const ViewModel = require('./backend/models/ViewModel');
+        const viewModel = new ViewModel(Database);
+        const viewStatus = await viewModel.viewChecker('transaction_view');
+
+        if (viewStatus) {
+            console.log('✅ transaction_view checked/created.');
+        } else {
+            console.warn('⚠️ Failed to create transaction_view.');
+        }
+
 
         // Register routers
         homeRouter(app, Database);
@@ -113,7 +124,7 @@ async function startServer() {
                 PrivilegeController(socket, Database);
                 DropdownController(socket, Database);
                 dashboardFetchController(socket, Database);
-                reportController(socket, Database); 
+                reportController(socket, Database);
             } catch (err) {
                 console.error('Error in socket controller:', err);
             }

@@ -124,6 +124,14 @@ module.exports = (socket, Database) => {
                 if (!insertProviderRole.affectedRows) throw new Error('Failed to insert service provider role');
 
 
+                // Insert customer role
+                const customerRoleID = gf.getTimeStamp();
+                const insertCustomerRole = await RoleModel.insertTable([
+                    customerRoleID, 'Customer', 'Customer', gf.getDateTime(), 'active'
+                ]);
+                if (!insertCustomerRole.affectedRows) throw new Error('Failed to insert customer role');
+
+
                 // Insert categories
                 const categories = [
                     ['Construction', 'Building materials and contractors', 'active'],
