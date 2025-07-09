@@ -204,10 +204,9 @@ $(document).ready(function () {
 
     // Render DataTable
     function renderTransactionDataTable(data) {
-        console.log(data);
         reCreateMdataTable('afrobuild_transaction_data_table', 'afrobuild_transaction_data_table_div');
 
-        $('.afrobuild_transaction_data_table').mDatatable({
+        const datatable = $('.afrobuild_transaction_data_table').mDatatable({
             data: {
                 type: 'local',
                 source: data,
