@@ -127,7 +127,7 @@ module.exports = (socket, Database) => {
                 // Insert customer role
                 const customerRoleID = gf.getTimeStamp();
                 const insertCustomerRole = await RoleModel.insertTable([
-                    customerRoleID, 'Customer', 'Customer', gf.getDateTime(), 'active'
+                    customerRoleID, 'Customer', 'Customer', gf.getDateTime(), 'customer'
                 ]);
                 if (!insertCustomerRole.affectedRows) throw new Error('Failed to insert customer role');
 
