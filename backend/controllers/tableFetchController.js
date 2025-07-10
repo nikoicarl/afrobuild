@@ -141,20 +141,28 @@ module.exports = (socket, Database) => {
 
             let data;
             if (config.method && typeof ModelInstance[config.method] === 'function') {
-                // Check if method expects parameters or not
-                const methodFn = ModelInstance[config.method];
-                if (methodFn.length === 0) {
-                    // Method takes no params
-                    data = await methodFn.call(ModelInstance);
-                } else {
-                    // Method expects {sql, columns}
-                    data = await methodFn.call(ModelInstance, { sql, columns });
+                if (param === 'transaction_table') {
+                    if (roleName === 'admin') {
+                        data = await ModelInstance[config.method](); // No params
+                    } else {
+                        data = await ModelInstance[config.method]({ userid }); // Only pass userid
+                    }
+                }
+                else {
+                    // existing logic
+                    const methodFn = ModelInstance[config.method];
+                    if (methodFn.length === 0) {
+                        data = await methodFn.call(ModelInstance);
+                    } else {
+                        data = await methodFn.call(ModelInstance, { sql, columns });
+                    }
                 }
             } else if (typeof ModelInstance.preparedFetch === 'function') {
                 data = await ModelInstance.preparedFetch({ sql, columns });
             } else {
                 throw new Error(`No valid method found for ${param}`);
             }
+
 
 
             if (!Array.isArray(data)) {

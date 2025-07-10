@@ -28,7 +28,7 @@ class TransactionItem {
                 subtotal DECIMAL(10,2)
             `,
             foreignKeyStatement: `
-                FOREIGN KEY (transactionid) REFERENCES transaction(transactionid) ON DELETE CASCADE
+                ADD FOREIGN KEY (transactionid) REFERENCES transaction(transactionid) ON DELETE CASCADE
             `,
             alterTableStatement: []
         });

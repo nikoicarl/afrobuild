@@ -1,5 +1,6 @@
 $(document).ready(function () {
     const privilege = JSON.parse($('.hidden_privilege_data').val());
+    const hasPrivilege = key => privilege?.afrobuild?.[key] === 'yes';
     const dashboardDisplay = $('#afrobuild_dashboard_page_form_display');
 
     dashboardDisplay.empty();
@@ -206,7 +207,7 @@ $(document).ready(function () {
     function renderTransactionDataTable(data) {
         reCreateMdataTable('afrobuild_transaction_data_table', 'afrobuild_transaction_data_table_div');
 
-        const datatable = $('.afrobuild_transaction_data_table').mDatatable({
+        $('.afrobuild_transaction_data_table').mDatatable({
             data: {
                 type: 'local',
                 source: data,
@@ -267,7 +268,7 @@ $(document).ready(function () {
                         const transactionId = row.transactionid;
                         const actions = [];
 
-                        if (status === 'pending' || status === 'active') {
+                        if (hasPrivilege('mark_completed_transaction') && (status === 'pending' || status === 'active')) {
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
@@ -275,6 +276,9 @@ $(document).ready(function () {
                                data-getname="mark_completed">
                                 <i class="icon-checkmark"></i> Mark as Completed
                             </a>`);
+                        }
+
+                        if (hasPrivilege('cancel_transaction') && (status === 'pending' || status === 'active')) {
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
@@ -284,7 +288,7 @@ $(document).ready(function () {
                             </a>`);
                         }
 
-                        if (status === 'cancelled') {
+                        if (hasPrivilege('reactivate_transaction') && status === 'cancelled') {
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
@@ -294,7 +298,7 @@ $(document).ready(function () {
                             </a>`);
                         }
 
-                        if (['cancelled', 'pending', 'active'].includes(status)) {
+                        if (hasPrivilege('flag_transaction') && ['cancelled', 'pending', 'active'].includes(status)) {
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
@@ -304,7 +308,7 @@ $(document).ready(function () {
                             </a>`);
                         }
 
-                        if (status === 'active') {
+                        if (hasPrivilege('mark_completed_transaction') && status === 'active') {
                             actions.push(`
                             <a class="afrobuild_transaction_table_edit_btn dropdown-item"
                                href="#"
@@ -314,15 +318,16 @@ $(document).ready(function () {
                             </a>`);
                         }
 
-                        // View action to show transaction details/items
                         actions.push(`
                         <a class="afrobuild_transaction_table_edit_btn dropdown-item"
-                           href="#"
-                           data-getid="${transactionId}"
-                           data-getname="view_transaction"
-                           data-viewdata="${dataEncoded}">
+                            href="#"
+                            data-getid="${transactionId}"
+                            data-getname="view_transaction"
+                            data-viewdata="${dataEncoded}">
                             <i class="icon-file-eye"></i> View
                         </a>`);
+
+                        if (actions.length === 0) return '';
 
                         return `
                         <div class="dropdown">

@@ -33,7 +33,7 @@ class User {
                 sessionid BIGINT(100)
             `,
             foreignKeyStatement: `
-                FOREIGN KEY (sessionid) REFERENCES session(sessionid)
+                ADD FOREIGN KEY (sessionid) REFERENCES session(sessionid)
             `,
             alterTableStatement: []
         });

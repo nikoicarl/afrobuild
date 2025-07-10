@@ -24,7 +24,7 @@ class Transaction {
                 status VARCHAR(50)
             `,
             foreignKeyStatement: '',
-            alterTableStatement: ['message TEXT'],
+            alterTableStatement: [],
         });
 
         return await CreateUpdateTable.checkTableExistence();
@@ -126,18 +126,23 @@ class Transaction {
         }
     }
 
-    async getAllTransactionsWithItems() {
-        try {
-            const sql = `
-            SELECT * FROM transaction_view
-            ORDER BY datetime DESC
-        `;
+    async getAllTransactionsWithItems({ userid, role } = {}) {
 
-            const rows = await this.Database.setupConnection({ sql, columns: [] }, 'object');
+        try {
+            let sql = `SELECT * FROM transaction_view`;
+            let columns = [];
+
+            if (role !== 'admin' && userid) {
+                sql += ` WHERE userid = ?`;
+                columns.push(userid);
+            }
+
+            sql += ` ORDER BY datetime DESC`;
+
+            const rows = await this.Database.setupConnection({ sql, columns }, 'object');
 
             if (!Array.isArray(rows) || rows.length === 0) return [];
 
-            // Group by transactionid
             const grouped = {};
 
             for (const row of rows) {
@@ -177,6 +182,7 @@ class Transaction {
             }
 
             return Object.values(grouped);
+
         } catch (error) {
             console.error('[getAllTransactionsWithItems Error]:', error);
             return [];
