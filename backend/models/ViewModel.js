@@ -76,6 +76,7 @@ class ViewModel {
                 t.userid,
                 t.amount,
                 t.message,
+                t.payment_method,
                 t.datetime,
                 t.status,
 

@@ -143,6 +143,11 @@ $(document).ready(function () {
             // Date
             viewModal.find('.afrobuild_view_date').text(viewData?.datetime?.fullDate?.() || 'N/A');
 
+            // Payment Method
+            viewModal.find('.afrobuild_view_payment_method').text(
+                viewData?.payment_method?.toUcwords?.() || 'N/A'
+            );
+
             // Amount
             viewModal.find('.afrobuild_view_amount').text(
                 Number(viewData?.amount || 0).toLocaleString('en-GH', {

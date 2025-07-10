@@ -170,6 +170,10 @@ function ViewModal() {
 
                     <div class="row">
                         <div class="col-md-6 mb-2">
+                            <label class="form-label fw-bold">Payment Method:</label>
+                            <p class="form-control-plaintext afrobuild_view_payment_method"></p>
+                        </div>
+                        <div class="col-md-6 mb-2">
                             <label class="form-label fw-bold">Status:</label>
                             <p class="form-control-plaintext afrobuild_view_status"></p>
                         </div>

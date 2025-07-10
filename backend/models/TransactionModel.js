@@ -6,7 +6,7 @@ class Transaction {
 
         this.tableName = 'transaction';
         this.columnsList = [
-            'transactionid', 'userid', 'amount', 'message', 'datetime', 'status'
+            'transactionid', 'userid', 'amount', 'message', 'payment_method', 'datetime', 'status'
         ];
 
         this.createTable();
@@ -20,6 +20,7 @@ class Transaction {
                 userid BIGINT(100),
                 amount DECIMAL(10, 2),
                 message TEXT,
+                payment_method VARCHAR(255),
                 datetime DATETIME,
                 status VARCHAR(50)
             `,
@@ -154,6 +155,7 @@ class Transaction {
                         userid: row.userid,
                         amount: row.amount,
                         message: row.message,
+                        payment_method: row.payment_method,
                         datetime: row.datetime,
                         status: row.status,
                         customer_full_name: row.customer_first_name && row.customer_last_name
